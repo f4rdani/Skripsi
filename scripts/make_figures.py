@@ -263,7 +263,7 @@ def fig_1_2_diagram_masalah():
         ax,
         (1.5, 2.6),
         (7.0, 1.0),
-        "Solusi: Post-Training Quantization (PTQ) GGUF k-quants\n(Q3_K_M / Q4_K_M / Q5_K_M) pada SLM LFM2-1.2B & Qwen2.5-1.5B-Instruct",
+        "Solusi: Post-Training Quantization (PTQ) GGUF k-quants\n(Q3_K_M / Q4_K_M / Q5_K_M) pada SLM LFM2-1.2B & Qwen3.5-2B",
         PALETTE["lightorange"],
         PALETTE["orange"],
         10,
@@ -495,7 +495,7 @@ def fig_3_2_pipeline_eksperimen():
     ax.axis("off")
     ax.set_title("Gambar 3.2 Pipeline Eksperimen On-Device pada Tecno Pova 5")
 
-    box(ax, (0.3, 5.0), (3.0, 1.0), "Sumber Bobot\nHugging Face\n(LFM2-1.2B, Qwen2.5-1.5B)", PALETTE["lightgray"], PALETTE["gray"], 9.5, "bold")
+    box(ax, (0.3, 5.0), (3.0, 1.0), "Sumber Bobot\nHugging Face\n(LFM2-1.2B, Qwen3.5-2B)", PALETTE["lightgray"], PALETTE["gray"], 9.5, "bold")
     box(ax, (4.0, 5.0), (3.0, 1.0), "Konversi & Kuantisasi\nllama.cpp convert.py\n+ quantize", PALETTE["lightorange"], PALETTE["orange"], 10, "bold")
     box(ax, (7.7, 5.0), (4.0, 1.0), "Artefak GGUF\nFP16 / Q5_K_M / Q4_K_M / Q3_K_M\n(8 file)", PALETTE["lightpurple"], PALETTE["purple"], 9.5, "bold")
     arrow(ax, (3.3, 5.5), (4.0, 5.5))
@@ -565,7 +565,7 @@ def fig_3_4_alur_3d_eval():
     ax.axis("off")
     ax.set_title("Gambar 3.4 Three-Dimensional Evaluation Framework (Jin et al., 2024)")
 
-    box(ax, (3.4, 4.7), (3.2, 1.0), "Model terkuantisasi\n(LFM2 / Qwen2.5 × Q3/Q4/Q5/FP16)", PALETTE["lightblue"], PALETTE["blue"], 10, "bold")
+    box(ax, (3.4, 4.7), (3.2, 1.0), "Model terkuantisasi\n(LFM2 / Qwen3.5 × Q3/Q4/Q5/FP16)", PALETTE["lightblue"], PALETTE["blue"], 10, "bold")
 
     box(ax, (0.3, 2.6), (3.0, 1.4), "Knowledge & Capacity\nMMLU (general)\nGSM8k (math)\nHumanEval (code)", PALETTE["lightgreen"], PALETTE["green"], 10, "bold")
     box(ax, (3.5, 2.6), (3.0, 1.4), "Alignment\nPerplexity\n(WikiText-2)", PALETTE["lightorange"], PALETTE["orange"], 10, "bold")

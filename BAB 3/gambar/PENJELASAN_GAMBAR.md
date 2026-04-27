@@ -68,7 +68,7 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 **Maksud / pesan utama.** Mengelompokkan metrik dari Gambar 3.3 ke dalam **tiga dimensi evaluasi** sesuai standar internasional terbaru untuk LLM terkuantisasi (Jin et al., 2024). Pembaca tahu mengapa pemilihan metrik (MMLU, GSM8k, HumanEval, PPL, file size, RAM, TPS) bukan acak—melainkan refleksi dari knowledge & capacity (apa yang model "tahu"), alignment (seberapa "lancar" output), dan efficiency (seberapa hemat resource).
 
 **Komponen yang ditampilkan.**
-- Atas: model terkuantisasi (LFM2 / Qwen2.5 × Q3/Q4/Q5/FP16).
+- Atas: model terkuantisasi (LFM2 / Qwen3.5 × Q3/Q4/Q5/FP16).
 - Tiga dimensi sejajar:
   - Knowledge & Capacity (hijau) → MMLU, GSM8k, HumanEval.
   - Alignment (oranye) → Perplexity WikiText-2.

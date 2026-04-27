@@ -7,17 +7,17 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 ## Gambar 2.1 — `2.1_arsitektur_transformer.png`
 **Judul lengkap:** Arsitektur Transformer Decoder (basis SLM modern).
 
-**Maksud / pesan utama.** Menampilkan blok-blok internal sebuah decoder-only transformer—yang menjadi cetak biru hampir seluruh SLM modern, termasuk LFM2 dan Qwen2.5—agar pembaca mengetahui **di mana** kuantisasi akan diaplikasikan (lapisan attention dan FFN).
+**Maksud / pesan utama.** Menampilkan blok-blok internal sebuah decoder-only transformer—yang menjadi cetak biru hampir seluruh SLM modern, termasuk LFM2 dan Qwen3.5—agar pembaca mengetahui **di mana** kuantisasi akan diaplikasikan (lapisan attention dan FFN).
 
 **Komponen yang ditampilkan (dari atas ke bawah).**
 1. Token + Positional Embedding — input ID token + informasi posisi.
 2. RMSNorm — normalisasi sebelum attention.
-3. Multi-Head Grouped-Query Attention (GQA) — mekanisme attention efisien-memori yang dipakai di LFM2/Qwen2.5.
+3. Multi-Head Grouped-Query Attention (GQA) — mekanisme attention efisien-memori yang dipakai di LFM2/Qwen3.5.
 4. Residual + (skip connection).
 5. RMSNorm — normalisasi sebelum FFN.
 6. SwiGLU FFN — feed-forward dengan aktivasi SwiGLU.
 7. Residual +.
-8. ×N decoder blocks — pengulangan blok 1–7 sebanyak N kali (LFM2-1.2B ≈ 16 blok, Qwen2.5-1.5B ≈ 28 blok).
+8. ×N decoder blocks — pengulangan blok 1–7 sebanyak N kali (LFM2-1.2B ≈ 16 blok, Qwen3.5-2B ≈ 28 blok).
 9. Final RMSNorm.
 10. Linear → Softmax (vocab logits) — keluaran berupa distribusi probabilitas token berikutnya.
 

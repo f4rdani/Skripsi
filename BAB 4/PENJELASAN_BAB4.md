@@ -33,7 +33,7 @@ Placeholder radar dan Pareto sudah saya generate di `gambar/4.X_radar_placeholde
 
 ## Pola paragraf pembahasan yang baik
 Pola **CLAIM → EVIDENCE → CONTEXT → IMPLICATION**:
-> Q4_K_M LFM2-1.2B mereduksi storage 65,8% dibanding FP16 (Tabel 4.1), sementara akurasi MMLU hanya turun 1,2 poin (Tabel 4.3). Reduksi serupa juga teramati pada Qwen2.5-1.5B-Instruct (66,1%, MMLU −1,4). Hasil ini konsisten dengan klaim Frantar et al. (2023) dan Jin et al. (2024) bahwa kuantisasi 4-bit dapat menjaga kualitas mendekati FP16 (≤ 5%). Implikasinya, Q4_K_M cocok dipakai sebagai default deploy SLM 1B–2B pada smartphone Android RAM 8 GB.
+> Q4_K_M LFM2-1.2B mereduksi storage 65,8% dibanding FP16 (Tabel 4.1), sementara akurasi MMLU hanya turun 1,2 poin (Tabel 4.3). Reduksi serupa juga teramati pada Qwen3.5-2B (66,1%, MMLU −1,4). Hasil ini konsisten dengan klaim Frantar et al. (2023) dan Jin et al. (2024) bahwa kuantisasi 4-bit dapat menjaga kualitas mendekati FP16 (≤ 5%). Implikasinya, Q4_K_M cocok dipakai sebagai default deploy SLM 1B–2B pada smartphone Android RAM 8 GB.
 
 ## Catatan kualitas akademik
 - Setiap angka **wajib** punya sumber tabel. Hindari angka melayang di paragraf tanpa rujukan tabel.

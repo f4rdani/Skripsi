@@ -27,7 +27,7 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 
 **Komponen yang ditampilkan.**
 - Tiga kotak merah di atas: Masalah 1 (cloud → privasi), Masalah 2 (RAM 8 GB → OOM), Masalah 3 (kompresi ekstrem → degradasi).
-- Kotak oranye di tengah: Solusi PTQ GGUF k-quants Q3_K_M / Q4_K_M / Q5_K_M pada SLM LFM2-1.2B & Qwen2.5-1.5B-Instruct.
+- Kotak oranye di tengah: Solusi PTQ GGUF k-quants Q3_K_M / Q4_K_M / Q5_K_M pada SLM LFM2-1.2B & Qwen3.5-2B.
 - Kotak hijau (kiri bawah): outcome teknis—file size turun > 60%, peak RAM aman < 8 GB, TPS naik di CPU ARM.
 - Kotak ungu (kanan bawah): outcome akademik—validasi 3D Evaluation Framework (Jin et al., 2024), pemetaan Pareto-optimal varian.
 

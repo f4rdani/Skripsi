@@ -47,7 +47,7 @@ Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `j
 - **2.3.1 Universitas Bina Sarana Informatika (BSI)** — institusi tempat skripsi disusun.
 - **2.3.2 Smartphone Tecno Pova 5** — perangkat eksperimen.
 - **2.3.3 LFM2-1.2B** — model uji 1.
-- **2.3.4 Qwen2.5-1.5B-Instruct** — model uji 2.
+- **2.3.4 Qwen3.5-2B** — model uji 2.
 - **2.3.5 Termux dan llama.cpp** — runtime utama.
 
 Adaptasi ini lazim dilakukan pada skripsi rekayasa di prodi yang sama, supaya struktur sub-bab tetap mengikuti panduan tetapi konten relevan dengan tema teknis.
