@@ -1,0 +1,82 @@
+Judul Skripsi:
+ANALISIS PERFORMA POST-TRAINING QUANTIZATION (PTQ) PADA SMALL LANGUAGE MODEL UNTUK IMPLEMENTASI EDGE COMPUTING BERBASIS ANDROID
+
+Oleh: [Nama Mahasiswa]
+
+========================================================================
+OUTLINE PENELITIAN SKRIPSI
+========================================================================
+
+BAB I: PENDAHULUAN
+1.1 Latar Belakang
+- Pertumbuhan penggunaan Large Language Models (LLMs) dan Small Language Models (SLMs) di berbagai aplikasi kecerdasan buatan.
+- Tantangan komputasi dan implementasi SLM pada perangkat edge (mobile computing) seperti smartphone Android yang memiliki keterbatasan memori dan penyimpanan.
+- Urgensi optimasi performa model menggunakan Post-Training Quantization (PTQ) agar model berat (FP16) dapat dikompresi ke bit yang lebih rendah (Q5, Q4, Q3) tanpa mengorbankan fungsi kognitif yang signifikan.
+- Alasan pemilihan model LFM 1.2B dan Qwen 3.5 (2B) serta eksekusinya pada perangkat Tecno Pova 5 dengan chipset Helio G99 (8GB RAM). 
+
+1.2 Rumusan Masalah
+1. Seberapa besar efisiensi penyimpanan (storage efficiency) yang didapat dari setiap varian kuantisasi (Q3, Q4, Q5, FP16) pada model LFM 1.2B dan Qwen 3.5 2B?
+2. Bagaimana perbandingan skor akurasi (berdasarkan MMLU, GSM8k, HumanEval) dan nilai perplexity (WikiText-2) yang dipertahankan masing-masing varian?
+3. Berapa besar penggunaan memori (RAM usage) dan seberapa efisien kecepatan inferensinya (Prompt Processing t/s dan Text Generation t/s) di perangkat Helio G99 RAM 8GB?
+4. Dari perbandingan keseluruhan (Trade-off Matrix), manakah varian model, parameter size (B), dan versi kuantisasi (Q) yang paling optimal/terbaik untuk diterapkan pada perangkat HP berkapasitas RAM 8 GB?
+
+1.3 Ruang Lingkup dan Batasan Penelitian
+- Hardware: Penelitian dilakukan murni secara on-device pada perangkat smartphone android Tecno Pova 5 (Mediatek Helio G99, RAM 8GB).
+- Model yang Diuji: LFM 1.2B dan Qwen 3.5 2B.
+- Varian Resolusi/Kuantisasi (PTQ): FP16 (Baseline), Q5, Q4, dan Q3.
+- Metrik Kualitas (Dataset Evaluasi): MMLU (Kemampuan general), GSM8k (Kemampuan logika matematika), HumanEval (Kemampuan coding), yang masing-masing pengujian dibatasi sejumlah 100 sampel data. Serta pengukuran Perplexity (PPL) menggunakan dataset wikitext-2.
+- Parameter Evaluasi Sistem: File Size Penyimpanan, Maksimal Penggunaan RAM, Prompt Processing Speed (t/s), Text Generation Speed (t/s).
+
+1.4 Tujuan Penelitian
+- Mengukur dan membandingkan dampak kompresi terhadap efisiensi penyimpanan SLM.
+- Menentukan batas trade-off kualitas model melalui skor uji akurasi (100 data run) dan angka perplexity.
+- Menganalisa statistik pemrosesan sistem (RAM & Tokens-per-second) secara real-world pada smartphone mid-range.
+- Merekomendasikan standar kuantisasi dan ukuran base model (1.2B vs 2B) terbaik bagi environment Android berkapasitas RAM 8 GB.
+
+BAB II: TINJAUAN PUSTAKA (KAJIAN LITERATUR)
+2.1 Penelitian Terdahulu
+- Membahas dan mencantumkan jurnal referensi yang mengulas kompresi model lokal (seperti LLaMA/Qwen).
+- Membahas penelitian sebelumnya (dari folder `jurnal refrensi`) mengenai metodologi GPTQ/AWQ serta PTQ pada Language Generative Models.
+- Membahas penelitian terkait pengujian inferensi LLM/SLM pada arsitektur Edge dengan resource constraint (Edge Intelligence).
+2.2 Landasan Teori
+- Pengenalan Small Language Model & Arsitektur dasar model LFM serta Qwen.
+- Konsep Post-Training Quantization (Penurunan presisi numerik ke INT4/INT3/dll).
+- Edge Computing dan Spesifikasi Komputasi MediaTek Helio G99.
+- Pengenalan standar benchmarking: MMLU, GSM8k, HumanEval, dan Perplexity (PPL) via wikitext-2.
+
+BAB III: METODOLOGI PENELITIAN
+3.1 Alat dan Bahan Eksperimen
+- Hardware Utama (Smartphone Android RAM 8GB) dan software runtime / eksekutor file format GGUF/inferensi.
+- Model Files (Bobot Model FP16, Q5, Q4, Q3 untuk LFM 1.2B & Qwen 3.5 2B).
+3.2 Skema Pengumpulan Data
+- Proses running otomatis (evaluator script) per sub-dataset 100 soal/prompt.
+- Perekaman log output saat proses benchmark berjalan.
+3.3 Skenario Uji Evaluasi
+- Tahap 1 (Sistem & Alokasi Ruang): Mencatat file size model statis dan peak RAM usage saat model dimuat ke dalam memori.
+- Tahap 2 (Kualitas & Perplexity): Mengeksekusi LFM dan Qwen pada dataset Wikitext-2 untuk metrik PPL, dan dataset evaluasi kognitif (MMLU, GSM8k, HumanEval).
+- Tahap 3 (Hardware Throughput): Monitoring metrics token/second (t/s) pada Prompt Processing dan Generation Task.
+3.4 Metode Analisis Komparatif
+- Menyederhanakan hasil dari pengujian kuantitatif ke dalam diagram Radar/Grafik Batang untuk menentukan zona Pareto-Optimal.
+
+BAB IV: HASIL PENELITIAN DAN PEMBAHASAN
+4.1 Hasil Evaluasi Efisiensi Penyimpanan (Storage Size)
+- Di sini akan dilampirkan tabel & grafik ukuran setiap varian GGUF/bin (Q3 sampai FP16).
+4.2 Hasil Pemantauan Resource Memori (RAM Usage)
+- Analisis tren pemakaian RAM di HP terhadap kelancaran multitasking sisa RAM di ponsel (Out-of-memory avoidance).
+4.3 Perbandingan Kinerja Kognisi dan Logika Model (Akurasi Uji)
+- Rincian hasil ketepatan (benar/salah) model dari MMLU (General), GSM8k (Matematika), dan HumanEval (Code) per 100 sampel.
+- Pembahasan penurunan kualitas degradatif (PPL & akurasi) akibat kuatnya tingkatan kuantisasi.
+4.4 Performa Real-Time Kecepatan Inferensi
+- Visualisasi metrik throughput (t/s) untuk Prompt Processing vs Generation Processing.
+4.5 Diskusi / Analisis Komparatif Keseluruhan (Trade-Off Model & Quantization)
+- Menarik perbandingan utuh antara LFM 1.2B dan Qwen 3.5 2B. 
+- Menganalisa "Kapan sebaiknya pakai Q8/Q5, kapan terpaksa turun ke Q3/Q4".
+
+BAB V: KESIMPULAN DAN SARAN
+5.1 Kesimpulan
+- Jawaban ringkas terkait varian mana (Model jenis apa dengan B berapa, pada ukuran Quantization berapa) yang secara matematis memberikan kombinasi terbaik antara Kecepatan, Hemat RAM, dan Kepintaran, untuk perangkat Android MediaTek Helio G99 dengan RAM terbatas 8 GB.
+5.2 Saran
+- Rekomendasi penggunaan format GGUF / AWQ ke depan untuk para developer yang ingin mendeploy AI asisten di backend aplikasi Android berbasis lokal sepenuhnya.
+
+DAFTAR PUSTAKA
+(Menyusun sitasi dari jurnal referensi yang telah dikumpulkan, minimal mengambil teori kompresi PTQ, SLM architecture, edge-computing intelligence, dan benchmarking parameter).
