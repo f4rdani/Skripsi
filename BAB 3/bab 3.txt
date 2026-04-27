@@ -99,7 +99,7 @@ Tabel 3.4 GQM Matrix Penelitian
 +-------+----------------------------------+---------------------------------------------+
 | Q1    | Storage hemat?                    | M1.1 file size (MB), M1.2 ratio FP16/Qx       |
 | Q2    | Kualitas terjaga?                 | M2.1 PPL WikiText-2, M2.2 MMLU/GSM8k/HumanEval|
-| Q3    | RAM aman & TPS naik?              | M3.1 peak RSS (MB), M3.2 OOM count            |
+| Q3    | RAM aman?                         | M3.1 peak RSS (MB), M3.2 OOM count            |
 | Q4    | Throughput meningkat?             | M4.1 prompt t/s, M4.2 generation t/s          |
 +-------+----------------------------------+---------------------------------------------+
 

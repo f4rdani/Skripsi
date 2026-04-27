@@ -52,7 +52,7 @@ GQM (Basili et al., 1994; Wohlin et al., 2024) adalah kerangka pengukuran empiri
 Reproducibility menjadi standar pelaporan penelitian eksperimen ML modern. NeurIPS Reproducibility Checklist (NeurIPS, 2024) mensyaratkan dilampirkannya: versi model dan hash file, prompt set, hyperparameter, hardware specs (chipset, frekuensi governor, suhu), dan random seed. Selain itu, threats to validity (Wohlin et al., 2024) diklasifikasikan menjadi empat kategori—internal, eksternal, construct, conclusion—yang wajib didiskusikan untuk menunjukkan kelemahan dan batas generalisasi penelitian.
 
 2.2.	Penelitian Terkait
-Tabel 2.1 merangkum sepuluh penelitian terkini (2022–2026) yang menjadi rujukan utama. Seluruh referensi ini juga tersedia pada folder jurnal referensi penulis.
+Tabel 2.1 merangkum dua belas penelitian terkini (2023–2026) yang menjadi rujukan utama. Seluruh referensi ini juga tersedia pada folder jurnal referensi penulis.
 
 Tabel 2.1 Ringkasan Penelitian Terkait
 +----+-----------------------------------+--------+----------------------------------------------------------------+
