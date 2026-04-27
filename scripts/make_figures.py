@@ -444,9 +444,8 @@ def fig_2_4_taxonomy_quantization():
     box(ax, (5.4, 2.6), (2.4, 1.0), "Mixed-precision\nGGUF k-quants\n(llama.cpp)", PALETTE["lightpurple"], PALETTE["purple"], 9, "bold")
     box(ax, (8.0, 2.6), (2.4, 1.0), "NormalFloat 4-bit\nQLoRA\n(Dettmers et al., 2023)", PALETTE["lightpurple"], PALETTE["purple"], 9, "bold")
 
-    for x in [1.4, 4.0, 6.6]:
+    for x in [1.4, 4.0, 6.6, 9.2]:
         arrow(ax, (2.5, 4.0), (x, 3.6))
-    arrow(ax, (8.5, 4.0), (9.2, 3.6))
 
     box(ax, (3.2, 0.6), (4.6, 1.2), "Fokus penelitian ini:\nGGUF k-quants Q3_K_M / Q4_K_M / Q5_K_M\npada CPU ARM (Helio G99)", PALETTE["lightred"], PALETTE["red"], 10, "bold")
     arrow(ax, (6.6, 2.6), (5.5, 1.8))
