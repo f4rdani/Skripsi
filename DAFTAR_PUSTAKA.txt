@@ -1,0 +1,34 @@
+DAFTAR PUSTAKA
+(Format APA edisi ke-7, Mendeley)
+
+Ahmad, A. F., & Safudin, M. (2024). Pengembangan chatbot AI Large Language Model (LLM) untuk layanan informasi dan konsultasi RS Brawijaya. Jurnal Informatika Kaputama (JIK), 1(1), 1–10.
+
+Basili, V. R., Caldiera, G., & Rombach, H. D. (1994). The Goal Question Metric Approach. Encyclopedia of Software Engineering, 2, 528–532.
+
+Dettmers, T., Pagnoni, A., Holtzman, A., & Zettlemoyer, L. (2023). QLoRA: Efficient finetuning of quantized LLMs. arXiv preprint arXiv:2305.14314. https://arxiv.org/abs/2305.14314
+
+Frantar, E., Ashkboos, S., Hoefler, T., & Alistarh, D. (2023). GPTQ: Accurate post-training quantization for generative pre-trained transformers. In International Conference on Learning Representations (ICLR). https://arxiv.org/abs/2210.17323
+
+Gong, Z., Liu, J., Wang, J., Cai, X., Zhao, D., & Yan, R. (2024). What makes quantization for large language models hard? An empirical study from the lens of perturbation. arXiv preprint arXiv:2403.06408. https://arxiv.org/abs/2403.06408
+
+Jin, R., Du, J., Huang, W., Liu, W., Luan, J., Wang, B., & Xiong, D. (2024). A comprehensive evaluation of quantization strategies for large language models. In Findings of the Association for Computational Linguistics: ACL 2024.
+
+Lin, J., Tang, J., Tang, H., Yang, S., Chen, W.-M., Wang, W.-C., Xiao, G., Dang, X., Gan, C., & Han, S. (2024). AWQ: Activation-aware weight quantization for on-device LLM compression and acceleration. In Proceedings of Machine Learning and Systems (MLSys 2024). https://arxiv.org/abs/2306.00978
+
+NeurIPS. (2024). NeurIPS 2024 Reproducibility Checklist. Conference on Neural Information Processing Systems.
+
+Nurohim, G. S., Setyadi, H. A., Fauzi, A., Arianto, D., & Kusumawardhani, V. (2025). Analisis komparatif Large Language Models DeepSeek dan Qwen dalam klasifikasi sentimen ulasan produk berbahasa Indonesia (Laporan Akhir Penelitian Dana Yayasan). Universitas Bina Sarana Informatika.
+
+Ray, P. P., & Pradhan, M. P. (2026). Performance analysis of localised large language models in resource-constrained edge for Python and Rust APIs. Journal of Edge Computing. https://doi.org/10.55056/jec.1047
+
+Sevim, N., Ibrahim, M., & Ekin, S. (2024). Large Language Models (LLMs) assisted wireless network deployment in urban settings. arXiv preprint arXiv:2405.13356. https://arxiv.org/abs/2405.13356
+
+Touvron, H., Lavril, T., Izacard, G., Martinet, X., Lachaux, M.-A., Lacroix, T., Rozière, B., Goyal, N., Hambro, E., Azhar, F., Rodriguez, A., Joulin, A., Grave, E., & Lample, G. (2023). LLaMA: Open and efficient foundation language models. arXiv preprint arXiv:2302.13971. https://arxiv.org/abs/2302.13971
+
+Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł., & Polosukhin, I. (2017). Attention is all you need. In Advances in Neural Information Processing Systems (NeurIPS), 30.
+
+Wohlin, C., Runeson, P., Höst, M., Ohlsson, M. C., Regnell, B., & Wesslén, A. (2024). Experimentation in Software Engineering (2nd ed., revisited). Springer.
+
+Zhan, Z., Zhou, S., Zeng, M., Yu, K., Song, M., Chen, X., Wang, J., Hou, Y., & Zhang, R. (2025). Quantized large language models in biomedical natural language processing: Evaluation and recommendation. arXiv preprint arXiv:2509.04534. https://arxiv.org/abs/2509.04534
+
+Zhang, X., Liu, J., Xiong, Z., Huang, Y., Xie, G., & Zhang, R. (2024). Edge intelligence optimization for large language model inference with batching and quantization. arXiv preprint arXiv:2405.07140. https://arxiv.org/abs/2405.07140

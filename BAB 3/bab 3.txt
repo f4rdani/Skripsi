@@ -1,0 +1,135 @@
+BAB III
+METODOLOGI PENELITIAN
+
+Bab ini menjabarkan metodologi penelitian yang digunakan untuk menjawab perumusan masalah pada Bagian 1.3. Pendekatan yang dipilih adalah penelitian kuantitatif eksperimental dengan kerangka pengukuran Goal–Question–Metric (Basili et al., 1994; Wohlin et al., 2024) yang diperluas dengan Three-Dimensional Evaluation Framework untuk Large Language Model terkuantisasi (Jin et al., 2024). Disiplin pengukuran mengadopsi praktik benchmarking ala MLPerf Inference (warm-up dipisah, run berulang, mean ± standar deviasi) dan dokumentasi reproducibility mengikuti NeurIPS Reproducibility Checklist (NeurIPS, 2024).
+
+3.1.	Tahapan Penelitian
+Penelitian dilaksanakan dalam delapan tahap berurutan sebagaimana diilustrasikan pada Gambar 3.1.
+
+[GAMBAR 3.1] Tahapan penelitian (waterfall eksperimental). Sumber: gambar/3.1_tahapan_penelitian.png
+
+a.	Studi Pustaka. Penelusuran literatur dilakukan pada jurnal bereputasi yang diterbitkan dalam rentang 2020–2026, mencakup metode kuantisasi, evaluasi LLM, edge intelligence, dan arsitektur SLM. Hasil studi pustaka dirangkum di BAB II.
+b.	Perencanaan Goal–Question–Metric (GQM). Tujuan penelitian (Goal) diturunkan menjadi empat pertanyaan riset (Question) sesuai Bagian 1.3, lalu setiap pertanyaan dipetakan ke metrik kuantitatif (Metric) sebagaimana dirinci pada Bagian 3.4 dan diilustrasikan pada Gambar 3.3.
+c.	Persiapan Model dan Lingkungan Eksperimen. Bobot LFM2-1.2B dan Qwen2.5-1.5B-Instruct diunduh dari Hugging Face, dikonversi ke GGUF, dan dikuantisasi ke Q5_K_M, Q4_K_M, dan Q3_K_M menggunakan utilitas llama.cpp quantize. Hasilnya berupa delapan file GGUF (2 model × 4 varian).
+d.	Pengukuran Statik. File size (MB) dicatat dari sistem berkas. Peak RAM dicatat saat model dimuat ke memori namun belum dieksekusi.
+e.	Pengukuran Dinamik. Prompt processing rate dan generation rate diukur menggunakan utilitas llama-bench dengan prompt panjang 512 token dan output 128 token, lima ulangan plus dua warm-up.
+f.	Pengukuran Kualitas. Perplexity dihitung pada dataset WikiText-2 (split test, 4096 token sliding window). Akurasi MMLU, GSM8k, dan HumanEval dihitung pada 100 sampel random per dataset menggunakan evaluator script.
+g.	Analisis Pareto dan Statistik. Hasil seluruh pengukuran diagregasi pada Python (pandas), kemudian dianalisis dengan diagram radar, diagram Pareto, dan uji Wilcoxon signed-rank (α = 0,05) terhadap baseline FP16.
+h.	Pelaporan dan Validasi. Hasil ditulis di BAB IV. Validasi dilakukan dengan re-run subset (10% kondisi) untuk memastikan reprodusibilitas.
+
+3.2.	Instrumen Penelitian
+Instrumen penelitian dikelompokkan ke dalam tiga kategori: hardware, software, dan dataset.
+
+3.2.1.	Hardware
+Tabel 3.1 Spesifikasi Hardware Eksperimen
++----+-----------------------------+--------------------------------------------------+
+| No | Komponen                    | Spesifikasi                                       |
++----+-----------------------------+--------------------------------------------------+
+| 1  | Smartphone                  | Tecno Pova 5 (POVA 5)                             |
+| 2  | SoC                         | MediaTek Helio G99 (TSMC 6 nm)                    |
+| 3  | CPU                         | 2× Cortex-A76 @ 2,2 GHz + 6× Cortex-A55 @ 2,0 GHz |
+| 4  | GPU                         | Mali-G57 MC2                                       |
+| 5  | RAM                         | 8 GB LPDDR4x dual-channel                         |
+| 6  | Storage                     | 256 GB UFS 2.2                                    |
+| 7  | Sistem Operasi              | Android 13 (HiOS 13)                              |
+| 8  | Suhu Ambient                | 27 ± 2 °C                                          |
+| 9  | Kondisi Daya                | Charger terhubung, baterai > 80%                  |
+| 10 | Network                     | Wi-Fi off, mobile data off (eksekusi penuh offline)|
++----+-----------------------------+--------------------------------------------------+
+
+3.2.2.	Software
+Tabel 3.2 Spesifikasi Software Eksperimen
++----+----------------------------+------------------------------------------------+
+| No | Software                   | Versi / Konfigurasi                             |
++----+----------------------------+------------------------------------------------+
+| 1  | Termux                     | versi rilis F-Droid stabil terbaru              |
+| 2  | llama.cpp                  | versi rilis stabil, build CMake + NEON + i8mm   |
+| 3  | Compiler                   | Clang Android NDK r26 (ARMv8-A)                 |
+| 4  | Python                     | 3.11 (Termux pkg)                               |
+| 5  | Python lib analitik        | numpy 2.x, pandas 2.x, scipy 1.x, matplotlib 3.x|
+| 6  | Utilitas observasi         | htop, /proc/meminfo, dumpsys meminfo            |
+| 7  | Hugging Face CLI           | huggingface_hub 0.24+                           |
+| 8  | Manajemen referensi        | Mendeley Desktop (format APA edisi ke-7)        |
++----+----------------------------+------------------------------------------------+
+
+3.2.3.	Model dan Dataset
+Tabel 3.3 Spesifikasi Model dan Dataset Evaluasi
++----+------------------------+-----------+------------------------------------------+
+| No | Model / Dataset        | Parameter | Sumber                                    |
++----+------------------------+-----------+------------------------------------------+
+| 1  | LFM2-1.2B              | 1,2 B     | Liquid AI / Hugging Face                  |
+| 2  | Qwen2.5-1.5B-Instruct  | 1,5 B     | Alibaba Cloud / Hugging Face              |
+| 3  | Varian kuantisasi      | -         | FP16 (baseline), Q5_K_M, Q4_K_M, Q3_K_M   |
+| 4  | WikiText-2             | 4096 ctx  | Hugging Face datasets (test split)        |
+| 5  | MMLU                   | 100 sampel| Hendrycks et al., Hugging Face            |
+| 6  | GSM8k                  | 100 sampel| Cobbe et al., Hugging Face                |
+| 7  | HumanEval              | 100 sampel| Chen et al., OpenAI / Hugging Face        |
++----+------------------------+-----------+------------------------------------------+
+
+Pipeline lengkap dari sumber bobot hingga aggregator hasil ditampilkan pada Gambar 3.2.
+
+[GAMBAR 3.2] Pipeline eksperimen on-device pada Tecno Pova 5. Sumber: gambar/3.2_pipeline_eksperimen.png
+
+3.3.	Metode Pengumpulan Data, Populasi, dan Sample Penelitian
+3.3.1.	Metode Pengumpulan Data
+Pengumpulan data dilakukan melalui tiga metode utama berikut, sesuai panduan BSI.
+a.	Observasi. Observasi dilakukan secara terotomasi melalui System Benchmarking Logging dengan menjalankan llama-bench dan skrip evaluator pada Termux. Tiga sumber log direkam:
+1.	Log sistem: htop dan pembacaan /proc/meminfo setiap 200 ms.
+2.	Log engine: keluaran stdout llama.cpp yang berisi prompt eval rate (t/s), generation rate (t/s), dan PPL.
+3.	Log kualitas: jawaban model pada dataset MMLU/GSM8k/HumanEval, dibandingkan dengan ground truth via skrip evaluator (regex/exact match).
+Seluruh log disimpan dalam format CSV dan diunduh ke laptop peneliti melalui adb pull untuk analisis lebih lanjut.
+b.	Wawancara. Wawancara terstruktur dilakukan secara terbatas dan bersifat opsional terhadap dosen pembimbing teknis sebagai validator metodologi. Wawancara hanya bertujuan memvalidasi rancangan eksperimen dan tidak menjadi sumber data primer.
+c.	Studi Pustaka. Studi pustaka dilakukan dengan mengumpulkan dan mereview jurnal yang dipublikasikan dalam lima tahun terakhir, sebagaimana telah dirangkum pada BAB II. Manajemen referensi memakai Mendeley dengan format APA edisi ke-7.
+
+3.3.2.	Populasi dan Sampel
+Populasi penelitian adalah seluruh kemungkinan kombinasi (model × varian kuantisasi × benchmark × ulangan) yang dapat dijalankan pada perangkat target. Sampel yang diuji adalah:
++	Model: 2 (LFM2-1.2B, Qwen2.5-1.5B-Instruct)
++	Varian: 4 (FP16, Q5_K_M, Q4_K_M, Q3_K_M)
++	Benchmark sistem: file size, peak RAM, prompt t/s, generation t/s
++	Benchmark kualitas: WikiText-2 (PPL), MMLU, GSM8k, HumanEval (100 sampel/benchmark)
++	Ulangan tiap kondisi: 5 run pengukuran + 2 warm-up
+Total run pengukuran efektif = 2 × 4 × 4 × 5 = 160 run sistem dan 2 × 4 × 4 × 1 = 32 run kualitas (kualitas tidak diulang karena hasilnya deterministik dengan temperature 0). Untuk RQ kualitas, jumlah sampel total per kondisi adalah 100 sehingga ukuran sampel per kondisi cukup secara statistik (Cohen's d 0,3 dengan power 0,8 mensyaratkan n ≥ 65).
+
+3.4.	Metode Analisis Data
+Analisis data dilakukan dalam dua jalur paralel: (a) analisis efisiensi, dan (b) analisis kualitas. Keduanya kemudian digabungkan pada analisis Pareto.
+
+3.4.1.	Goal–Question–Metric Matrix
+Matriks GQM memetakan tujuan penelitian ke pertanyaan dan metrik. Skema lengkap GQM yang dipakai disajikan pada Gambar 3.3.
+
+[GAMBAR 3.3] Goal–Question–Metric (Basili et al., 1994). Sumber: gambar/3.3_skema_GQM.png
+
+Tabel 3.4 GQM Matrix Penelitian
++-------+----------------------------------+---------------------------------------------+
+| Goal  | Question                          | Metric                                       |
++-------+----------------------------------+---------------------------------------------+
+| G     | Mengkuantifikasi trade-off PTQ    | (lihat Q1–Q4)                                |
+|       | k-quants pada SLM untuk Android   |                                              |
+|       | RAM 8 GB                          |                                              |
++-------+----------------------------------+---------------------------------------------+
+| Q1    | Storage hemat?                    | M1.1 file size (MB), M1.2 ratio FP16/Qx       |
+| Q2    | Kualitas terjaga?                 | M2.1 PPL WikiText-2, M2.2 MMLU/GSM8k/HumanEval|
+| Q3    | RAM aman & TPS naik?              | M3.1 peak RSS (MB), M3.2 OOM count            |
+| Q4    | Throughput meningkat?             | M4.1 prompt t/s, M4.2 generation t/s          |
++-------+----------------------------------+---------------------------------------------+
+
+3.4.2.	Three-Dimensional Evaluation Framework
+Hasil pengukuran kemudian diorganisasi ke dalam tiga dimensi evaluasi sesuai Jin et al. (2024) yang dijelaskan pada Bagian 2.1.8 dan diilustrasikan pada Gambar 3.4.
+
+[GAMBAR 3.4] Three-Dimensional Evaluation Framework. Sumber: gambar/3.4_alur_evaluasi_3dimensi.png
+
+a.	Knowledge & Capacity → MMLU, GSM8k, HumanEval (akurasi).
+b.	Alignment → Perplexity WikiText-2.
+c.	Efficiency → file size, peak RAM, prompt t/s, generation t/s.
+
+3.4.3.	Statistik Inferensial
+Untuk membandingkan setiap varian Qx_K_M dengan baseline FP16 pada metrik dinamik (TPS, RAM), digunakan uji Wilcoxon signed-rank (paired non-parametric, n = 5 per kondisi) dengan tingkat signifikansi α = 0,05. Pemilihan uji non-parametrik didasarkan pada ukuran sampel kecil dan tidak adanya jaminan normalitas. Effect size dilaporkan sebagai r = Z/√N.
+
+3.4.4.	Analisis Pareto
+Analisis Pareto memetakan trade-off antara dua sumbu utama, biasanya storage (sumbu X, lebih kiri = lebih baik) dan composite accuracy (sumbu Y, lebih atas = lebih baik). Marker size dipakai sebagai dimensi ketiga yang merepresentasikan peak RAM. Varian yang berada pada Pareto frontier dianggap tidak terdominasi (Pareto-optimal) dan menjadi rekomendasi akhir penelitian.
+
+3.4.5.	Reproducibility dan Threats to Validity
+Mengikuti NeurIPS Reproducibility Checklist (NeurIPS, 2024), seluruh konfigurasi eksperimen didokumentasikan: nama dan tag versi model, hash file GGUF (SHA256), prompt set yang dipakai, parameter sampling (temperature = 0, top_k = 1, top_p = 1), governor CPU (performance), suhu ambient, dan random seed (untuk shuffle dataset). Threats to validity dianalisis pada empat kategori (Wohlin et al., 2024):
+1.	Internal validity: variasi suhu perangkat dan thermal throttling—dimitigasi dengan jeda cooldown 60 detik antar run.
+2.	External validity: hasil mungkin tidak generalisasi ke SoC lain. Dimitigasi dengan deklarasi eksplisit batasan hardware pada Bagian 1.7.
+3.	Construct validity: PPL bisa tidak korelat dengan akurasi. Dimitigasi dengan menyertakan tiga benchmark kapabilitas (MMLU, GSM8k, HumanEval) sebagai triangulasi.
+4.	Conclusion validity: ukuran sampel kecil dapat memunculkan false positive. Dimitigasi dengan uji non-parametrik dan effect size.

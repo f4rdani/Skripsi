@@ -1,0 +1,133 @@
+BAB IV
+HASIL PENELITIAN DAN PEMBAHASAN
+
+[CATATAN PENULIS — TEMPLATE]
+Bab ini ditulis SETELAH seluruh data eksperimen tersedia. Setiap sub-bab berikut sudah memiliki kerangka kalimat. Ganti placeholder bertanda <…> dengan angka aktual hasil pengukuran. Setiap angka WAJIB dirujuk ke tabel/gambar pendukung.
+
+Bab ini menyajikan hasil penelitian dan pembahasan yang diperoleh dari eksekusi metodologi pada BAB III. Bagian 4.1 menampilkan hasil dan analisis efisiensi penyimpanan; Bagian 4.2 menampilkan hasil dan analisis pemakaian RAM; Bagian 4.3 menampilkan hasil kualitas (PPL dan akurasi); Bagian 4.4 menampilkan hasil kecepatan inferensi (TPS); Bagian 4.5 menyajikan analisis trade-off Pareto untuk menjawab perumusan masalah keempat (RQ4); Bagian 4.6 mendiskusikan threats to validity dan reproducibility hasil.
+
+4.1.	Hasil Evaluasi Efisiensi Penyimpanan (Storage)
+[ISI: Jawab RQ1.] Tabel 4.1 menampilkan ukuran file (MB) dan rasio kompresi terhadap baseline FP16 untuk setiap kombinasi model × varian.
+
+Tabel 4.1 Ukuran file dan rasio kompresi terhadap FP16
++----+------------------------+--------+-----------+-----------+-------------+
+| No | Model                  | Varian | Size (MB) | Ratio FP16| Δ vs FP16   |
++----+------------------------+--------+-----------+-----------+-------------+
+| 1  | LFM2-1.2B              | FP16   | <…>       | 1.000     | -            |
+| 2  | LFM2-1.2B              | Q5_K_M | <…>       | <…>       | <…>%         |
+| 3  | LFM2-1.2B              | Q4_K_M | <…>       | <…>       | <…>%         |
+| 4  | LFM2-1.2B              | Q3_K_M | <…>       | <…>       | <…>%         |
+| 5  | Qwen2.5-1.5B-Instruct  | FP16   | <…>       | 1.000     | -            |
+| 6  | Qwen2.5-1.5B-Instruct  | Q5_K_M | <…>       | <…>       | <…>%         |
+| 7  | Qwen2.5-1.5B-Instruct  | Q4_K_M | <…>       | <…>       | <…>%         |
+| 8  | Qwen2.5-1.5B-Instruct  | Q3_K_M | <…>       | <…>       | <…>%         |
++----+------------------------+--------+-----------+-----------+-------------+
+
+[GAMBAR 4.1] Diagram batang ukuran file model per varian. (gambar/4.1_storage.png)
+
+Pembahasan: <Sebutkan rasio rata-rata yang dicapai Q3/Q4/Q5_K_M dan bandingkan dengan klaim Frantar et al. (2023) dan Lin et al. (2024). Sebutkan apakah pola kompresi konsisten antar dua model.>
+
+4.2.	Hasil Pemantauan Resource Memori (Peak RAM)
+[ISI: Jawab RQ3 bagian RAM.] Tabel 4.2 menampilkan peak RAM (MB) saat inferensi untuk setiap kombinasi.
+
+Tabel 4.2 Peak RAM (MB) saat inferensi (mean ± std, n = 5)
++----+------------------------+--------+--------------+-------------+
+| No | Model                  | Varian | Peak RAM (MB)| OOM count   |
++----+------------------------+--------+--------------+-------------+
+| 1  | LFM2-1.2B              | FP16   | <…> ± <…>    | <…>          |
+| 2  | LFM2-1.2B              | Q5_K_M | <…> ± <…>    | 0            |
+| 3  | LFM2-1.2B              | Q4_K_M | <…> ± <…>    | 0            |
+| 4  | LFM2-1.2B              | Q3_K_M | <…> ± <…>    | 0            |
+| 5  | Qwen2.5-1.5B-Instruct  | FP16   | <…> ± <…>    | <…>          |
+| 6  | Qwen2.5-1.5B-Instruct  | Q5_K_M | <…> ± <…>    | 0            |
+| 7  | Qwen2.5-1.5B-Instruct  | Q4_K_M | <…> ± <…>    | 0            |
+| 8  | Qwen2.5-1.5B-Instruct  | Q3_K_M | <…> ± <…>    | 0            |
++----+------------------------+--------+--------------+-------------+
+
+[GAMBAR 4.2] Diagram batang peak RAM per varian dengan garis ambang 8 GB. (gambar/4.2_ram.png)
+
+Pembahasan: <Sebutkan apakah varian FP16 memicu OOM/Force Close di Pova 5. Bahas margin RAM bebas yang tersisa untuk OS dan aplikasi background.>
+
+4.3.	Perbandingan Kualitas Linguistik & Kognitif (PPL, MMLU, GSM8k, HumanEval)
+[ISI: Jawab RQ2.] Tabel 4.3 menampilkan PPL WikiText-2, MMLU, GSM8k, HumanEval (100 sampel/benchmark).
+
+Tabel 4.3 Hasil pengukuran kualitas
++----+------------------------+--------+--------+--------+--------+----------+
+| No | Model                  | Varian | PPL    | MMLU % | GSM8k %| HumanEv %|
++----+------------------------+--------+--------+--------+--------+----------+
+| 1  | LFM2-1.2B              | FP16   | <…>    | <…>    | <…>    | <…>      |
+| 2  | LFM2-1.2B              | Q5_K_M | <…>    | <…>    | <…>    | <…>      |
+| 3  | LFM2-1.2B              | Q4_K_M | <…>    | <…>    | <…>    | <…>      |
+| 4  | LFM2-1.2B              | Q3_K_M | <…>    | <…>    | <…>    | <…>      |
+| 5  | Qwen2.5-1.5B-Instruct  | FP16   | <…>    | <…>    | <…>    | <…>      |
+| 6  | Qwen2.5-1.5B-Instruct  | Q5_K_M | <…>    | <…>    | <…>    | <…>      |
+| 7  | Qwen2.5-1.5B-Instruct  | Q4_K_M | <…>    | <…>    | <…>    | <…>      |
+| 8  | Qwen2.5-1.5B-Instruct  | Q3_K_M | <…>    | <…>    | <…>    | <…>      |
++----+------------------------+--------+--------+--------+--------+----------+
+
+[GAMBAR 4.3] Diagram radar (PPL inv. + 3 akurasi) per model. (gambar/4.3_radar.png)
+
+Pembahasan: <Hitung Δ akurasi vs FP16 dan Δ PPL vs FP16. Bahas keterkaitan PPL dengan akurasi (Jin et al., 2024). Diskusikan benchmark mana yang paling sensitif terhadap kuantisasi.>
+
+4.4.	Performa Real-Time Kecepatan Inferensi (Tokens per Second)
+[ISI: Jawab RQ3 bagian TPS.] Tabel 4.4 menampilkan prompt processing rate dan generation rate (mean ± std, n = 5).
+
+Tabel 4.4 Kecepatan inferensi (t/s)
++----+------------------------+--------+----------------+----------------+
+| No | Model                  | Varian | Prompt t/s     | Gen t/s        |
++----+------------------------+--------+----------------+----------------+
+| 1  | LFM2-1.2B              | FP16   | <…> ± <…>      | <…> ± <…>      |
+| 2  | LFM2-1.2B              | Q5_K_M | <…> ± <…>      | <…> ± <…>      |
+| 3  | LFM2-1.2B              | Q4_K_M | <…> ± <…>      | <…> ± <…>      |
+| 4  | LFM2-1.2B              | Q3_K_M | <…> ± <…>      | <…> ± <…>      |
+| 5  | Qwen2.5-1.5B-Instruct  | FP16   | <…> ± <…>      | <…> ± <…>      |
+| 6  | Qwen2.5-1.5B-Instruct  | Q5_K_M | <…> ± <…>      | <…> ± <…>      |
+| 7  | Qwen2.5-1.5B-Instruct  | Q4_K_M | <…> ± <…>      | <…> ± <…>      |
+| 8  | Qwen2.5-1.5B-Instruct  | Q3_K_M | <…> ± <…>      | <…> ± <…>      |
++----+------------------------+--------+----------------+----------------+
+
+Tabel 4.5 Uji Wilcoxon signed-rank vs FP16 (α = 0,05)
++--------+--------+----------+--------+--------+
+| Varian | Metric | W-stat   | p-val  | Sig    |
++--------+--------+----------+--------+--------+
+| Q5_K_M | gen t/s| <…>      | <…>    | <Yes/No>|
+| Q4_K_M | gen t/s| <…>      | <…>    | <Yes/No>|
+| Q3_K_M | gen t/s| <…>      | <…>    | <Yes/No>|
++--------+--------+----------+--------+--------+
+
+[GAMBAR 4.4] Diagram batang prompt t/s & gen t/s per varian. (gambar/4.4_tps.png)
+
+Pembahasan: <Sebutkan speed-up rasio Qx terhadap FP16. Bandingkan dengan Ray & Pradhan (2026) yang melaporkan ~2,7–7,4 t/s pada Raspberry Pi 4.>
+
+4.5.	Diskusi / Analisis Komparatif Keseluruhan (Trade-Off & Pareto)
+[ISI: Jawab RQ4.] Gambar 4.5 menyajikan diagram Pareto storage vs composite accuracy, dengan ukuran marker merepresentasikan peak RAM.
+
+[GAMBAR 4.5] Pareto plot storage × composite accuracy × peak RAM. (gambar/4.5_pareto.png)
+
+Tabel 4.6 Komposit Skor Pareto
++----+------------------------+--------+----------+----------+----------+----------+
+| No | Model                  | Varian | StorScore| AccScore | RAMScore | TPSScore | Pareto?  |
++----+------------------------+--------+----------+----------+----------+----------+
+| 1  | LFM2-1.2B              | FP16   | <…>      | <…>      | <…>      | <…>      | <Yes/No> |
+| 2  | LFM2-1.2B              | Q5_K_M | <…>      | <…>      | <…>      | <…>      | <Yes/No> |
+| ...|                        |        |          |          |          |          |          |
++----+------------------------+--------+----------+----------+----------+----------+
+
+Pembahasan: <Tentukan varian yang berada pada Pareto frontier. Berdasarkan kombinasi storage, akurasi, RAM, dan TPS, varian yang direkomendasikan adalah <…> dengan justifikasi <…>. Diskusikan rekomendasi praktis: kapan sebaiknya pakai Q5_K_M, kapan pakai Q4_K_M, kapan terpaksa Q3_K_M.>
+
+4.6.	Reproducibility dan Threats to Validity
+[ISI:] Sebutkan hash SHA256 setiap file GGUF, versi llama.cpp, prompt set, dan governor CPU. Diskusikan empat threats to validity (internal, eksternal, construct, conclusion) dan mitigasinya yang telah dijabarkan pada Bagian 3.4.5.
+
+Tabel 4.7 Reproducibility checklist
++----+----------------------------+---------------------+
+| No | Item                       | Nilai / Sumber       |
++----+----------------------------+---------------------+
+| 1  | LFM2-1.2B FP16 hash        | <SHA256>             |
+| 2  | LFM2-1.2B Q5_K_M hash      | <SHA256>             |
+| ...|                            |                      |
+| 9  | llama.cpp tag              | <…>                  |
+| 10 | Compiler                   | <…>                  |
+| 11 | CPU governor               | performance          |
+| 12 | Prompt set                 | <link/path>          |
+| 13 | Random seed                | 42                   |
++----+----------------------------+---------------------+
