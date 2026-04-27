@@ -25,14 +25,17 @@ BAB III adalah **resep eksperimen**. Pembaca yang ingin mereplikasi penelitian i
 
 **Pentingnya tabel:** Setiap kategori instrumen disajikan sebagai tabel (Tabel 3.1, 3.2, 3.3) supaya pembaca yang ingin mereplikasi tahu persis versi dan konfigurasi yang dipakai.
 
-## 3.3 Metode Pengumpulan Data, Populasi, dan Sample
+## 3.3 Metode Pengumpulan Data
 **Fungsi:** Menjelaskan **bagaimana** data dikumpulkan dan **berapa** banyak. Pada skripsi rekayasa, populasi dan sampel sering diabstraksi sebagai kombinasi kondisi eksperimen (model × varian × benchmark × ulangan).
 
 **Standar BSI:** "Menjelaskan tentang metode pengumpulan data yang real dilakukan antara lain berupa Pengamatan langsung, wawancara, studi Pustaka atau lainnya."
 
 **Sub-bab yang dipakai:**
-- **3.3.1 Metode Pengumpulan Data** — (a) Observasi terotomasi via System Benchmarking Logging, (b) Wawancara terstruktur opsional sebagai validator metodologi, (c) Studi Pustaka.
-- **3.3.2 Populasi dan Sampel** — uraikan jumlah kombinasi kondisi, jumlah ulangan, dan justifikasi statistik untuk ukuran sampel.
+- **(a) Observasi** — terotomasi via System Benchmarking Logging (htop, /proc/meminfo, stdout llama.cpp, evaluator regex/exact-match).
+- **(b) Wawancara** — terstruktur opsional terhadap dosen pembimbing teknis sebagai validator metodologi.
+- **(c) Studi Pustaka** — review 12 jurnal lima tahun terakhir, manajemen referensi via Mendeley APA edisi ke-7.
+
+Pada paragraf akhir 3.3, populasi dan sampel diabstraksi sebagai kombinasi kondisi eksperimen (model × varian × benchmark × ulangan) dengan justifikasi ukuran sampel statistik (Cohen's d). Sub-bab tidak diberi nomor 3.3.1/3.3.2 karena panduan BSI hanya menyebut 3.3 sebagai satu sub-bab tunggal.
 
 **Catatan:** Wawancara pada penelitian rekayasa biasanya bukan sumber data primer — peneliti wajib jelas kapan wawancara digunakan dan kapan tidak.
 

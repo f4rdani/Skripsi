@@ -70,25 +70,16 @@ Pipeline lengkap dari sumber bobot hingga aggregator hasil ditampilkan pada Gamb
 
 [GAMBAR 3.2] Pipeline eksperimen on-device pada Tecno Pova 5. Sumber: gambar/3.2_pipeline_eksperimen.png
 
-3.3.	Metode Pengumpulan Data, Populasi, dan Sample Penelitian
-3.3.1.	Metode Pengumpulan Data
+3.3.	Metode Pengumpulan Data
 Pengumpulan data dilakukan melalui tiga metode utama berikut, sesuai panduan BSI.
-a.	Observasi. Observasi dilakukan secara terotomasi melalui System Benchmarking Logging dengan menjalankan llama-bench dan skrip evaluator pada Termux. Tiga sumber log direkam:
-1.	Log sistem: htop dan pembacaan /proc/meminfo setiap 200 ms.
-2.	Log engine: keluaran stdout llama.cpp yang berisi prompt eval rate (t/s), generation rate (t/s), dan PPL.
-3.	Log kualitas: jawaban model pada dataset MMLU/GSM8k/HumanEval, dibandingkan dengan ground truth via skrip evaluator (regex/exact match).
-Seluruh log disimpan dalam format CSV dan diunduh ke laptop peneliti melalui adb pull untuk analisis lebih lanjut.
-b.	Wawancara. Wawancara terstruktur dilakukan secara terbatas dan bersifat opsional terhadap dosen pembimbing teknis sebagai validator metodologi. Wawancara hanya bertujuan memvalidasi rancangan eksperimen dan tidak menjadi sumber data primer.
+
+a.	Observasi. Observasi dilakukan secara terotomasi melalui System Benchmarking Logging dengan menjalankan llama-bench dan skrip evaluator pada Termux. Tiga sumber log direkam: (1) log sistem berupa pembacaan htop dan /proc/meminfo setiap 200 ms; (2) log engine berupa keluaran stdout llama.cpp yang berisi prompt eval rate (t/s), generation rate (t/s), dan perplexity; (3) log kualitas berupa jawaban model pada dataset MMLU, GSM8k, dan HumanEval yang dibandingkan dengan ground truth melalui skrip evaluator (regex/exact match). Seluruh log disimpan dalam format CSV dan ditarik ke laptop peneliti melalui adb pull untuk analisis lebih lanjut.
+
+b.	Wawancara. Wawancara terstruktur dilakukan secara terbatas dan bersifat opsional terhadap dosen pembimbing teknis sebagai validator metodologi. Wawancara hanya bertujuan memvalidasi rancangan eksperimen, dan tidak menjadi sumber data primer.
+
 c.	Studi Pustaka. Studi pustaka dilakukan dengan mengumpulkan dan mereview jurnal yang dipublikasikan dalam lima tahun terakhir, sebagaimana telah dirangkum pada BAB II. Manajemen referensi memakai Mendeley dengan format APA edisi ke-7.
 
-3.3.2.	Populasi dan Sampel
-Populasi penelitian adalah seluruh kemungkinan kombinasi (model × varian kuantisasi × benchmark × ulangan) yang dapat dijalankan pada perangkat target. Sampel yang diuji adalah:
-+	Model: 2 (LFM2-1.2B, Qwen2.5-1.5B-Instruct)
-+	Varian: 4 (FP16, Q5_K_M, Q4_K_M, Q3_K_M)
-+	Benchmark sistem: file size, peak RAM, prompt t/s, generation t/s
-+	Benchmark kualitas: WikiText-2 (PPL), MMLU, GSM8k, HumanEval (100 sampel/benchmark)
-+	Ulangan tiap kondisi: 5 run pengukuran + 2 warm-up
-Total run pengukuran efektif = 2 × 4 × 4 × 5 = 160 run sistem dan 2 × 4 × 4 × 1 = 32 run kualitas (kualitas tidak diulang karena hasilnya deterministik dengan temperature 0). Untuk RQ kualitas, jumlah sampel total per kondisi adalah 100 sehingga ukuran sampel per kondisi cukup secara statistik (Cohen's d 0,3 dengan power 0,8 mensyaratkan n ≥ 65).
+Untuk menjamin ukuran sampel yang memadai, setiap kondisi (kombinasi model × varian kuantisasi × benchmark) dijalankan dengan dua warm-up run yang dipisahkan dari lima run pengukuran efektif (n = 5). Sampel pengujian terdiri dari dua model (LFM2-1.2B dan Qwen2.5-1.5B-Instruct), empat varian kuantisasi (FP16, Q5_K_M, Q4_K_M, Q3_K_M), empat benchmark sistem (file size, peak RAM, prompt t/s, generation t/s), serta empat benchmark kualitas (WikiText-2 PPL, MMLU, GSM8k, HumanEval) dengan 100 sampel per benchmark kualitas, sehingga total 160 run pengukuran sistem dan 32 run pengukuran kualitas. Jumlah ini memenuhi persyaratan statistik (Cohen's d = 0,3 dengan power 0,8 mensyaratkan n ≥ 65).
 
 3.4.	Metode Analisis Data
 Analisis data dilakukan dalam dua jalur paralel: (a) analisis efisiensi, dan (b) analisis kualitas. Keduanya kemudian digabungkan pada analisis Pareto.

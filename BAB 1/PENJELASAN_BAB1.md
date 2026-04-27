@@ -1,6 +1,22 @@
 # Penjelasan BAB I — PENDAHULUAN
 
-Catatan ini merupakan rangkuman fungsi tiap sub-bab pada BAB I sesuai dengan **Handout Skripsi Prodi Teknologi Informasi** (Universitas Bina Sarana Informatika, Periode I 2024, halaman 11–12) dan adaptasinya untuk topik skripsi: **"Analisis Performa Post-Training Quantization (PTQ) pada Small Language Model untuk Implementasi Edge Computing Berbasis Android"**.
+Catatan ini merupakan rangkuman fungsi tiap sub-bab pada BAB I berdasarkan **Handout Skripsi Prodi Teknologi Informasi BSI** dan adaptasinya untuk topik skripsi: **"Analisis Performa Post-Training Quantization (PTQ) pada Small Language Model untuk Implementasi Edge Computing Berbasis Android"**.
+
+## Dua versi outline (V1 dan V2)
+Folder ini berisi **dua versi** BAB I yang sengaja **berbeda layout** karena mengikuti dua periode panduan BSI:
+
+| File | Outline | Periode panduan | Sub-bab |
+|---|---|---|---|
+| `bab 1 V1.txt` | 1.1–1.8 | Panduan **Periode I 2024** | 1.1 Latar Belakang · 1.2 Identifikasi Permasalahan · 1.3 Perumusan Masalah · 1.4 Tujuan dan Manfaat · 1.5 Metode Penelitian · 1.6 Teknik Pengumpulan Data (a/b/c) · 1.7 Ruang Lingkup · 1.8 Hipotesis |
+| `bab 1 V2.txt` | 1.1–1.6 | Panduan **2025** | 1.1 Latar Belakang · 1.2 Identifikasi Permasalahan · 1.3 Maksud dan Tujuan (Maksud / Tujuan / Manfaat) · 1.4 Metode Penelitian · 1.5 Ruang Lingkup · 1.6 Hipotesis |
+
+Konten kedua versi **identik secara substansi** (LB sama, identifikasi sama, tujuan sama, metode sama, ruang lingkup sama, hipotesis sama). Yang berbeda hanya **layout sub-bab**: V1 memisahkan Perumusan Masalah dan Teknik Pengumpulan Data sebagai sub-bab tersendiri, sementara V2 menggabungkan tujuan & manfaat di bawah 1.3 Maksud dan Tujuan, dan teknik pengumpulan data masuk ke dalam paragraf 1.4 Metode Penelitian.
+
+**Jangan ubah layout.** Pilih versi sesuai outline yang diinstruksikan dosen pembimbing.
+
+---
+
+Selanjutnya catatan di bawah ini menjelaskan fungsi setiap sub-bab pada V1 (1.1–1.8). Untuk V2 (1.1–1.6), pemetaan dirangkum di bagian akhir.
 
 ## Tujuan umum BAB I
 BAB I berperan sebagai *prolog ilmiah*. Pembaca yang baru pertama kali melihat skripsi ini harus dapat menjawab tiga pertanyaan setelah selesai membaca BAB I:
@@ -92,7 +108,7 @@ Aspek yang lazim dibatasi pada skripsi rekayasa: hardware, lingkungan eksekusi, 
 - Setiap sub-bab dimulai dengan paragraf pembuka yang menyambungkan dengan sub-bab sebelumnya.
 - Tidak boleh ada kalimat opini personal tanpa rujukan.
 
-## Pemetaan singkat antara dokumen
+## Pemetaan singkat antara dokumen (V1 — outline 2024, 1.1–1.8)
 | Sub-bab | Output dokumen | Cek konsistensi dengan |
 |---|---|---|
 | 1.2 Identifikasi | Tiga masalah | 2.2 Penelitian Terkait |
@@ -102,3 +118,15 @@ Aspek yang lazim dibatasi pada skripsi rekayasa: hardware, lingkungan eksekusi, 
 | 1.6 Teknik | Observasi/Wawancara/Pustaka | 3.3 BAB III |
 | 1.7 Ruang Lingkup | 7 batas | 3.2 Instrumen |
 | 1.8 Hipotesis | H1 | 5.1 Kesimpulan |
+
+## Pemetaan V2 (outline 2025, 1.1–1.6)
+| Sub-bab V2 | Berisi konten dari V1 sub-bab | Catatan |
+|---|---|---|
+| 1.1 Latar Belakang | 1.1 V1 | identik |
+| 1.2 Identifikasi Permasalahan | 1.2 V1 | identik (3 masalah) |
+| 1.3 Maksud dan Tujuan | 1.3 + 1.4 V1 | digabung jadi tiga sub-poin: 1.3.1 Maksud, 1.3.2 Tujuan, 1.3.3 Manfaat (Penulis / Objek / Pembaca) |
+| 1.4 Metode Penelitian | 1.5 + 1.6 V1 | metodologi + teknik pengumpulan data (Observasi/Wawancara/Pustaka) digabung dalam satu paragraf |
+| 1.5 Ruang Lingkup | 1.7 V1 | identik (7 batas) |
+| 1.6 Hipotesis | 1.8 V1 | identik (H1) |
+
+Pada V2, **Perumusan Masalah (kalimat tanya)** **tidak dipisahkan** sebagai sub-bab tersendiri sesuai panduan 2025. Ide rumusan masalah tetap tercermin pada poin Tujuan (1.3.2) yang menyatakan apa yang akan diukur/dibandingkan/direkomendasikan.

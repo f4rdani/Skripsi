@@ -98,15 +98,20 @@ k.	Nurohim et al. (2025) melakukan analisis komparatif LLM DeepSeek dan Qwen dal
 
 l.	Ray & Pradhan (2026) mempresentasikan analisis performa LLM lokal pada Raspberry Pi 4 (8 GB LPDDR4, ARM Cortex-A72) menggunakan klien Python dan Rust. Mereka menemukan bahwa pemilihan API client (Rust vs Python) berdampak besar pada cold-start latency. Penelitian ini menjadi pembanding paling dekat (resource-constrained edge ARM) untuk skripsi ini.
 
-2.3.	Tinjauan Objek Penelitian
-2.3.1.	Smartphone Tecno Pova 5 (perangkat eksperimen)
+2.3.	Tinjauan Organisasi
+Skripsi ini disusun di lingkungan Program Studi Teknologi Informasi Universitas Bina Sarana Informatika (BSI). Karena penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi sebagai studi kasus, sub-bab ini diadaptasi untuk menjelaskan lingkungan riset—yaitu institusi tempat skripsi disusun serta perangkat dan ekosistem perangkat lunak yang menjadi objek eksperimen. Adaptasi serupa lazim dilakukan pada skripsi rekayasa di prodi yang sama.
+
+2.3.1.	Universitas Bina Sarana Informatika
+Universitas Bina Sarana Informatika (BSI) merupakan institusi tempat penelitian ini disusun dan diuji. Sumber daya yang digunakan dari sisi institusi mencakup: bimbingan akademik dari dosen pembimbing, akses jurnal/digital library kampus untuk studi pustaka, serta pedoman penulisan skripsi (Handout Skripsi Prodi Teknologi Informasi BSI) yang menjadi acuan struktur dokumen ini.
+
+2.3.2.	Smartphone Tecno Pova 5 (perangkat eksperimen)
 Tecno Pova 5 dipilih sebagai perangkat eksperimen karena merepresentasikan smartphone kelas menengah populer di pasar Asia Tenggara dengan spesifikasi: SoC MediaTek Helio G99 (TSMC 6 nm; 2× Cortex-A76 @ 2,2 GHz + 6× Cortex-A55 @ 2,0 GHz), GPU Mali-G57 MC2, RAM 8 GB LPDDR4x (dilengkapi virtual RAM 8 GB), penyimpanan internal 256 GB UFS 2.2, layar 6,78" FHD+ 120 Hz, dan baterai 6.000 mAh. Perangkat berjalan di Android 13 dengan kustomisasi HiOS 13. Kombinasi RAM 8 GB dan CPU ARM modern menjadikan Pova 5 representasi yang valid untuk pengujian batas atas SLM on-device pada smartphone konsumen.
 
-2.3.2.	LFM2-1.2B (Liquid AI)
+2.3.3.	LFM2-1.2B (Liquid AI)
 LFM2 adalah generasi kedua keluarga Liquid Foundation Models yang menerapkan blok hibrid Liquid Time-Constant + transformer untuk efisiensi pada perangkat edge. Varian LFM2-1.2B memiliki 1,2 miliar parameter, jendela konteks 32k, dan dipublikasikan dengan bobot terbuka. Konfigurasi ini menjadikan LFM2-1.2B salah satu SLM ringan terbaru yang relevan untuk penelitian on-device.
 
-2.3.3.	Qwen2.5-1.5B-Instruct (Alibaba Cloud)
+2.3.4.	Qwen2.5-1.5B-Instruct (Alibaba Cloud)
 Qwen2.5 adalah keluarga LLM/SLM yang dirilis oleh tim Qwen, Alibaba Cloud, mencakup model 0,5B sampai 72B parameter. Varian Qwen2.5-1.5B-Instruct merupakan versi instruction-tuned dengan 1,5 miliar parameter, dukungan multibahasa, dan jendela konteks 32k. Qwen2.5 menjadi salah satu SLM paling banyak digunakan komunitas open-source pada 2024–2025 untuk eksperimen on-device, sehingga relevan dijadikan subjek pembanding LFM2.
 
-2.3.4.	Termux dan llama.cpp
+2.3.5.	Termux dan llama.cpp
 Termux adalah aplikasi terminal emulator + Linux environment yang berjalan pada Android non-root. Termux memungkinkan instalasi toolchain GCC/Clang, Python, serta build llama.cpp menggunakan NDK Android. llama.cpp sendiri adalah library inferensi C++ open-source berlisensi MIT yang mendukung CPU ARM dengan optimasi NEON, dotprod, dan i8mm. llama.cpp menjadi runtime de facto untuk format GGUF dan menawarkan utilitas llama-bench, llama-cli, perplexity, dan quantize.

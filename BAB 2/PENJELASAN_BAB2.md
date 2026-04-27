@@ -40,13 +40,17 @@ Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `j
 - Penjelasan ringkas paragraf untuk setiap penelitian.
 - Penjelasan dikaitkan secara eksplisit ke topik skripsi (mengapa relevan, bukan sekadar daftar abstrak).
 
-## 2.3 Tinjauan Objek Penelitian
-**Fungsi:** Menjelaskan objek/subjek yang diteliti. Pada skripsi rekayasa software/sistem, objek penelitian biasanya bukan organisasi tetapi:
-- Perangkat keras yang dipakai (smartphone Tecno Pova 5).
-- Model AI yang diuji (LFM2-1.2B, Qwen2.5-1.5B-Instruct).
-- Software runtime utama (Termux, llama.cpp).
+## 2.3 Tinjauan Organisasi
+**Standar BSI (panduan):** "Berisi tentang tinjauan organisasi ditempat riset dilakukan."
 
-**Standar BSI:** "Berisi tentang tinjauan organisasi ditempat riset dilakukan." Untuk skripsi rekayasa, dapat diadaptasi menjadi tinjauan **objek penelitian** (perangkat, model, software).
+**Adaptasi untuk skripsi ini.** Penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak mengambil studi kasus pada satu organisasi tertentu. Karena itu sub-bab 2.3 diadaptasi—tetap memakai judul resmi panduan **"Tinjauan Organisasi"**—dengan isi yang dibagi menjadi:
+- **2.3.1 Universitas Bina Sarana Informatika (BSI)** — institusi tempat skripsi disusun.
+- **2.3.2 Smartphone Tecno Pova 5** — perangkat eksperimen.
+- **2.3.3 LFM2-1.2B** — model uji 1.
+- **2.3.4 Qwen2.5-1.5B-Instruct** — model uji 2.
+- **2.3.5 Termux dan llama.cpp** — runtime utama.
+
+Adaptasi ini lazim dilakukan pada skripsi rekayasa di prodi yang sama, supaya struktur sub-bab tetap mengikuti panduan tetapi konten relevan dengan tema teknis.
 
 ## Aturan kutipan & gaya
 - Setiap teori atau angka spesifik **wajib** memiliki sitasi.
