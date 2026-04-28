@@ -13,7 +13,7 @@ b.	Perencanaan Goal–Question–Metric (GQM). Tujuan penelitian (Goal) diturunk
 c.	Persiapan Model dan Lingkungan Eksperimen. Bobot LFM2.5-1.2B-Base dan Qwen3.5-2B diunduh dari Hugging Face, dikonversi ke GGUF, dan dikuantisasi ke Q5_K_M, Q4_K_M, dan Q3_K_M menggunakan utilitas llama.cpp quantize. Hasilnya berupa delapan file GGUF (2 model × 4 varian).
 d.	Pengukuran Statik. File size (MB) dicatat dari sistem berkas. Peak RAM dicatat saat model dimuat ke memori namun belum dieksekusi.
 e.	Pengukuran Dinamik. Prompt processing rate dan generation rate diukur menggunakan utilitas llama-bench dengan prompt panjang 512 token dan output 128 token, lima ulangan plus dua warm-up.
-f.	Pengukuran Kualitas. Perplexity dihitung pada dataset WikiText-2 (split test, 4096 token sliding window). Akurasi MMLU, GSM8k, dan HumanEval dihitung pada 100 sampel random per dataset menggunakan evaluator script.
+f.	Pengukuran Kualitas. Perplexity dihitung pada dataset WikiText-2 (split test, 512 token sliding window — default `llama-perplexity` llama.cpp). Akurasi MMLU, GSM8k, dan HumanEval dihitung pada 100 sampel random per dataset menggunakan evaluator script.
 g.	Analisis Pareto dan Statistik. Hasil seluruh pengukuran diagregasi pada Python (pandas), kemudian dianalisis dengan diagram radar, diagram Pareto, dan uji Wilcoxon signed-rank (α = 0,05) terhadap baseline FP16.
 h.	Pelaporan dan Validasi. Hasil ditulis di BAB IV. Validasi dilakukan dengan re-run subset (10% kondisi) untuk memastikan reprodusibilitas.
 
@@ -60,7 +60,7 @@ Tabel 3.3 Spesifikasi Model dan Dataset Evaluasi
 | 1  | LFM2.5-1.2B-Base              | 1,2 B     | Liquid AI / Hugging Face                  |
 | 2  | Qwen3.5-2B             | 2 B       | Alibaba Cloud / Hugging Face              |
 | 3  | Varian kuantisasi      | -         | FP16 (baseline), Q5_K_M, Q4_K_M, Q3_K_M   |
-| 4  | WikiText-2             | 4096 ctx  | Hugging Face datasets (test split)        |
+| 4  | WikiText-2             | 512 ctx   | Hugging Face datasets (test split)        |
 | 5  | MMLU                   | 100 sampel| Hendrycks et al., Hugging Face            |
 | 6  | GSM8k                  | 100 sampel| Cobbe et al., Hugging Face                |
 | 7  | HumanEval              | 100 sampel| Chen et al., OpenAI / Hugging Face        |

@@ -87,19 +87,19 @@ Dengan data yang sudah tersedia (storage, PPL, akurasi tiga benchmark), Tabel 4.
 Tabel 4.5 Skor Komposit Storage vs Akurasi
 | Model              | Varian   | Relative Storage | Mean Acc (%) | Pareto-status sementara |
 |--------------------|----------|------------------|--------------|--------------------------|
-| LFM2.5-1.2B-Base   | FP16     | 1,000×           | 40,3         | Dominated by Q4_K_M (rasio biaya/akurasi) |
-| LFM2.5-1.2B-Base   | Q5_K_M   | 0,357×           | 37,0         | Pareto                   |
+| LFM2.5-1.2B-Base   | FP16     | 1,000×           | 40,3         | Pareto (akurasi tertinggi) |
+| LFM2.5-1.2B-Base   | Q5_K_M   | 0,357×           | 37,0         | Dominated oleh Q4_K_M (lebih boros & lebih rendah akurasi) |
 | LFM2.5-1.2B-Base   | Q4_K_M   | 0,310×           | 38,7         | Pareto (sweet spot LFM)  |
 | LFM2.5-1.2B-Base   | Q3_K_M   | 0,254×           | 34,7         | Pareto (paling hemat)    |
-| Qwen3.5-2B         | FP16     | 1,000×           | 40,3         | Pareto                   |
-| Qwen3.5-2B         | Q5_K_M   | 0,389×           | 38,0         | Pareto                   |
+| Qwen3.5-2B         | FP16     | 1,000×           | 40,3         | Pareto (akurasi tertinggi) |
+| Qwen3.5-2B         | Q5_K_M   | 0,389×           | 38,0         | Dominated oleh Q4_K_M (lebih boros, akurasi sama) |
 | Qwen3.5-2B         | Q4_K_M   | 0,333×           | 38,0         | Pareto (sweet spot Qwen) |
-| Qwen3.5-2B         | Q3_K_M   | 0,306×           | 28,3         | Dominated (akurasi anjlok) |
+| Qwen3.5-2B         | Q3_K_M   | 0,306×           | 28,3         | Pareto (paling hemat)    |
 
 [GAMBAR 4.4] Pareto Storage vs Composite Accuracy. Sumber: gambar/4.4_pareto_storage_vs_accuracy.png
 [GAMBAR 4.5] Radar kualitas × efisiensi per model (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval). Sumber: gambar/4.5_radar_kualitas.png
 
-Pembahasan. Berdasarkan dua dimensi yang sudah terukur (storage dan akurasi), titik Pareto-optimal sementara untuk LFM2.5-1.2B-Base adalah Q4_K_M (kompromi terbaik antara reduksi 69,0 % dengan rerata akurasi 38,7 %). Untuk Qwen3.5-2B, titik Pareto-optimal sementara adalah Q4_K_M (reduksi 66,7 % dengan rerata akurasi 38,0 %). Q3_K_M Qwen jelas mendominasi negatif: penghematan storage tambahan hanya 2,7 poin persentase tetapi akurasi anjlok 9,7 poin persentase. Q5_K_M kedua model tetap berada di Pareto frontier untuk kasus penggunaan yang menempatkan kualitas linguistik (PPL terendah setelah FP16) sebagai prioritas. Penjawaban final RQ-4 (rekomendasi blueprint deployment) akan diselesaikan setelah subbab 4.4 terisi sehingga sumbu RAM dan TPS dapat dimasukkan ke dalam analisis Pareto multi-dimensi.
+Pembahasan. Pareto frontier sementara (sebelum dimensi RAM dan TPS dimasukkan) untuk kedua model terdiri atas tiga titik yang sama secara struktur: {FP16, Q4_K_M, Q3_K_M}. FP16 mendominasi pada sumbu akurasi (40,3 % rerata), Q3_K_M mendominasi pada sumbu storage hemat (LFM 0,254×, Qwen 0,306×), sedangkan Q4_K_M berperan sebagai sweet spot di tengah-tengah trayektori (LFM 0,310× dengan 38,7 %, Qwen 0,333× dengan 38,0 %). Q5_K_M kedua model justru *dominated* oleh Q4_K_M karena Q4 lebih hemat storage dan setidaknya setara akurasinya (LFM: Q5 37,0 % vs Q4 38,7 %; Qwen: Q5 38,0 % vs Q4 38,0 %). Implikasi praktisnya, Q4_K_M konsisten menjadi rekomendasi deployment default; FP16 hanya dipilih jika kapasitas storage bukan kendala dan akurasi maksimum mutlak diperlukan; Q3_K_M dipilih jika storage menjadi kendala paling ketat dan penurunan akurasi (sekitar 5,7 poin pada LFM, 12,0 poin pada Qwen) masih dapat ditoleransi. Penjawaban final RQ-4 (rekomendasi blueprint deployment) akan diselesaikan setelah subbab 4.4 terisi sehingga sumbu RAM dan TPS dapat dimasukkan ke dalam analisis Pareto multi-dimensi.
 
 4.6.	Ringkasan Temuan dan Posisi Hasil terhadap Penelitian Terkait
 Lima temuan utama dapat ditarik dari hasil di atas:

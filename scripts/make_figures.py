@@ -623,9 +623,11 @@ ACC = {
 
 VARIANTS = ["FP16", "Q5_K_M", "Q4_K_M", "Q3_K_M"]
 MODELS = ["LFM2.5-1.2B-Base", "Qwen3.5-2B"]
-# Dua warna konsisten untuk membedakan dua model di seluruh BAB 4
-MODEL_COLOR = {"LFM2.5-1.2B-Base": PALETTE["blue"], "Qwen3.5-2B": PALETTE["green"]}
-MODEL_FILL  = {"LFM2.5-1.2B-Base": PALETTE["lightblue"], "Qwen3.5-2B": PALETTE["lightgreen"]}
+# Dua warna kontras tinggi (hue + value berbeda) untuk membedakan dua model
+# di seluruh BAB 4. Tetap aman dicetak grayscale karena LFM lebih gelap dari
+# Qwen pada konversi luminance.
+MODEL_COLOR = {"LFM2.5-1.2B-Base": "#1f4e79", "Qwen3.5-2B": "#b45309"}
+MODEL_FILL  = {"LFM2.5-1.2B-Base": "#cfe2f3", "Qwen3.5-2B": "#fde7c8"}
 
 
 def fig_4_1_storage():
@@ -728,11 +730,11 @@ def fig_4_5_radar_quality():
     all_ppl   = [PPL[m][v] for m in MODELS for v in VARIANTS]
     max_size = max(all_sizes); min_ppl = min(all_ppl); max_ppl = max(all_ppl)
 
-    fig, axes = plt.subplots(1, 2, figsize=(13, 6), subplot_kw=dict(polar=True))
-    variant_style = {"FP16": ("-", PALETTE["gray"]),
-                     "Q5_K_M": ("-", PALETTE["green"]),
+    fig, axes = plt.subplots(1, 2, figsize=(13, 7.2), subplot_kw=dict(polar=True))
+    variant_style = {"FP16":   ("-",  PALETTE["gray"]),
+                     "Q5_K_M": ("-",  PALETTE["green"]),
                      "Q4_K_M": ("--", PALETTE["blue"]),
-                     "Q3_K_M": (":", PALETTE["red"])}
+                     "Q3_K_M": (":",  PALETTE["red"])}
     for ax, m in zip(axes, MODELS):
         ax.set_theta_offset(np.pi / 2)
         ax.set_theta_direction(-1)
@@ -740,8 +742,8 @@ def fig_4_5_radar_quality():
         ax.set_xticklabels(cats, fontsize=9)
         ax.set_ylim(0, 1)
         for v in VARIANTS:
-            storage_score = 1.0 - FILE_SIZE_MB[m][v] / max_size      # kecil = bagus
-            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)  # kecil = bagus
+            storage_score = 1.0 - FILE_SIZE_MB[m][v] / max_size              # kecil = bagus
+            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)    # kecil = bagus
             mmlu = ACC[m][v]["MMLU"] / 100
             gsm  = ACC[m][v]["GSM8k"] / 100
             he   = ACC[m][v]["HumanEval"] / 100
@@ -750,9 +752,15 @@ def fig_4_5_radar_quality():
             ls, c = variant_style[v]
             ax.plot(angles, vals, ls, color=c, linewidth=2, label=v)
             ax.fill(angles, vals, color=c, alpha=0.08)
-        ax.set_title(m, fontsize=11, fontweight="bold", pad=18)
-        ax.legend(loc="upper right", bbox_to_anchor=(1.30, 1.10), fontsize=8.5)
-    fig.suptitle("Gambar 4.5 Radar Kualitas × Efisiensi (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval)", fontsize=12, fontweight="bold")
+        # Nama model ditaruh di BAWAH panel (bukan judul atas) supaya tidak
+        # tumpang tindih dengan suptitle. Pakai annotate axes-fraction.
+        ax.annotate(m, xy=(0.5, -0.18), xycoords="axes fraction",
+                    ha="center", va="center", fontsize=11, fontweight="bold",
+                    color=MODEL_COLOR[m])
+        ax.legend(loc="upper right", bbox_to_anchor=(1.32, 1.05), fontsize=8.5)
+    fig.suptitle("Gambar 4.5 Radar Kualitas × Efisiensi (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval)",
+                 fontsize=12, fontweight="bold", y=0.99)
+    fig.subplots_adjust(top=0.88, bottom=0.14, wspace=0.5)
     save(fig, REPO / "BAB 4" / "gambar" / "4.5_radar_kualitas.png")
 
 

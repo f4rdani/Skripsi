@@ -8,7 +8,7 @@ Nomor halaman akan disesuaikan saat naskah dirakit menjadi dokumen final.
 |------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------------|------|
 | Gambar 1.1 | Perbandingan Alur Inferensi: Cloud-based vs On-Device (Edge) LLM/SLM                                       | BAB 1/gambar/1.1_alur_inferensi_edge.png               |  ... |
 | Gambar 1.2 | Identifikasi Permasalahan & Pendekatan Solusi (Kompresi PTQ untuk SLM Mobile)                              | BAB 1/gambar/1.2_diagram_masalah_kompresi.png          |  ... |
-| Gambar 2.1 | Skema Arsitektur Transformer (Encoder-Decoder Self-Attention)                                              | BAB 2/gambar/2.1_arsitektur_transformer.png            |  ... |
+| Gambar 2.1 | Arsitektur Transformer Decoder (basis SLM modern)                                                          | BAB 2/gambar/2.1_arsitektur_transformer.png            |  ... |
 | Gambar 2.2 | Skema Post-Training Quantization Format GGUF k-quants (Q3/Q4/Q5_K_M)                                       | BAB 2/gambar/2.2_skema_PTQ_GGUF_kquants.png            |  ... |
 | Gambar 2.3 | Arsitektur Edge Intelligence: Cloud → Fog → Edge Device                                                    | BAB 2/gambar/2.3_arsitektur_edge_intelligence.png      |  ... |
 | Gambar 2.4 | Taksonomi Metode Kuantisasi (PTQ vs QAT, Cabang GPTQ, AWQ, GGUF k-quants, QLoRA)                           | BAB 2/gambar/2.4_taxonomy_quantization.png             |  ... |
