@@ -1,0 +1,33 @@
+DAFTAR GAMBAR                                                               xii
+
+Berisi daftar seluruh gambar/diagram yang muncul pada naskah skripsi, lengkap
+dengan referensi file PNG di repositori dan halaman tempat gambar dirujuk.
+Nomor halaman akan disesuaikan saat naskah dirakit menjadi dokumen final.
+
+| No.        | Judul Gambar                                                                                              | Path File                                              | Hal. |
+|------------|-----------------------------------------------------------------------------------------------------------|--------------------------------------------------------|------|
+| Gambar 1.1 | Perbandingan Alur Inferensi: Cloud-based vs On-Device (Edge) LLM/SLM                                       | BAB 1/gambar/1.1_alur_inferensi_edge.png               |  ... |
+| Gambar 1.2 | Identifikasi Permasalahan & Pendekatan Solusi (Kompresi PTQ untuk SLM Mobile)                              | BAB 1/gambar/1.2_diagram_masalah_kompresi.png          |  ... |
+| Gambar 2.1 | Skema Arsitektur Transformer (Encoder-Decoder Self-Attention)                                              | BAB 2/gambar/2.1_arsitektur_transformer.png            |  ... |
+| Gambar 2.2 | Skema Post-Training Quantization Format GGUF k-quants (Q3/Q4/Q5_K_M)                                       | BAB 2/gambar/2.2_skema_PTQ_GGUF_kquants.png            |  ... |
+| Gambar 2.3 | Arsitektur Edge Intelligence: Cloud → Fog → Edge Device                                                    | BAB 2/gambar/2.3_arsitektur_edge_intelligence.png      |  ... |
+| Gambar 2.4 | Taksonomi Metode Kuantisasi (PTQ vs QAT, Cabang GPTQ, AWQ, GGUF k-quants, QLoRA)                           | BAB 2/gambar/2.4_taxonomy_quantization.png             |  ... |
+| Gambar 3.1 | Tahapan Penelitian (Studi Pustaka → Akuisisi Model → Konversi GGUF → Kuantisasi → Evaluasi → Analisis)     | BAB 3/gambar/3.1_tahapan_penelitian.png                |  ... |
+| Gambar 3.2 | Pipeline Eksperimen End-to-End (Hugging Face → llama.cpp → llama-quantize → Termux Pova 5)                 | BAB 3/gambar/3.2_pipeline_eksperimen.png               |  ... |
+| Gambar 3.3 | Skema Goal-Question-Metric (G1 Efisiensi, G2 Kualitas, dengan 4 Question dan 8 Metric)                     | BAB 3/gambar/3.3_skema_GQM.png                         |  ... |
+| Gambar 3.4 | Alur Evaluasi Tiga Dimensi (Knowledge & Capacity · Alignment · Efficiency)                                 | BAB 3/gambar/3.4_alur_evaluasi_3dimensi.png            |  ... |
+| Gambar 4.1 | Ukuran Berkas Model GGUF (FP16 vs k-quants) — LFM2.5-1.2B-Base & Qwen3.5-2B                                | BAB 4/gambar/4.1_ukuran_berkas.png                     |  ... |
+| Gambar 4.2 | Perplexity WikiText-2 per Varian Kuantisasi                                                               | BAB 4/gambar/4.2_perplexity.png                        |  ... |
+| Gambar 4.3 | Akurasi MMLU, GSM8k, HumanEval per Varian Kuantisasi                                                      | BAB 4/gambar/4.3_akurasi_mmlu_gsm8k_humaneval.png      |  ... |
+| Gambar 4.4 | Pareto Storage vs Composite Accuracy                                                                      | BAB 4/gambar/4.4_pareto_storage_vs_accuracy.png        |  ... |
+| Gambar 4.5 | Radar Kualitas × Efisiensi (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval) — Per Model                       | BAB 4/gambar/4.5_radar_kualitas.png                    |  ... |
+| Gambar 4.6 | Profil RAM dan Tokens per Second (placeholder — menunggu pengujian Termux di Pova 5)                       | BAB 4/gambar/4.6_ram_tps_placeholder.png               |  ... |
+
+Catatan:
+1. Halaman ditulis "..." sementara karena penomoran halaman akan diberi otomatis
+   ketika naskah dirakit ke template Microsoft Word/LaTeX BSI final.
+2. Seluruh gambar diregenerasi via skrip `scripts/make_figures.py` sehingga dapat
+   diperbarui ulang setelah data eksperimen baru masuk (mis. RAM, TPS).
+3. Konsistensi visual dijaga: tiga warna utama (biru, merah, hijau), satu bentuk
+   node (rounded rectangle), satu jenis panah (-|>); seluruh keterangan ada di
+   teks dalam node, tanpa ikon eksternal.

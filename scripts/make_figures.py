@@ -26,19 +26,27 @@ plt.rcParams.update(
     }
 )
 
+# Palet sengaja disederhanakan menjadi tiga kategori saja agar
+# tampilan seluruh diagram konsisten dan tidak "berbeda-beda mulu":
+#   default  = biru navy   -> node netral / proses
+#   alert    = merah marun -> node masalah / risiko / batas
+#   success  = hijau gelap -> node target / hasil
+# Semua bentuk node tetap rounded rectangle, semua panah tetap "-|>",
+# tidak ada ikon eksternal — hanya teks di dalam kotak.
 PALETTE = {
     "blue": "#1f4e79",
-    "lightblue": "#cfe2f3",
-    "orange": "#d97706",
-    "lightorange": "#fde7c8",
-    "green": "#15803d",
-    "lightgreen": "#d1fae5",
+    "lightblue": "#dbe7f3",
     "red": "#b91c1c",
-    "lightred": "#fee2e2",
-    "purple": "#6b21a8",
-    "lightpurple": "#ede9fe",
+    "lightred": "#fde2e2",
+    "green": "#15803d",
+    "lightgreen": "#d6efdd",
     "gray": "#374151",
-    "lightgray": "#e5e7eb",
+    "lightgray": "#eef0f3",
+    # alias supaya pemanggil lama tetap jalan, dipetakan ke 3 kategori utama
+    "orange": "#1f4e79",
+    "lightorange": "#dbe7f3",
+    "purple": "#1f4e79",
+    "lightpurple": "#dbe7f3",
 }
 
 
@@ -263,7 +271,7 @@ def fig_1_2_diagram_masalah():
         ax,
         (1.5, 2.6),
         (7.0, 1.0),
-        "Solusi: Post-Training Quantization (PTQ) GGUF k-quants\n(Q3_K_M / Q4_K_M / Q5_K_M) pada SLM LFM2-1.2B & Qwen3.5-2B",
+        "Solusi: Post-Training Quantization (PTQ) GGUF k-quants\n(Q3_K_M / Q4_K_M / Q5_K_M) pada SLM LFM2.5-1.2B-Base & Qwen3.5-2B",
         PALETTE["lightorange"],
         PALETTE["orange"],
         10,
@@ -495,7 +503,7 @@ def fig_3_2_pipeline_eksperimen():
     ax.axis("off")
     ax.set_title("Gambar 3.2 Pipeline Eksperimen On-Device pada Tecno Pova 5")
 
-    box(ax, (0.3, 5.0), (3.0, 1.0), "Sumber Bobot\nHugging Face\n(LFM2-1.2B, Qwen3.5-2B)", PALETTE["lightgray"], PALETTE["gray"], 9.5, "bold")
+    box(ax, (0.3, 5.0), (3.0, 1.0), "Sumber Bobot\nHugging Face\n(LFM2.5-1.2B-Base, Qwen3.5-2B)", PALETTE["lightgray"], PALETTE["gray"], 9.5, "bold")
     box(ax, (4.0, 5.0), (3.0, 1.0), "Konversi & Kuantisasi\nllama.cpp convert.py\n+ quantize", PALETTE["lightorange"], PALETTE["orange"], 10, "bold")
     box(ax, (7.7, 5.0), (4.0, 1.0), "Artefak GGUF\nFP16 / Q5_K_M / Q4_K_M / Q3_K_M\n(8 file)", PALETTE["lightpurple"], PALETTE["purple"], 9.5, "bold")
     arrow(ax, (3.3, 5.5), (4.0, 5.5))
@@ -583,65 +591,182 @@ def fig_3_4_alur_3d_eval():
     save(fig, REPO / "BAB 3" / "gambar" / "3.4_alur_evaluasi_3dimensi.png")
 
 
-# ========== BAB 4 placeholder ==========
+# ========== BAB 4 (data riil) ==========
+
+# File size dalam MB (dari `ls -lh` user; konversi 1 G = 1024 MB).
+FILE_SIZE_MB = {
+    "LFM2.5-1.2B-Base": {"FP16": 2252.8, "Q5_K_M": 805.0, "Q4_K_M": 698.0, "Q3_K_M": 573.0},
+    "Qwen3.5-2B":      {"FP16": 3686.4, "Q5_K_M": 1433.6, "Q4_K_M": 1228.8, "Q3_K_M": 1126.4},
+}
+
+# Perplexity WikiText-2 (lower is better).
+PPL = {
+    "LFM2.5-1.2B-Base": {"FP16": 12.6829, "Q5_K_M": 12.8297, "Q4_K_M": 13.2145, "Q3_K_M": 14.5135},
+    "Qwen3.5-2B":      {"FP16": 12.7763, "Q5_K_M": 13.0856, "Q4_K_M": 13.3617, "Q3_K_M": 15.2172},
+}
+
+# Akurasi (%).
+ACC = {
+    "LFM2.5-1.2B-Base": {
+        "FP16":   {"MMLU": 33, "GSM8k": 52, "HumanEval": 36},
+        "Q5_K_M": {"MMLU": 30, "GSM8k": 52, "HumanEval": 29},
+        "Q4_K_M": {"MMLU": 28, "GSM8k": 51, "HumanEval": 37},
+        "Q3_K_M": {"MMLU": 32, "GSM8k": 42, "HumanEval": 30},
+    },
+    "Qwen3.5-2B": {
+        "FP16":   {"MMLU": 12, "GSM8k": 57, "HumanEval": 52},
+        "Q5_K_M": {"MMLU": 14, "GSM8k": 53, "HumanEval": 47},
+        "Q4_K_M": {"MMLU": 14, "GSM8k": 56, "HumanEval": 44},
+        "Q3_K_M": {"MMLU": 22, "GSM8k": 37, "HumanEval": 26},
+    },
+}
+
+VARIANTS = ["FP16", "Q5_K_M", "Q4_K_M", "Q3_K_M"]
+MODELS = ["LFM2.5-1.2B-Base", "Qwen3.5-2B"]
+# Dua warna konsisten untuk membedakan dua model di seluruh BAB 4
+MODEL_COLOR = {"LFM2.5-1.2B-Base": PALETTE["blue"], "Qwen3.5-2B": PALETTE["green"]}
+MODEL_FILL  = {"LFM2.5-1.2B-Base": PALETTE["lightblue"], "Qwen3.5-2B": PALETTE["lightgreen"]}
 
 
-def fig_4_placeholder_radar():
-    """Generate a placeholder radar chart for BAB 4 with mock illustrative data."""
-    categories = ["Storage\n(efficiency)", "RAM\n(efficiency)", "TPS-Gen\n(efficiency)", "MMLU", "GSM8k", "HumanEval", "PPL inv."]
-    n = len(categories)
-    angles = np.linspace(0, 2 * np.pi, n, endpoint=False).tolist()
+def fig_4_1_storage():
+    fig, ax = plt.subplots(figsize=(9, 5))
+    x = np.arange(len(VARIANTS))
+    w = 0.36
+    for i, m in enumerate(MODELS):
+        vals = [FILE_SIZE_MB[m][v] for v in VARIANTS]
+        offset = (i - 0.5) * w
+        bars = ax.bar(x + offset, vals, w, label=m, color=MODEL_FILL[m], edgecolor=MODEL_COLOR[m], linewidth=1.4)
+        for b, val in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width()/2, val + 60, f"{val:.0f}", ha="center", fontsize=8.5)
+    ax.set_xticks(x)
+    ax.set_xticklabels(VARIANTS)
+    ax.set_ylabel("Ukuran berkas (MB)")
+    ax.set_title("Gambar 4.1 Ukuran Berkas Model GGUF (FP16 vs k-quants)")
+    ax.legend()
+    ax.grid(True, axis="y", alpha=0.3)
+    save(fig, REPO / "BAB 4" / "gambar" / "4.1_ukuran_berkas.png")
+
+
+def fig_4_2_perplexity():
+    fig, ax = plt.subplots(figsize=(9, 5))
+    x = np.arange(len(VARIANTS))
+    w = 0.36
+    for i, m in enumerate(MODELS):
+        vals = [PPL[m][v] for v in VARIANTS]
+        offset = (i - 0.5) * w
+        bars = ax.bar(x + offset, vals, w, label=m, color=MODEL_FILL[m], edgecolor=MODEL_COLOR[m], linewidth=1.4)
+        for b, val in zip(bars, vals):
+            ax.text(b.get_x() + b.get_width()/2, val + 0.1, f"{val:.3f}", ha="center", fontsize=8.5)
+    ax.set_xticks(x)
+    ax.set_xticklabels(VARIANTS)
+    ax.set_ylabel("Perplexity WikiText-2 (lebih rendah lebih baik)")
+    ax.set_title("Gambar 4.2 Perplexity per Varian Kuantisasi")
+    ax.legend()
+    ax.grid(True, axis="y", alpha=0.3)
+    save(fig, REPO / "BAB 4" / "gambar" / "4.2_perplexity.png")
+
+
+def fig_4_3_accuracy():
+    benches = ["MMLU", "GSM8k", "HumanEval"]
+    fig, axes = plt.subplots(1, 3, figsize=(15, 4.5), sharey=True)
+    for ax, b in zip(axes, benches):
+        x = np.arange(len(VARIANTS))
+        w = 0.36
+        for i, m in enumerate(MODELS):
+            vals = [ACC[m][v][b] for v in VARIANTS]
+            offset = (i - 0.5) * w
+            bars = ax.bar(x + offset, vals, w, label=m, color=MODEL_FILL[m], edgecolor=MODEL_COLOR[m], linewidth=1.4)
+            for bar, val in zip(bars, vals):
+                ax.text(bar.get_x() + bar.get_width()/2, val + 1, f"{val}%", ha="center", fontsize=8.5)
+        ax.set_xticks(x)
+        ax.set_xticklabels(VARIANTS)
+        ax.set_title(b)
+        ax.set_ylim(0, 70)
+        ax.grid(True, axis="y", alpha=0.3)
+    axes[0].set_ylabel("Akurasi (%)")
+    axes[-1].legend(loc="upper right", fontsize=8)
+    fig.suptitle("Gambar 4.3 Akurasi MMLU, GSM8k, HumanEval per Varian Kuantisasi", y=1.02, fontsize=12, fontweight="bold")
+    save(fig, REPO / "BAB 4" / "gambar" / "4.3_akurasi_mmlu_gsm8k_humaneval.png")
+
+
+def fig_4_4_pareto_storage_vs_acc():
+    """Pareto: x = relative storage vs FP16, y = composite accuracy (mean of 3 benches)."""
+    fig, ax = plt.subplots(figsize=(8.5, 6))
+    markers = {"FP16": "o", "Q5_K_M": "s", "Q4_K_M": "^", "Q3_K_M": "D"}
+    for m in MODELS:
+        fp16 = FILE_SIZE_MB[m]["FP16"]
+        for v in VARIANTS:
+            rel = FILE_SIZE_MB[m][v] / fp16
+            comp = np.mean(list(ACC[m][v].values()))
+            ax.scatter(rel, comp, s=160, marker=markers[v], color=MODEL_FILL[m], edgecolor=MODEL_COLOR[m], linewidth=1.6, label=f"{m} {v}")
+            ax.annotate(v, (rel, comp), xytext=(7, 5), textcoords="offset points", fontsize=8.5, color=MODEL_COLOR[m])
+        # garis penghubung (urut FP16 -> Q5 -> Q4 -> Q3)
+        xs = [FILE_SIZE_MB[m][v] / fp16 for v in VARIANTS]
+        ys = [np.mean(list(ACC[m][v].values())) for v in VARIANTS]
+        ax.plot(xs, ys, color=MODEL_COLOR[m], linewidth=1.0, alpha=0.5)
+    ax.set_xlabel("Relative storage (× FP16) — lebih kiri = lebih hemat")
+    ax.set_ylabel("Composite accuracy (mean MMLU · GSM8k · HumanEval)")
+    ax.set_xlim(0.0, 1.1)
+    ax.grid(True, alpha=0.3)
+    # legenda manual: hanya 2 model + 4 varian (markers)
+    from matplotlib.lines import Line2D
+    h = [Line2D([0], [0], marker="o", color="w", markerfacecolor=MODEL_FILL[m], markeredgecolor=MODEL_COLOR[m], markersize=10, label=m) for m in MODELS]
+    h += [Line2D([0], [0], marker=markers[v], color="k", linestyle="", markerfacecolor="white", markersize=9, label=v) for v in VARIANTS]
+    ax.legend(handles=h, loc="lower right", fontsize=8.5)
+    ax.set_title("Gambar 4.4 Pareto Storage vs Composite Accuracy")
+    save(fig, REPO / "BAB 4" / "gambar" / "4.4_pareto_storage_vs_accuracy.png")
+
+
+def fig_4_5_radar_quality():
+    """Radar empat varian per model: storage hemat, PPL invers, MMLU, GSM8k, HumanEval. RAM/TPS belum tersedia."""
+    cats = ["Storage\nhemat", "PPL\ninvers", "MMLU", "GSM8k", "HumanEval"]
+    angles = np.linspace(0, 2 * np.pi, len(cats), endpoint=False).tolist()
     angles += angles[:1]
 
-    # Mock illustrative scores (0..1) - placeholder until real data is filled in
-    series = {
-        "FP16": [0.10, 0.20, 0.40, 1.00, 1.00, 1.00, 1.00],
-        "Q5_K_M": [0.50, 0.55, 0.70, 0.98, 0.97, 0.96, 0.97],
-        "Q4_K_M": [0.75, 0.78, 0.85, 0.95, 0.93, 0.92, 0.94],
-        "Q3_K_M": [0.92, 0.92, 0.95, 0.85, 0.80, 0.78, 0.82],
-    }
-    colors = {"FP16": PALETTE["gray"], "Q5_K_M": PALETTE["green"], "Q4_K_M": PALETTE["orange"], "Q3_K_M": PALETTE["red"]}
+    # normalisasi ke 0..1 berdasarkan agregat semua kondisi
+    all_sizes = [FILE_SIZE_MB[m][v] for m in MODELS for v in VARIANTS]
+    all_ppl   = [PPL[m][v] for m in MODELS for v in VARIANTS]
+    max_size = max(all_sizes); min_ppl = min(all_ppl); max_ppl = max(all_ppl)
 
-    fig, ax = plt.subplots(figsize=(7, 7), subplot_kw=dict(polar=True))
-    ax.set_theta_offset(np.pi / 2)
-    ax.set_theta_direction(-1)
-    ax.set_xticks(angles[:-1])
-    ax.set_xticklabels(categories, fontsize=9)
-    ax.set_ylim(0, 1)
-    for label, values in series.items():
-        v = values + values[:1]
-        ax.plot(angles, v, color=colors[label], linewidth=2, label=label)
-        ax.fill(angles, v, color=colors[label], alpha=0.10)
-    ax.legend(loc="upper right", bbox_to_anchor=(1.25, 1.1), fontsize=9)
-    ax.set_title(
-        "Gambar 4.X Diagram Radar (PLACEHOLDER — diisi setelah data benchmark masuk)",
-        pad=22,
-        fontsize=11,
-    )
-    save(fig, REPO / "BAB 4" / "gambar" / "4.X_radar_placeholder.png")
+    fig, axes = plt.subplots(1, 2, figsize=(13, 6), subplot_kw=dict(polar=True))
+    variant_style = {"FP16": ("-", PALETTE["gray"]),
+                     "Q5_K_M": ("-", PALETTE["green"]),
+                     "Q4_K_M": ("--", PALETTE["blue"]),
+                     "Q3_K_M": (":", PALETTE["red"])}
+    for ax, m in zip(axes, MODELS):
+        ax.set_theta_offset(np.pi / 2)
+        ax.set_theta_direction(-1)
+        ax.set_xticks(angles[:-1])
+        ax.set_xticklabels(cats, fontsize=9)
+        ax.set_ylim(0, 1)
+        for v in VARIANTS:
+            storage_score = 1.0 - FILE_SIZE_MB[m][v] / max_size      # kecil = bagus
+            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)  # kecil = bagus
+            mmlu = ACC[m][v]["MMLU"] / 100
+            gsm  = ACC[m][v]["GSM8k"] / 100
+            he   = ACC[m][v]["HumanEval"] / 100
+            vals = [storage_score, ppl_score, mmlu, gsm, he]
+            vals += vals[:1]
+            ls, c = variant_style[v]
+            ax.plot(angles, vals, ls, color=c, linewidth=2, label=v)
+            ax.fill(angles, vals, color=c, alpha=0.08)
+        ax.set_title(m, fontsize=11, fontweight="bold", pad=18)
+        ax.legend(loc="upper right", bbox_to_anchor=(1.30, 1.10), fontsize=8.5)
+    fig.suptitle("Gambar 4.5 Radar Kualitas × Efisiensi (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval)", fontsize=12, fontweight="bold")
+    save(fig, REPO / "BAB 4" / "gambar" / "4.5_radar_kualitas.png")
 
 
-def fig_4_placeholder_pareto():
-    fig, ax = plt.subplots(figsize=(8, 6))
-    # Mock illustrative
-    pts = {
-        "FP16": (1.00, 100, 80, "o"),
-        "Q5_K_M": (0.55, 97, 50, "s"),
-        "Q4_K_M": (0.32, 93, 32, "^"),
-        "Q3_K_M": (0.20, 80, 22, "D"),
-    }
-    for label, (size, acc, ram, marker) in pts.items():
-        ax.scatter(size, acc, s=ram * 10, marker=marker, alpha=0.7, label=f"{label} (RAM~{ram}%)", edgecolor="black")
-        ax.annotate(label, (size, acc), xytext=(8, 6), textcoords="offset points", fontsize=10, fontweight="bold")
-
-    ax.set_xlabel("Relative storage (× FP16) — lebih kiri = lebih hemat")
-    ax.set_ylabel("Composite accuracy score (%)")
-    ax.set_xlim(0, 1.1)
-    ax.set_ylim(60, 105)
-    ax.grid(True, alpha=0.3)
-    ax.legend(title="Marker size ∝ peak RAM", loc="lower right", fontsize=9)
-    ax.set_title("Gambar 4.Y Pareto plot Storage vs Accuracy (PLACEHOLDER)")
-    save(fig, REPO / "BAB 4" / "gambar" / "4.Y_pareto_placeholder.png")
+def fig_4_6_ram_tps_placeholder():
+    """Gambar 4.6 placeholder — menunggu data RAM/TPS dari pengujian Termux di Pova 5."""
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.set_xlim(0, 10); ax.set_ylim(0, 6); ax.axis("off")
+    ax.set_title("Gambar 4.6 Profil RAM dan TPS (PLACEHOLDER — menunggu pengujian Termux di Pova 5)")
+    box(ax, (0.5, 1.5), (9.0, 3.0),
+        "Diagram RAM dan TPS akan dibuat setelah benchmark di smartphone Pova 5 selesai.\n\n"
+        "Metrik yang ditunggu: peak RAM (MB), prompt t/s, generation t/s,\n"
+        "OOM count, baterai 0→40% (estimasi),  thermal throttling rate.",
+        PALETTE["lightred"], PALETTE["red"], 11, "bold")
+    save(fig, REPO / "BAB 4" / "gambar" / "4.6_ram_tps_placeholder.png")
 
 
 def main() -> None:
@@ -661,9 +786,13 @@ def main() -> None:
     fig_3_3_skema_gqm()
     fig_3_4_alur_3d_eval()
 
-    print("Generating BAB 4 placeholders...")
-    fig_4_placeholder_radar()
-    fig_4_placeholder_pareto()
+    print("Generating BAB 4 figures...")
+    fig_4_1_storage()
+    fig_4_2_perplexity()
+    fig_4_3_accuracy()
+    fig_4_4_pareto_storage_vs_acc()
+    fig_4_5_radar_quality()
+    fig_4_6_ram_tps_placeholder()
 
     print("Done.")
 

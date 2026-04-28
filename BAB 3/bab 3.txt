@@ -10,7 +10,7 @@ Penelitian dilaksanakan dalam delapan tahap berurutan sebagaimana diilustrasikan
 
 a.	Studi Pustaka. Penelusuran literatur dilakukan pada jurnal bereputasi yang diterbitkan dalam rentang 2020–2026, mencakup metode kuantisasi, evaluasi LLM, edge intelligence, dan arsitektur SLM. Hasil studi pustaka dirangkum di BAB II.
 b.	Perencanaan Goal–Question–Metric (GQM). Tujuan penelitian (Goal) diturunkan menjadi empat pertanyaan riset (Question) sesuai Bagian 1.3, lalu setiap pertanyaan dipetakan ke metrik kuantitatif (Metric) sebagaimana dirinci pada Bagian 3.4 dan diilustrasikan pada Gambar 3.3.
-c.	Persiapan Model dan Lingkungan Eksperimen. Bobot LFM2-1.2B dan Qwen3.5-2B diunduh dari Hugging Face, dikonversi ke GGUF, dan dikuantisasi ke Q5_K_M, Q4_K_M, dan Q3_K_M menggunakan utilitas llama.cpp quantize. Hasilnya berupa delapan file GGUF (2 model × 4 varian).
+c.	Persiapan Model dan Lingkungan Eksperimen. Bobot LFM2.5-1.2B-Base dan Qwen3.5-2B diunduh dari Hugging Face, dikonversi ke GGUF, dan dikuantisasi ke Q5_K_M, Q4_K_M, dan Q3_K_M menggunakan utilitas llama.cpp quantize. Hasilnya berupa delapan file GGUF (2 model × 4 varian).
 d.	Pengukuran Statik. File size (MB) dicatat dari sistem berkas. Peak RAM dicatat saat model dimuat ke memori namun belum dieksekusi.
 e.	Pengukuran Dinamik. Prompt processing rate dan generation rate diukur menggunakan utilitas llama-bench dengan prompt panjang 512 token dan output 128 token, lima ulangan plus dua warm-up.
 f.	Pengukuran Kualitas. Perplexity dihitung pada dataset WikiText-2 (split test, 4096 token sliding window). Akurasi MMLU, GSM8k, dan HumanEval dihitung pada 100 sampel random per dataset menggunakan evaluator script.
@@ -57,7 +57,7 @@ Tabel 3.3 Spesifikasi Model dan Dataset Evaluasi
 +----+------------------------+-----------+------------------------------------------+
 | No | Model / Dataset        | Parameter | Sumber                                    |
 +----+------------------------+-----------+------------------------------------------+
-| 1  | LFM2-1.2B              | 1,2 B     | Liquid AI / Hugging Face                  |
+| 1  | LFM2.5-1.2B-Base              | 1,2 B     | Liquid AI / Hugging Face                  |
 | 2  | Qwen3.5-2B             | 2 B       | Alibaba Cloud / Hugging Face              |
 | 3  | Varian kuantisasi      | -         | FP16 (baseline), Q5_K_M, Q4_K_M, Q3_K_M   |
 | 4  | WikiText-2             | 4096 ctx  | Hugging Face datasets (test split)        |
@@ -79,7 +79,7 @@ b.	Wawancara. Wawancara terstruktur dilakukan secara terbatas dan bersifat opsio
 
 c.	Studi Pustaka. Studi pustaka dilakukan dengan mengumpulkan dan mereview jurnal yang dipublikasikan dalam lima tahun terakhir, sebagaimana telah dirangkum pada BAB II. Manajemen referensi memakai Mendeley dengan format APA edisi ke-7.
 
-Untuk menjamin ukuran sampel yang memadai, setiap kondisi (kombinasi model × varian kuantisasi × benchmark) dijalankan dengan dua warm-up run yang dipisahkan dari lima run pengukuran efektif (n = 5). Sampel pengujian terdiri dari dua model (LFM2-1.2B dan Qwen3.5-2B), empat varian kuantisasi (FP16, Q5_K_M, Q4_K_M, Q3_K_M), empat benchmark sistem (file size, peak RAM, prompt t/s, generation t/s), serta empat benchmark kualitas (WikiText-2 PPL, MMLU, GSM8k, HumanEval) dengan 100 sampel per benchmark kualitas, sehingga total 160 run pengukuran sistem dan 32 run pengukuran kualitas. Jumlah ini memenuhi persyaratan statistik (Cohen's d = 0,3 dengan power 0,8 mensyaratkan n ≥ 65).
+Untuk menjamin ukuran sampel yang memadai, setiap kondisi (kombinasi model × varian kuantisasi × benchmark) dijalankan dengan dua warm-up run yang dipisahkan dari lima run pengukuran efektif (n = 5). Sampel pengujian terdiri dari dua model (LFM2.5-1.2B-Base dan Qwen3.5-2B), empat varian kuantisasi (FP16, Q5_K_M, Q4_K_M, Q3_K_M), empat benchmark sistem (file size, peak RAM, prompt t/s, generation t/s), serta empat benchmark kualitas (WikiText-2 PPL, MMLU, GSM8k, HumanEval) dengan 100 sampel per benchmark kualitas, sehingga total 160 run pengukuran sistem dan 32 run pengukuran kualitas. Jumlah ini memenuhi persyaratan statistik (Cohen's d = 0,3 dengan power 0,8 mensyaratkan n ≥ 65).
 
 3.4.	Metode Analisis Data
 Analisis data dilakukan dalam dua jalur paralel: (a) analisis efisiensi, dan (b) analisis kualitas. Keduanya kemudian digabungkan pada analisis Pareto.

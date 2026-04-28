@@ -1,0 +1,63 @@
+DAFTAR SIMBOL                                                                xi
+
+Berisi simbol matematis, simbol grafis pada diagram, serta singkatan teknis yang
+muncul di seluruh naskah skripsi. Simbol disusun mengikuti urutan kemunculan.
+
+A. SIMBOL MATEMATIS
+| Simbol | Nama / Bacaan        | Penjelasan                                                       |
+|--------|----------------------|------------------------------------------------------------------|
+| Δ      | Delta                | Selisih atau perubahan nilai antara dua pengukuran.               |
+| ≈      | Kira-kira            | Pendekatan numerik (mis. ≈ 8 GB).                                  |
+| ≤      | Kurang dari atau sama| Batas atas suatu nilai.                                            |
+| ≥      | Lebih dari atau sama | Batas bawah suatu nilai.                                           |
+| ±      | Plus-minus           | Margin error pada hasil pengukuran (mis. mean ± standar deviasi).  |
+| ×      | Kali / multiplikator | Rasio relatif (mis. 0,310× = 31 % dari nilai acuan).               |
+| ⁻¹     | Invers / negative-1  | Kebalikan suatu nilai (mis. PPL⁻¹ = 1/PPL).                         |
+| ∝      | Proporsional         | Berbanding lurus terhadap suatu variabel.                          |
+| α      | Alfa                 | Tingkat signifikansi statistik (mis. α = 0,05).                    |
+| σ      | Sigma                | Standar deviasi populasi.                                          |
+| μ      | Mu                   | Rerata (mean) populasi.                                            |
+| n      | n-sampel             | Jumlah sampel pengamatan.                                          |
+
+B. SIMBOL GRAFIS PADA DIAGRAM
+| Simbol            | Penjelasan                                                                  |
+|-------------------|-----------------------------------------------------------------------------|
+| Kotak rounded biru (default)  | Node netral: proses, modul, data, atau model.                    |
+| Kotak rounded merah (alert)   | Node masalah / risiko / batas yang harus dihindari.              |
+| Kotak rounded hijau (success) | Node target, hasil, atau kondisi yang diinginkan.                |
+| Kotak rounded abu-abu         | Node aktor (pengguna, peneliti) atau konteks lingkungan.         |
+| Panah →                       | Alur sebab-akibat / urutan proses (sumber → tujuan).              |
+| Panah ⇒                       | Implikasi atau kesimpulan yang ditarik.                          |
+| Garis putus-putus             | Hubungan opsional / referensial, bukan alur eksekusi utama.       |
+
+Catatan konsistensi: seluruh diagram pada Bab I–IV menggunakan tiga warna utama
+(biru = default, merah = alert, hijau = success) dan satu bentuk node tunggal
+berupa rounded rectangle. Tidak ada ikon eksternal (foto, gambar) di dalam node;
+seluruh keterangan disampaikan dalam bentuk teks agar simbol tetap seragam.
+
+C. SINGKATAN / AKRONIM TEKNIS UTAMA
+| Akronim    | Kepanjangan                                  | Penjelasan singkat                                          |
+|------------|----------------------------------------------|-------------------------------------------------------------|
+| AI         | Artificial Intelligence                      | Kecerdasan buatan.                                          |
+| AWQ        | Activation-aware Weight Quantization         | Metode PTQ pelindung outliers (Lin et al., 2024).            |
+| FP16       | Floating-Point 16-bit                        | Presisi setengah, baseline tanpa kuantisasi.                |
+| GGUF       | GPT-Generated Unified Format                 | Format file model untuk inferensi llama.cpp.                |
+| GPTQ       | Gradient-based Post-Training Quantization    | Metode PTQ second-order (Frantar et al., 2023).             |
+| GPU        | Graphics Processing Unit                     | Akselerator komputasi paralel.                              |
+| GQM        | Goal-Question-Metric                         | Kerangka pengukuran (Basili et al., 1994).                  |
+| LLM        | Large Language Model                         | Model bahasa berskala besar (≥ 7 B parameter).               |
+| MMLU       | Massive Multitask Language Understanding     | Benchmark akurasi pengetahuan multi-domain.                 |
+| NLP        | Natural Language Processing                  | Pemrosesan bahasa alami.                                    |
+| OOM        | Out of Memory                                | Kondisi kehabisan memori (memicu Force Close).               |
+| PPL        | Perplexity                                   | Indeks kualitas linguistik; semakin rendah semakin baik.     |
+| PTQ        | Post-Training Quantization                   | Kuantisasi setelah fase pelatihan tanpa retraining.          |
+| QAT        | Quantization-Aware Training                  | Kuantisasi yang menyatu dalam fase pelatihan.                |
+| Q3_K_M     | k-quants 3-bit (Mostly)                      | Varian kuantisasi 3-bit tipe presisi campuran.               |
+| Q4_K_M     | k-quants 4-bit (Mostly)                      | Varian kuantisasi 4-bit tipe presisi campuran.               |
+| Q5_K_M     | k-quants 5-bit (Mostly)                      | Varian kuantisasi 5-bit tipe presisi campuran.               |
+| RAM        | Random Access Memory                         | Memori akses acak (kapasitas terbatas pada smartphone).      |
+| RQ         | Research Question                            | Pertanyaan penelitian.                                       |
+| SLM        | Small Language Model                         | Model bahasa berskala kecil (≤ 4 B parameter).               |
+| SoC        | System-on-Chip                               | Cip terintegrasi pada smartphone (CPU + GPU + DSP).          |
+| SD         | Standar Deviasi                              | Sebaran nilai di sekitar rerata.                            |
+| TPS        | Tokens per Second                            | Kecepatan generasi/pemrosesan token.                        |

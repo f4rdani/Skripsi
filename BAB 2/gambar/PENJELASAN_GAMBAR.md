@@ -17,7 +17,7 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 5. RMSNorm — normalisasi sebelum FFN.
 6. SwiGLU FFN — feed-forward dengan aktivasi SwiGLU.
 7. Residual +.
-8. ×N decoder blocks — pengulangan blok 1–7 sebanyak N kali (LFM2-1.2B ≈ 16 blok, Qwen3.5-2B ≈ 28 blok).
+8. ×N decoder blocks — pengulangan blok 1–7 sebanyak N kali (LFM2.5-1.2B-Base ≈ 16 blok, Qwen3.5-2B ≈ 28 blok).
 9. Final RMSNorm.
 10. Linear → Softmax (vocab logits) — keluaran berupa distribusi probabilitas token berikutnya.
 

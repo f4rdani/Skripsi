@@ -14,6 +14,21 @@ Konten kedua versi **identik secara substansi** (LB sama, identifikasi sama, tuj
 
 **Jangan ubah layout.** Pilih versi sesuai outline yang diinstruksikan dosen pembimbing.
 
+### Sumber konten BAB I (per November 2026)
+Naskah BAB I V1 dan V2 di repo ini disusun berdasarkan **dokumen `SKRIPSI full v2.docx`** yang dilampirkan oleh penulis (Altria/Fardani) sebagai sumber utama. Dokumen tersebut memuat BAB I lengkap dengan struktur 1.1–1.6 (selaras dengan V2). Untuk V1 (1.1–1.8), konten yang sama diadaptasi dengan dua tambahan sub-bab eksplisit (1.3 Perumusan Masalah dan 1.6 Teknik Pengumpulan Data dengan sub a/b/c) sesuai panduan BSI Periode I 2024. Gaya bahasa metaforis (purple prose) dipertahankan persis sebagaimana di docx; hanya sitasi yang ditambahkan dalam kurung agar setiap klaim memiliki rujukan, dan koreksi typo minor dilakukan di tempat yang dibutuhkan.
+
+Pemetaan blok konten dari docx ke V1 dan V2:
+| Blok docx                | V1 (1.1–1.8)            | V2 (1.1–1.6)            |
+|--------------------------|-------------------------|-------------------------|
+| Latar Belakang Masalah   | 1.1                     | 1.1                     |
+| Identifikasi Permasalahan| 1.2                     | 1.2                     |
+| (turunan: kalimat tanya) | 1.3 Perumusan Masalah   | (tidak ada subbab)      |
+| Maksud + Tujuan + Manfaat| 1.4 Tujuan & Manfaat    | 1.3 Maksud dan Tujuan   |
+| Metode Penelitian        | 1.5                     | 1.4 (paragraf utama)    |
+| Observasi + Studi Pustaka + opsional Wawancara | 1.6 a/b/c | 1.4.1 / 1.4.2          |
+| Ruang Lingkup            | 1.7                     | 1.5                     |
+| Hipotesis                | 1.8                     | 1.6                     |
+
 ---
 
 Selanjutnya catatan di bawah ini menjelaskan fungsi setiap sub-bab pada V1 (1.1–1.8). Untuk V2 (1.1–1.6), pemetaan dirangkum di bagian akhir.

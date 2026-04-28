@@ -46,7 +46,7 @@ Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `j
 **Adaptasi untuk skripsi ini.** Penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak mengambil studi kasus pada satu organisasi tertentu. Karena itu sub-bab 2.3 diadaptasi—tetap memakai judul resmi panduan **"Tinjauan Organisasi"**—dengan isi yang dibagi menjadi:
 - **2.3.1 Universitas Bina Sarana Informatika (BSI)** — institusi tempat skripsi disusun.
 - **2.3.2 Smartphone Tecno Pova 5** — perangkat eksperimen.
-- **2.3.3 LFM2-1.2B** — model uji 1.
+- **2.3.3 LFM2.5-1.2B-Base** — model uji 1.
 - **2.3.4 Qwen3.5-2B** — model uji 2.
 - **2.3.5 Termux dan llama.cpp** — runtime utama.
 
