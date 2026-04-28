@@ -40,17 +40,14 @@ Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `j
 - Penjelasan ringkas paragraf untuk setiap penelitian.
 - Penjelasan dikaitkan secara eksplisit ke topik skripsi (mengapa relevan, bukan sekadar daftar abstrak).
 
-## 2.3 Tinjauan Organisasi
-**Standar BSI (panduan):** "Berisi tentang tinjauan organisasi ditempat riset dilakukan."
+## 2.3 Tinjauan Objek Penelitian
+**Standar BSI (panduan):** "Tinjauan Organisasi/Objek Penelitian — berisi tentang tinjauan organisasi di tempat riset dilakukan, atau tinjauan terhadap objek penelitian apabila skripsi tidak terikat pada satu organisasi."
 
-**Adaptasi untuk skripsi ini.** Penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak mengambil studi kasus pada satu organisasi tertentu. Karena itu sub-bab 2.3 diadaptasi—tetap memakai judul resmi panduan **"Tinjauan Organisasi"**—dengan isi yang dibagi menjadi:
-- **2.3.1 Universitas Bina Sarana Informatika (BSI)** — institusi tempat skripsi disusun.
-- **2.3.2 Smartphone Tecno Pova 5** — perangkat eksperimen.
-- **2.3.3 LFM2.5-1.2B-Base** — model uji 1.
-- **2.3.4 Qwen3.5-2B** — model uji 2.
-- **2.3.5 Termux dan llama.cpp** — runtime utama.
-
-Adaptasi ini lazim dilakukan pada skripsi rekayasa di prodi yang sama, supaya struktur sub-bab tetap mengikuti panduan tetapi konten relevan dengan tema teknis.
+**Pilihan untuk skripsi ini.** Penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi atau tempat riset sebagai studi kasus. Sesuai panduan yang menyebut judul **"Tinjauan Organisasi/Objek Penelitian"**, sub-bab 2.3 menggunakan opsi **"Tinjauan Objek Penelitian"** dengan isi:
+- **2.3.1 Smartphone Tecno Pova 5** — perangkat eksperimen.
+- **2.3.2 LFM2.5-1.2B-Base** — model uji 1.
+- **2.3.3 Qwen3.5-2B** — model uji 2.
+- **2.3.4 Termux dan llama.cpp** — runtime utama.
 
 ## Aturan kutipan & gaya
 - Setiap teori atau angka spesifik **wajib** memiliki sitasi.

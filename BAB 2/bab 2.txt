@@ -1,7 +1,7 @@
 BAB II
 LANDASAN TEORI
 
-Bab ini menguraikan landasan teori yang menopang penelitian. Bagian 2.1 memaparkan teori-teori dasar yang relevan terhadap topik. Bagian 2.2 mereview penelitian terkait yang dipublikasikan dalam lima tahun terakhir, dan Bagian 2.3 menjelaskan tinjauan terhadap objek penelitian, yaitu perangkat smartphone Android dan dua arsitektur Small Language Model (SLM) yang menjadi subjek uji.
+Bab ini menguraikan landasan teori yang menopang penelitian. Bagian 2.1 memaparkan teori-teori dasar yang relevan terhadap topik. Bagian 2.2 mereview penelitian terkait yang dipublikasikan dalam lima tahun terakhir, dan Bagian 2.3 menjelaskan tinjauan objek penelitian, yaitu perangkat smartphone Android, dua arsitektur Small Language Model (SLM) yang menjadi subjek uji, serta lingkungan perangkat lunak Termux + llama.cpp.
 
 2.1.	Tinjauan Pustaka
 2.1.1.	Large Language Model (LLM) dan Small Language Model (SLM)
@@ -98,20 +98,17 @@ k.	Nurohim et al. (2025) melakukan analisis komparatif LLM DeepSeek dan Qwen dal
 
 l.	Ray & Pradhan (2026) mempresentasikan analisis performa LLM lokal pada Raspberry Pi 4 (8 GB LPDDR4, ARM Cortex-A72) menggunakan klien Python dan Rust. Mereka menemukan bahwa pemilihan API client (Rust vs Python) berdampak besar pada cold-start latency. Penelitian ini menjadi pembanding paling dekat (resource-constrained edge ARM) untuk skripsi ini.
 
-2.3.	Tinjauan Organisasi
-Skripsi ini disusun di lingkungan Program Studi Teknologi Informasi Universitas Bina Sarana Informatika (BSI). Karena penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi sebagai studi kasus, sub-bab ini diadaptasi untuk menjelaskan lingkungan riset—yaitu institusi tempat skripsi disusun serta perangkat dan ekosistem perangkat lunak yang menjadi objek eksperimen. Adaptasi serupa lazim dilakukan pada skripsi rekayasa di prodi yang sama.
+2.3.	Tinjauan Objek Penelitian
+Karena penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi atau tempat riset sebagai studi kasus, sub-bab ini berisi tinjauan terhadap objek penelitian — yaitu perangkat keras, dua arsitektur Small Language Model yang menjadi subjek uji, serta lingkungan perangkat lunak yang dipakai untuk mengeksekusi eksperimen. Adaptasi sub-bab ini sejalan dengan panduan yang menyebut judul "Tinjauan Organisasi/Objek Penelitian".
 
-2.3.1.	Universitas Bina Sarana Informatika
-Universitas Bina Sarana Informatika (BSI) merupakan institusi tempat penelitian ini disusun dan diuji. Sumber daya yang digunakan dari sisi institusi mencakup: bimbingan akademik dari dosen pembimbing, akses jurnal/digital library kampus untuk studi pustaka, serta pedoman penulisan skripsi (Handout Skripsi Prodi Teknologi Informasi BSI) yang menjadi acuan struktur dokumen ini.
-
-2.3.2.	Smartphone Tecno Pova 5 (perangkat eksperimen)
+2.3.1.	Smartphone Tecno Pova 5 (perangkat eksperimen)
 Tecno Pova 5 dipilih sebagai perangkat eksperimen karena merepresentasikan smartphone kelas menengah populer di pasar Asia Tenggara dengan spesifikasi: SoC MediaTek Helio G99 (TSMC 6 nm; 2× Cortex-A76 @ 2,2 GHz + 6× Cortex-A55 @ 2,0 GHz), GPU Mali-G57 MC2, RAM 8 GB LPDDR4x (dilengkapi virtual RAM 8 GB), penyimpanan internal 256 GB UFS 2.2, layar 6,78" FHD+ 120 Hz, dan baterai 6.000 mAh. Perangkat berjalan di Android 13 dengan kustomisasi HiOS 13. Kombinasi RAM 8 GB dan CPU ARM modern menjadikan Pova 5 representasi yang valid untuk pengujian batas atas SLM on-device pada smartphone konsumen.
 
-2.3.3.	LFM2.5-1.2B-Base (Liquid AI)
+2.3.2.	LFM2.5-1.2B-Base (Liquid AI)
 LFM2 adalah generasi kedua keluarga Liquid Foundation Models yang menerapkan blok hibrid Liquid Time-Constant + transformer untuk efisiensi pada perangkat edge. Varian LFM2.5-1.2B-Base memiliki 1,2 miliar parameter, jendela konteks 32k, dan dipublikasikan dengan bobot terbuka. Konfigurasi ini menjadikan LFM2.5-1.2B-Base salah satu SLM ringan terbaru yang relevan untuk penelitian on-device.
 
-2.3.4.	Qwen3.5-2B (Alibaba Cloud)
+2.3.3.	Qwen3.5-2B (Alibaba Cloud)
 Qwen3.5 adalah generasi terbaru keluarga LLM/SLM yang dirilis oleh tim Qwen, Alibaba Cloud, mencakup beberapa skala parameter dengan dukungan jendela konteks panjang dan multibahasa. Varian Qwen3.5-2B (≈ 2 miliar parameter) dirilis pada Hugging Face sebagai SLM ringan untuk eksperimen edge inference. Qwen menjadi salah satu keluarga SLM paling banyak digunakan komunitas open-source pada periode 2024–2026 untuk eksperimen on-device, sehingga relevan dijadikan subjek pembanding LFM2.5-1.2B-Base.
 
-2.3.5.	Termux dan llama.cpp
+2.3.4.	Termux dan llama.cpp
 Termux adalah aplikasi terminal emulator + Linux environment yang berjalan pada Android non-root. Termux memungkinkan instalasi toolchain GCC/Clang, Python, serta build llama.cpp menggunakan NDK Android. llama.cpp sendiri adalah library inferensi C++ open-source berlisensi MIT yang mendukung CPU ARM dengan optimasi NEON, dotprod, dan i8mm. llama.cpp menjadi runtime de facto untuk format GGUF dan menawarkan utilitas llama-bench, llama-cli, perplexity, dan quantize.
