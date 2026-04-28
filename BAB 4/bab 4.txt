@@ -62,7 +62,7 @@ Pembahasan.
 2.	GSM8k. Kedua model menunjukkan pola degradasi yang jelas pada Q3_K_M (LFM turun dari 52 → 42 %, Qwen turun dari 57 → 37 %), sedangkan Q4 dan Q5 hampir setara FP16 (selisih ≤ 5 poin). Pola ini konsisten dengan literatur (Lin et al., 2024; Frantar et al., 2023): aritmetika berantai terbukti sensitif terhadap kuantisasi 3-bit karena akumulasi error perturbation pada multi-step reasoning.
 3.	HumanEval. LFM Q4_K_M (37 %) bahkan sedikit melampaui FP16 (36 %), fenomena random fluctuation yang umum pada benchmark code generation 100 soal. Untuk Qwen, Q5 (47 %), Q4 (44 %), dan Q3 (26 %) mengikuti tren menurun yang konsisten dengan hipotesis H1.
 
-Untuk RQ-2 secara keseluruhan, dapat disimpulkan bahwa kompromi kualitas pada Q5_K_M dan Q4_K_M masih dalam batas wajar (rerata 3-benchmark turun hanya 2,3–3,3 poin pada Q4–Q5 dibandingkan FP16), sedangkan pada Q3_K_M penurunan signifikan (5,7 poin pada LFM, 12,0 poin pada Qwen).
+Untuk RQ-2 secara keseluruhan, dapat disimpulkan bahwa kompromi kualitas pada Q5_K_M dan Q4_K_M masih dalam batas wajar (rerata 3-benchmark turun hanya 1,7–3,3 poin pada Q4–Q5 dibandingkan FP16; LFM Q4_K_M malah hanya −1,7 poin), sedangkan pada Q3_K_M penurunan signifikan (5,7 poin pada LFM, 12,0 poin pada Qwen).
 
 4.4.	Profil RAM dan Tokens per Second (Pengujian On-Device)
 Pengujian on-device pada smartphone Tecno Pova 5 (MediaTek Helio G99, RAM 8 GB, Android 13) belum tersedia pada saat penyusunan bab ini karena setup Termux + llama.cpp di perangkat target masih dalam tahap penyesuaian (kompilasi llama.cpp ARM-NEON, izin proot-distro, dan kalibrasi htop/getrusage). Subbab ini disiapkan dengan kerangka tabel kosong agar pengisian dilakukan tanpa mengubah penomoran tabel dan gambar.
