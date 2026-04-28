@@ -728,7 +728,8 @@ def fig_4_5_radar_quality():
     # normalisasi ke 0..1 berdasarkan agregat semua kondisi
     all_sizes = [FILE_SIZE_MB[m][v] for m in MODELS for v in VARIANTS]
     all_ppl   = [PPL[m][v] for m in MODELS for v in VARIANTS]
-    max_size = max(all_sizes); min_ppl = min(all_ppl); max_ppl = max(all_ppl)
+    min_size = min(all_sizes); max_size = max(all_sizes)
+    min_ppl = min(all_ppl); max_ppl = max(all_ppl)
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 7.2), subplot_kw=dict(polar=True))
     variant_style = {"FP16":   ("-",  PALETTE["gray"]),
@@ -742,8 +743,10 @@ def fig_4_5_radar_quality():
         ax.set_xticklabels(cats, fontsize=9)
         ax.set_ylim(0, 1)
         for v in VARIANTS:
-            storage_score = 1.0 - FILE_SIZE_MB[m][v] / max_size              # kecil = bagus
-            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)    # kecil = bagus
+            # Min-max normalisasi konsisten untuk seluruh sumbu radar:
+            # nilai terbaik teramati = 1.0, nilai terburuk teramati = 0.0.
+            storage_score = 1.0 - (FILE_SIZE_MB[m][v] - min_size) / (max_size - min_size)  # kecil = bagus
+            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)                   # kecil = bagus
             mmlu = ACC[m][v]["MMLU"] / 100
             gsm  = ACC[m][v]["GSM8k"] / 100
             he   = ACC[m][v]["HumanEval"] / 100

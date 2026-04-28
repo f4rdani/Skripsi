@@ -32,10 +32,7 @@ Edge Computing adalah paradigma komputasi yang memproses data pada perangkat di 
 
 [GAMBAR 2.3] Hierarki Edge Intelligence untuk inferensi LLM/SLM. Sumber: gambar/2.3_arsitektur_edge_intelligence.png
 
-2.1.6.	Spesifikasi MediaTek Helio G99
-MediaTek Helio G99 adalah System-on-Chip (SoC) kelas menengah yang menyasar smartphone gaming. Helio G99 menggunakan proses fabrikasi TSMC 6 nm, dilengkapi dua core ARM Cortex-A76 berkecepatan 2,2 GHz dan enam core Cortex-A55 berkecepatan 2,0 GHz dengan dukungan instruksi NEON dan extension i8mm/dotprod yang penting untuk akselerasi inferensi GGUF. RAM yang dipasangkan biasanya LPDDR4x dual channel hingga 8 GB. Spesifikasi tersebut menjadikan Helio G99 representasi smartphone mid-range yang banyak beredar di pasar Indonesia.
-
-2.1.7.	Benchmark Evaluasi LLM/SLM: MMLU, GSM8k, HumanEval, dan Perplexity
+2.1.6.	Benchmark Evaluasi LLM/SLM: MMLU, GSM8k, HumanEval, dan Perplexity
 Untuk mengukur kapabilitas dan kualitas linguistik model, penelitian ini mengadopsi empat tolok ukur yang lazim dipakai komunitas riset internasional:
 1.	MMLU (Massive Multitask Language Understanding) — 57 subjek pengetahuan umum (sains, hukum, kedokteran, dst.) dalam format pilihan ganda.
 2.	GSM8k — 8.500 soal cerita matematika tingkat dasar yang menguji kemampuan reasoning numerik.
@@ -43,16 +40,13 @@ Untuk mengukur kapabilitas dan kualitas linguistik model, penelitian ini mengado
 4.	Perplexity (PPL) — metrik likelihood per token pada dataset WikiText-2; semakin rendah semakin baik. PPL menjadi proxy kualitas model bahasa setelah kuantisasi.
 Jin et al. (2024) menunjukkan bahwa PPL dapat dipakai sebagai proxy ringkas untuk performa model terkuantisasi pada banyak benchmark, sehingga kombinasi MMLU/GSM8k/HumanEval + PPL memberi gambaran komprehensif knowledge & capacity dan alignment.
 
-2.1.8.	Goal–Question–Metric (GQM) dan Three-Dimensional Evaluation Framework
+2.1.7.	Goal–Question–Metric (GQM) dan Three-Dimensional Evaluation Framework
 GQM (Basili et al., 1994; Wohlin et al., 2024) adalah kerangka pengukuran empiris yang menurunkan setiap goal penelitian ke pertanyaan riset spesifik, lalu ke metrik kuantitatif yang dapat diukur. GQM tetap menjadi rujukan standar pada Empirical Software Engineering kontemporer. Untuk evaluasi model terkuantisasi, Jin et al. (2024) memperluas GQM dengan kerangka tiga dimensi: (1) knowledge & capacity, (2) alignment, dan (3) efficiency. Kerangka ini telah dipakai dalam berbagai laporan evaluasi model terkuantisasi tahun 2024–2025 dan menjadi rujukan internasional terkini yang dipakai pada penelitian ini. Diagram klasifikasi teknik kuantisasi terkait dengan kerangka tersebut disajikan pada Gambar 2.4.
 
 [GAMBAR 2.4] Taksonomi Teknik Kuantisasi LLM/SLM. Sumber: gambar/2.4_taxonomy_quantization.png
 
-2.1.9.	Reproducibility dan Threats to Validity
-Reproducibility menjadi standar pelaporan penelitian eksperimen ML modern. NeurIPS Reproducibility Checklist (NeurIPS, 2024) mensyaratkan dilampirkannya: versi model dan hash file, prompt set, hyperparameter, hardware specs (chipset, frekuensi governor, suhu), dan random seed. Selain itu, threats to validity (Wohlin et al., 2024) diklasifikasikan menjadi empat kategori—internal, eksternal, construct, conclusion—yang wajib didiskusikan untuk menunjukkan kelemahan dan batas generalisasi penelitian.
-
 2.2.	Penelitian Terkait
-Tabel 2.1 merangkum dua belas penelitian terkini (2023–2026) yang menjadi rujukan utama. Seluruh referensi ini juga tersedia pada folder jurnal referensi penulis.
+Tabel 2.1 merangkum sebelas penelitian terkini (2023–2026) yang menjadi rujukan utama. Seluruh referensi ini juga tersedia pada folder jurnal referensi penulis.
 
 Tabel 2.1 Ringkasan Penelitian Terkait
 +----+-----------------------------------+--------+----------------------------------------------------------------+
@@ -65,11 +59,10 @@ Tabel 2.1 Ringkasan Penelitian Terkait
 | 5  | Gong et al.                        | 2024   | Lens of perturbation: kuantisasi sebagai noise pada bobot.      |
 | 6  | Zhang et al.                       | 2024   | Edge Intelligence Optimization untuk inferensi LLM (batching+Q).|
 | 7  | Jin et al.                         | 2024   | Three-dimensional evaluation framework untuk LLM terkuantisasi. |
-| 8  | Sevim et al.                       | 2024   | LLM membantu deployment jaringan nirkabel urban.                |
-| 9  | Ahmad & Safudin                    | 2024   | Chatbot LLM untuk RS Brawijaya — use case sektor kesehatan.     |
-| 10 | Zhan et al.                        | 2025   | Quantized LLMs in biomedical NLP. Privacy-preserving local LLM. |
-| 11 | Nurohim et al.                     | 2025   | Komparatif DeepSeek vs Qwen pada teks Bahasa Indonesia.         |
-| 12 | Ray & Pradhan                      | 2026   | Performance LLM lokal pada Raspberry Pi 4 (Python vs Rust).     |
+| 8  | Ahmad & Safudin                    | 2024   | Chatbot LLM untuk RS Brawijaya — use case sektor kesehatan.     |
+| 9  | Zhan et al.                        | 2025   | Quantized LLMs in biomedical NLP. Privacy-preserving local LLM. |
+| 10 | Nurohim et al.                     | 2025   | Komparatif DeepSeek vs Qwen pada teks Bahasa Indonesia.         |
+| 11 | Ray & Pradhan                      | 2026   | Performance LLM lokal pada Raspberry Pi 4 (Python vs Rust).     |
 +----+-----------------------------------+--------+----------------------------------------------------------------+
 
 Penjelasan ringkas masing-masing penelitian terkait:
@@ -88,15 +81,13 @@ f.	Zhang et al. (2024) mengoptimasi inferensi LLM pada edge dengan kombinasi bat
 
 g.	Jin et al. (2024) mengusulkan kerangka evaluasi tiga dimensi (knowledge & capacity, alignment, efficiency) untuk LLM terkuantisasi dan menemukan bahwa LLM 4-bit dapat mempertahankan performa setara non-kuantisasi. Penelitian ini mengadopsi kerangka tersebut sebagai pondasi metodologi BAB III.
 
-h.	Sevim et al. (2024) mendemonstrasikan LLM untuk membantu deployment jaringan nirkabel pada lingkungan urban — relevan sebagai bukti keberagaman use-case Edge AI.
+h.	Ahmad & Safudin (2024) mengembangkan chatbot LLM Braca untuk RS Brawijaya — relevan sebagai contoh use-case sektor kesehatan yang menjadi target manfaat praktis penelitian ini.
 
-i.	Ahmad & Safudin (2024) mengembangkan chatbot LLM Braca untuk RS Brawijaya — relevan sebagai contoh use-case sektor kesehatan yang menjadi target manfaat praktis penelitian ini.
+i.	Zhan et al. (2025) mengevaluasi 12 LLM terkuantisasi pada delapan dataset biomedical NLP dan membuktikan bahwa kuantisasi mampu mengurangi memori GPU hingga 75% tanpa kehilangan performa, dan domain-specific knowledge tetap terjaga. Penelitian ini menjadi referensi bahwa SLM 4-bit cocok untuk skenario sensitif privasi.
 
-j.	Zhan et al. (2025) mengevaluasi 12 LLM terkuantisasi pada delapan dataset biomedical NLP dan membuktikan bahwa kuantisasi mampu mengurangi memori GPU hingga 75% tanpa kehilangan performa, dan domain-specific knowledge tetap terjaga. Penelitian ini menjadi referensi bahwa SLM 4-bit cocok untuk skenario sensitif privasi.
+j.	Nurohim et al. (2025) melakukan analisis komparatif LLM DeepSeek dan Qwen dalam klasifikasi sentimen ulasan produk berbahasa Indonesia. Penelitian ini menjadi rujukan domestik (BSI) yang relevan dengan topik dan model Qwen yang dipakai.
 
-k.	Nurohim et al. (2025) melakukan analisis komparatif LLM DeepSeek dan Qwen dalam klasifikasi sentimen ulasan produk berbahasa Indonesia. Penelitian ini menjadi rujukan domestik (BSI) yang relevan dengan topik dan model Qwen yang dipakai.
-
-l.	Ray & Pradhan (2026) mempresentasikan analisis performa LLM lokal pada Raspberry Pi 4 (8 GB LPDDR4, ARM Cortex-A72) menggunakan klien Python dan Rust. Mereka menemukan bahwa pemilihan API client (Rust vs Python) berdampak besar pada cold-start latency. Penelitian ini menjadi pembanding paling dekat (resource-constrained edge ARM) untuk skripsi ini.
+k.	Ray & Pradhan (2026) mempresentasikan analisis performa LLM lokal pada Raspberry Pi 4 (8 GB LPDDR4, ARM Cortex-A72) menggunakan klien Python dan Rust. Mereka menemukan bahwa pemilihan API client (Rust vs Python) berdampak besar pada cold-start latency. Penelitian ini menjadi pembanding paling dekat (resource-constrained edge ARM) untuk skripsi ini.
 
 2.3.	Tinjauan Objek Penelitian
 Karena penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi atau tempat riset sebagai studi kasus, sub-bab ini berisi tinjauan terhadap objek penelitian — yaitu perangkat keras, dua arsitektur Small Language Model yang menjadi subjek uji, serta lingkungan perangkat lunak yang dipakai untuk mengeksekusi eksperimen. Adaptasi sub-bab ini sejalan dengan panduan yang menyebut judul "Tinjauan Organisasi/Objek Penelitian".

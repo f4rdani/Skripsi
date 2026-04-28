@@ -75,6 +75,6 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 - Sub-cabang PTQ: Weight-only GPTQ (Frantar 2023), Activation-aware AWQ (Lin 2024), Mixed-precision GGUF k-quants (llama.cpp), NormalFloat 4-bit QLoRA (Dettmers 2023).
 - Kotak merah di bawah: Fokus penelitian — GGUF k-quants Q3_K_M / Q4_K_M / Q5_K_M pada CPU ARM (Helio G99).
 
-**Kapan dirujuk.** Sub-bab 2.1.8 GQM dan Three-Dimensional Evaluation Framework (sebagai pemetaan taksonomi yang akan dievaluasi dengan kerangka 3D).
+**Kapan dirujuk.** Sub-bab 2.1.7 GQM dan Three-Dimensional Evaluation Framework (sebagai pemetaan taksonomi yang akan dievaluasi dengan kerangka 3D).
 
 **Sumber konsep.** Frantar et al. (2023), Dettmers et al. (2023), Lin et al. (2024), dokumentasi llama.cpp.

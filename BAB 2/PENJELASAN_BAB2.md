@@ -19,10 +19,8 @@ BAB II adalah **fondasi konseptual** penelitian. Pembaca harus mendapatkan tiga 
 3. **2.1.3 Post-Training Quantization (PTQ)** — definisi, GPTQ, AWQ, QLoRA.
 4. **2.1.4 Format GGUF dan k-quants** — fokus utama metode kompresi yang dipakai. Disertai Gambar 2.2.
 5. **2.1.5 Edge Computing dan Edge Intelligence** — paradigma deployment. Disertai Gambar 2.3.
-6. **2.1.6 Spesifikasi MediaTek Helio G99** — hardware target.
-7. **2.1.7 Benchmark MMLU/GSM8k/HumanEval/Perplexity** — metrik kualitas yang dipakai.
-8. **2.1.8 GQM dan Three-Dimensional Evaluation Framework** — kerangka metodologi internasional. Disertai Gambar 2.4.
-9. **2.1.9 Reproducibility dan Threats to Validity** — standar pelaporan modern.
+6. **2.1.6 Benchmark MMLU/GSM8k/HumanEval/Perplexity** — metrik kualitas yang dipakai.
+7. **2.1.7 GQM dan Three-Dimensional Evaluation Framework** — kerangka metodologi internasional. Disertai Gambar 2.4.
 
 **Catatan:** Susunan ini mengikuti pola **funnel** (corong)—dari konsep paling umum hingga ke metrik dan kerangka evaluasi paling spesifik—agar pembaca terbawa secara natural menuju BAB III.
 
@@ -33,7 +31,7 @@ BAB II adalah **fondasi konseptual** penelitian. Pembaca harus mendapatkan tiga 
 - minimal **5 kutipan** (panduan BSI).
 - format sitasi **APA** dengan manajemen Mendeley.
 
-Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `jurnal refrensi/`).
+Skripsi ini memakai **11 referensi** yang memenuhi syarat (terdapat di folder `jurnal refrensi/`).
 
 **Format sub-bab yang dipakai:**
 - Tabel ringkasan (No, Penulis, Tahun, Kontribusi).
@@ -62,7 +60,7 @@ Skripsi ini memakai **12 referensi** yang memenuhi syarat (terdapat di folder `j
 | 2.1 Arsitektur Transformer Decoder | gambar/2.1_arsitektur_transformer.png | sub-bab 2.1.2 |
 | 2.2 Skema PTQ GGUF k-quants | gambar/2.2_skema_PTQ_GGUF_kquants.png | sub-bab 2.1.4 |
 | 2.3 Hierarki Edge Intelligence | gambar/2.3_arsitektur_edge_intelligence.png | sub-bab 2.1.5 |
-| 2.4 Taksonomi Teknik Kuantisasi | gambar/2.4_taxonomy_quantization.png | sub-bab 2.1.8 |
+| 2.4 Taksonomi Teknik Kuantisasi | gambar/2.4_taxonomy_quantization.png | sub-bab 2.1.7 |
 
 ## Daftar tabel BAB II
 | Tabel | Judul | Letak |
