@@ -741,11 +741,20 @@ def fig_4_5_radar_quality():
     angles = np.linspace(0, 2 * np.pi, len(cats), endpoint=False).tolist()
     angles += angles[:1]
 
-    # normalisasi ke 0..1 berdasarkan agregat semua kondisi
+    # normalisasi min-max berdasarkan agregat semua kondisi (8 titik per metrik)
     all_sizes = [FILE_SIZE_MB[m][v] for m in MODELS for v in VARIANTS]
     all_ppl   = [PPL[m][v] for m in MODELS for v in VARIANTS]
-    min_size = min(all_sizes); max_size = max(all_sizes)
-    min_ppl = min(all_ppl); max_ppl = max(all_ppl)
+    all_mmlu  = [ACC[m][v]["MMLU"]      for m in MODELS for v in VARIANTS]
+    all_gsm   = [ACC[m][v]["GSM8k"]     for m in MODELS for v in VARIANTS]
+    all_he    = [ACC[m][v]["HumanEval"] for m in MODELS for v in VARIANTS]
+    min_size, max_size = min(all_sizes), max(all_sizes)
+    min_ppl,  max_ppl  = min(all_ppl),   max(all_ppl)
+    min_mmlu, max_mmlu = min(all_mmlu),  max(all_mmlu)
+    min_gsm,  max_gsm  = min(all_gsm),   max(all_gsm)
+    min_he,   max_he   = min(all_he),    max(all_he)
+
+    def _mm(val, lo, hi):
+        return 0.5 if hi == lo else (val - lo) / (hi - lo)
 
     fig, axes = plt.subplots(1, 2, figsize=(13, 7.2), subplot_kw=dict(polar=True))
     variant_style = {"FP16":   ("-",  PALETTE["gray"]),
@@ -759,13 +768,13 @@ def fig_4_5_radar_quality():
         ax.set_xticklabels(cats, fontsize=9)
         ax.set_ylim(0, 1)
         for v in VARIANTS:
-            # Min-max normalisasi konsisten untuk seluruh sumbu radar:
+            # Min-max normalisasi konsisten untuk SEMUA sumbu radar (5 metrik):
             # nilai terbaik teramati = 1.0, nilai terburuk teramati = 0.0.
-            storage_score = 1.0 - (FILE_SIZE_MB[m][v] - min_size) / (max_size - min_size)  # kecil = bagus
-            ppl_score = 1.0 - (PPL[m][v] - min_ppl) / (max_ppl - min_ppl)                   # kecil = bagus
-            mmlu = ACC[m][v]["MMLU"] / 100
-            gsm  = ACC[m][v]["GSM8k"] / 100
-            he   = ACC[m][v]["HumanEval"] / 100
+            storage_score = 1.0 - _mm(FILE_SIZE_MB[m][v], min_size, max_size)  # kecil = bagus
+            ppl_score     = 1.0 - _mm(PPL[m][v],         min_ppl,  max_ppl)   # kecil = bagus
+            mmlu = _mm(ACC[m][v]["MMLU"],      min_mmlu, max_mmlu)             # besar = bagus
+            gsm  = _mm(ACC[m][v]["GSM8k"],     min_gsm,  max_gsm)
+            he   = _mm(ACC[m][v]["HumanEval"], min_he,   max_he)
             vals = [storage_score, ppl_score, mmlu, gsm, he]
             vals += vals[:1]
             ls, c = variant_style[v]
