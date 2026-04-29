@@ -1,0 +1,105 @@
+BAB II
+LANDASAN TEORI
+
+Bab ini menguraikan landasan teori yang menopang penelitian. Bagian 2.1 memaparkan teori-teori dasar yang relevan terhadap topik. Bagian 2.2 mereview penelitian terkait yang dipublikasikan dalam lima tahun terakhir, dan Bagian 2.3 menjelaskan tinjauan objek penelitian, yaitu perangkat smartphone Android, dua arsitektur Small Language Model (SLM) yang menjadi subjek uji, serta lingkungan perangkat lunak Termux + llama.cpp.
+
+2.1.	Tinjauan Pustaka
+2.1.1.	Large Language Model (LLM) dan Small Language Model (SLM)
+Large Language Model (LLM) adalah model berbasis arsitektur transformer (Vaswani et al., 2017) yang dilatih pada korpus teks berskala miliar hingga triliun token sehingga mampu melakukan berbagai tugas Natural Language Processing tanpa pelatihan ulang khusus. Touvron et al. (2023) memperkenalkan keluarga LLaMA dengan parameter 7B–65B yang membuktikan bahwa model open weights yang dilatih pada data publik dapat menyamai performa model proprietary. Sebagai turunan, Small Language Model (SLM) merupakan model bahasa dengan jumlah parameter di bawah 7 miliar, biasanya 0,5B hingga 3B, yang dirancang khusus untuk eksekusi pada perangkat dengan sumber daya terbatas (Lin et al., 2024). Penelitian ini menggunakan dua SLM mutakhir sebagai subjek uji, yaitu LFM2.5-1.2B-Base (Liquid AI) dan Qwen3.5-2B (Alibaba Cloud).
+
+2.1.2.	Arsitektur Transformer Decoder
+Arsitektur SLM modern berakar pada decoder-only transformer. Setiap blok decoder terdiri atas Root Mean Square Normalization (RMSNorm), mekanisme self-attention—umumnya Grouped-Query Attention (GQA) untuk efisiensi memori—diikuti oleh Feed-Forward Network berbasis SwiGLU (Lin et al., 2024). Output akhir dipetakan kembali ke ruang vocabulary melalui matriks Linear dan softmax. Skema ini menjadi pondasi LFM2 dan Qwen3.5. Perlu dicatat bahwa lapisan attention dan FFN menyumbang lebih dari 90% dari total parameter model, sehingga setiap usaha kompresi (kuantisasi) berfokus pada matriks bobot kedua lapisan tersebut. Diagram lengkap dari blok decoder ditampilkan pada Gambar 2.1.
+
+[GAMBAR 2.1] Arsitektur Transformer Decoder (basis SLM modern). Sumber: gambar/2.1_arsitektur_transformer.png
+
+2.1.3.	Post-Training Quantization (PTQ)
+Post-Training Quantization (PTQ) adalah teknik kompresi model yang dilakukan setelah model selesai dilatih. PTQ mengubah representasi numerik bobot dari 16-bit floating point (FP16) atau 32-bit floating point (FP32) ke representasi dengan bit yang lebih rendah, misalnya 8-bit integer (INT8) hingga 3-bit (INT3). Pendekatan ini tidak memerlukan dataset pelatihan ulang, sehingga proses kompresi jauh lebih cepat dibanding Quantization-Aware Training (QAT). Dua metode PTQ yang menjadi rujukan utama adalah:
+1.	GPTQ (Frantar et al., 2023). Merupakan metode weight-only PTQ yang menggunakan informasi matriks Hessian dari sebagian kecil data kalibrasi untuk meminimalkan error kuantisasi per layer. GPTQ mampu mengompresi LLaMA-65B ke 3–4 bit per bobot dengan penurunan akurasi minor.
+2.	AWQ (Lin et al., 2024). Activation-aware Weight Quantization mempertahankan 1% bobot "salient" yang teridentifikasi dari aktivasi, lalu melakukan scaling per channel untuk meminimalkan error pada bobot non-salient. AWQ unggul pada model instruction-tuned dan multimodal.
+QLoRA (Dettmers et al., 2023) memperkenalkan tipe data NormalFloat 4-bit (NF4) dan double-quantization, yang menjadi basis 4-bit kuantisasi pada banyak ekosistem open-source modern.
+
+2.1.4.	Format GGUF dan k-quants pada llama.cpp
+GGUF (GPT-Generated Unified Format) adalah format file biner yang dirancang oleh komunitas llama.cpp untuk menampung bobot model bahasa terkuantisasi beserta metadatanya (tokenizer, arsitektur, hyperparameter). Berbeda dengan PTQ uniform, GGUF menggunakan skema k-quants—sebuah pendekatan mixed-precision yang membagi bobot ke dalam super-block (32 bobot) dan block (16 bobot), kemudian menyimpan scale dan zero-point per block dalam FP16. Skema ini menjaga outlier yang penting tanpa mengorbankan efisiensi memori. Penamaan varian k-quants mengikuti pola Qx_K_S/M/L:
+1.	Q3_K_M: rata-rata 3,5 bit per bobot, ukuran paling kecil.
+2.	Q4_K_M: rata-rata 4,5 bit per bobot, sweet-spot default pada llama.cpp.
+3.	Q5_K_M: rata-rata 5,5 bit per bobot, kualitas mendekati FP16.
+Skema teknis konversi FP16 ke setiap varian Q*_K_M ditampilkan pada Gambar 2.2.
+
+[GAMBAR 2.2] Skema Post-Training Quantization GGUF k-quants. Sumber: gambar/2.2_skema_PTQ_GGUF_kquants.png
+
+2.1.5.	Edge Computing dan Edge Intelligence
+Edge Computing adalah paradigma komputasi yang memproses data pada perangkat di tepi jaringan (smartphone, IoT, embedded) alih-alih pada cloud sentral. Edge Intelligence (EI) merupakan integrasi Artificial Intelligence ke dalam Edge Computing, yang menyangkut pemilihan model, pemilihan tier komputasi (cloud–edge server–edge device), dan optimasi komputasional khusus seperti kuantisasi, pruning, KV-cache compression, batching dinamis, dan speculative decoding (Zhang et al., 2024). Penelitian ini berada pada tier edge device—komputasi penuh dilakukan di smartphone tanpa server pendukung. Ilustrasi hierarki tier komputasi disajikan pada Gambar 2.3.
+
+[GAMBAR 2.3] Hierarki Edge Intelligence untuk inferensi LLM/SLM. Sumber: gambar/2.3_arsitektur_edge_intelligence.png
+
+2.1.6.	Benchmark Evaluasi LLM/SLM: MMLU, GSM8k, HumanEval, dan Perplexity
+Untuk mengukur kapabilitas dan kualitas linguistik model, penelitian ini mengadopsi empat tolok ukur yang lazim dipakai komunitas riset internasional:
+1.	MMLU (Massive Multitask Language Understanding) — 57 subjek pengetahuan umum (sains, hukum, kedokteran, dst.) dalam format pilihan ganda.
+2.	GSM8k — 8.500 soal cerita matematika tingkat dasar yang menguji kemampuan reasoning numerik.
+3.	HumanEval — 164 soal pemrograman Python yang menguji kemampuan code completion (functional correctness pass@1).
+4.	Perplexity (PPL) — metrik likelihood per token pada dataset WikiText-2; semakin rendah semakin baik. PPL menjadi proxy kualitas model bahasa setelah kuantisasi.
+Jin et al. (2024) menunjukkan bahwa PPL dapat dipakai sebagai proxy ringkas untuk performa model terkuantisasi pada banyak benchmark, sehingga kombinasi MMLU/GSM8k/HumanEval + PPL memberi gambaran komprehensif knowledge & capacity dan alignment.
+
+2.1.7.	Goal–Question–Metric (GQM) dan Three-Dimensional Evaluation Framework
+GQM (Basili et al., 1994; Wohlin et al., 2024) adalah kerangka pengukuran empiris yang menurunkan setiap goal penelitian ke pertanyaan riset spesifik, lalu ke metrik kuantitatif yang dapat diukur. GQM tetap menjadi rujukan standar pada Empirical Software Engineering kontemporer. Untuk evaluasi model terkuantisasi, Jin et al. (2024) memperluas GQM dengan kerangka tiga dimensi: (1) knowledge & capacity, (2) alignment, dan (3) efficiency. Kerangka ini telah dipakai dalam berbagai laporan evaluasi model terkuantisasi tahun 2024–2025 dan menjadi rujukan internasional terkini yang dipakai pada penelitian ini. Diagram klasifikasi teknik kuantisasi terkait dengan kerangka tersebut disajikan pada Gambar 2.4.
+
+[GAMBAR 2.4] Taksonomi Teknik Kuantisasi LLM/SLM. Sumber: gambar/2.4_taxonomy_quantization.png
+
+2.2.	Penelitian Terkait
+Tabel 2.1 merangkum sebelas penelitian terkini (2023–2026) yang menjadi rujukan utama. Seluruh referensi ini juga tersedia pada folder jurnal referensi penulis.
+
+Tabel 2.1 Ringkasan Penelitian Terkait
++----+-----------------------------------+--------+----------------------------------------------------------------+
+| No | Penulis                            | Tahun  | Kontribusi terhadap penelitian ini                              |
++----+-----------------------------------+--------+----------------------------------------------------------------+
+| 1  | Touvron et al.                     | 2023   | LLaMA: open weights LLM. Dasar arsitektur SLM modern.           |
+| 2  | Dettmers et al.                    | 2023   | QLoRA, NF4, double-quantization. Dasar teori 4-bit data type.   |
+| 3  | Frantar et al.                     | 2023   | GPTQ. Algoritma weight-only PTQ berbasis Hessian.               |
+| 4  | Lin et al.                         | 2024   | AWQ. PTQ activation-aware untuk on-device LLM/VLM.              |
+| 5  | Gong et al.                        | 2024   | Lens of perturbation: kuantisasi sebagai noise pada bobot.      |
+| 6  | Zhang et al.                       | 2024   | Edge Intelligence Optimization untuk inferensi LLM (batching+Q).|
+| 7  | Jin et al.                         | 2024   | Three-dimensional evaluation framework untuk LLM terkuantisasi. |
+| 8  | Ahmad & Safudin                    | 2024   | Chatbot LLM untuk RS Brawijaya — use case sektor kesehatan.     |
+| 9  | Zhan et al.                        | 2025   | Quantized LLMs in biomedical NLP. Privacy-preserving local LLM. |
+| 10 | Nurohim et al.                     | 2025   | Komparatif DeepSeek vs Qwen pada teks Bahasa Indonesia.         |
+| 11 | Ray & Pradhan                      | 2026   | Performance LLM lokal pada Raspberry Pi 4 (Python vs Rust).     |
++----+-----------------------------------+--------+----------------------------------------------------------------+
+
+Penjelasan ringkas masing-masing penelitian terkait:
+
+a.	Touvron et al. (2023) memperkenalkan LLaMA, keluarga LLM open-weight 7B–65B yang menjadi cikal-bakal banyak SLM open source berikutnya, termasuk LFM2 dan Qwen. Penelitian ini menggunakan teori dasar transformer dari LLaMA sebagai konteks arsitektur SLM.
+
+b.	Dettmers et al. (2023) merumuskan tipe data NormalFloat 4-bit (NF4) yang information-theoretically optimal untuk distribusi normal dan teknik double-quantization. Hasil mereka membuktikan bahwa kompresi 4-bit dapat mempertahankan 99,3% performa dibanding FP16. Penelitian ini meminjam justifikasi teoritis bahwa bobot 3–5 bit dapat menjaga kualitas model.
+
+c.	Frantar et al. (2023) memperkenalkan GPTQ, algoritma PTQ generatif satu-shot berbasis layer-wise quantization yang memanfaatkan inverse Hessian. GPTQ menjadi referensi kompresi 3-bit yang banyak diimplementasikan di llama.cpp dan transformers.
+
+d.	Lin et al. (2024) merumuskan AWQ yang menjaga 1% bobot salient berdasarkan aktivasi. AWQ menjadi rujukan utama PTQ untuk on-device LLM dan menyediakan kerangka TinyChat untuk inferensi 4-bit pada perangkat edge.
+
+e.	Gong et al. (2024) menguji kuantisasi sebagai perturbation pada bobot dan aktivasi. Mereka menemukan bahwa kuantisasi uniform gagal pada outliers dan merekomendasikan skema mixed-precision—justifikasi langsung untuk pemilihan k-quants pada penelitian ini.
+
+f.	Zhang et al. (2024) mengoptimasi inferensi LLM pada edge dengan kombinasi batching dan kuantisasi pada arsitektur Edge Intelligence. Penelitian ini mengadopsi konsep Edge Intelligence Tier-3 (edge device) sebagai konteks deploy.
+
+g.	Jin et al. (2024) mengusulkan kerangka evaluasi tiga dimensi (knowledge & capacity, alignment, efficiency) untuk LLM terkuantisasi dan menemukan bahwa LLM 4-bit dapat mempertahankan performa setara non-kuantisasi. Penelitian ini mengadopsi kerangka tersebut sebagai pondasi metodologi BAB III.
+
+h.	Ahmad & Safudin (2024) mengembangkan chatbot LLM Braca untuk RS Brawijaya — relevan sebagai contoh use-case sektor kesehatan yang menjadi target manfaat praktis penelitian ini.
+
+i.	Zhan et al. (2025) mengevaluasi 12 LLM terkuantisasi pada delapan dataset biomedical NLP dan membuktikan bahwa kuantisasi mampu mengurangi memori GPU hingga 75% tanpa kehilangan performa, dan domain-specific knowledge tetap terjaga. Penelitian ini menjadi referensi bahwa SLM 4-bit cocok untuk skenario sensitif privasi.
+
+j.	Nurohim et al. (2025) melakukan analisis komparatif LLM DeepSeek dan Qwen dalam klasifikasi sentimen ulasan produk berbahasa Indonesia. Penelitian ini menjadi rujukan domestik (BSI) yang relevan dengan topik dan model Qwen yang dipakai.
+
+k.	Ray & Pradhan (2026) mempresentasikan analisis performa LLM lokal pada Raspberry Pi 4 (8 GB LPDDR4, ARM Cortex-A72) menggunakan klien Python dan Rust. Mereka menemukan bahwa pemilihan API client (Rust vs Python) berdampak besar pada cold-start latency. Penelitian ini menjadi pembanding paling dekat (resource-constrained edge ARM) untuk skripsi ini.
+
+2.3.	Tinjauan Objek Penelitian
+Karena penelitian ini bersifat rekayasa sistem (engineering thesis) dan tidak terikat pada satu organisasi atau tempat riset sebagai studi kasus, sub-bab ini berisi tinjauan terhadap objek penelitian — yaitu perangkat keras, dua arsitektur Small Language Model yang menjadi subjek uji, serta lingkungan perangkat lunak yang dipakai untuk mengeksekusi eksperimen. Adaptasi sub-bab ini sejalan dengan panduan yang menyebut judul "Tinjauan Organisasi/Objek Penelitian".
+
+2.3.1.	Smartphone Tecno Pova 5 (perangkat eksperimen)
+Tecno Pova 5 dipilih sebagai perangkat eksperimen karena merepresentasikan smartphone kelas menengah populer di pasar Asia Tenggara dengan spesifikasi: SoC MediaTek Helio G99 (TSMC 6 nm; 2× Cortex-A76 @ 2,2 GHz + 6× Cortex-A55 @ 2,0 GHz), GPU Mali-G57 MC2, RAM 8 GB LPDDR4x (dilengkapi virtual RAM 8 GB), penyimpanan internal 256 GB UFS 2.2, layar 6,78" FHD+ 120 Hz, dan baterai 6.000 mAh. Perangkat berjalan di Android 13 dengan kustomisasi HiOS 13. Kombinasi RAM 8 GB dan CPU ARM modern menjadikan Pova 5 representasi yang valid untuk pengujian batas atas SLM on-device pada smartphone konsumen.
+
+2.3.2.	LFM2.5-1.2B-Base (Liquid AI)
+LFM2 adalah generasi kedua keluarga Liquid Foundation Models yang menerapkan blok hibrid Liquid Time-Constant + transformer untuk efisiensi pada perangkat edge. Varian LFM2.5-1.2B-Base memiliki 1,2 miliar parameter, jendela konteks 32k, dan dipublikasikan dengan bobot terbuka. Konfigurasi ini menjadikan LFM2.5-1.2B-Base salah satu SLM ringan terbaru yang relevan untuk penelitian on-device.
+
+2.3.3.	Qwen3.5-2B (Alibaba Cloud)
+Qwen3.5 adalah generasi terbaru keluarga LLM/SLM yang dirilis oleh tim Qwen, Alibaba Cloud, mencakup beberapa skala parameter dengan dukungan jendela konteks panjang dan multibahasa. Varian Qwen3.5-2B (≈ 2 miliar parameter) dirilis pada Hugging Face sebagai SLM ringan untuk eksperimen edge inference. Qwen menjadi salah satu keluarga SLM paling banyak digunakan komunitas open-source pada periode 2024–2026 untuk eksperimen on-device, sehingga relevan dijadikan subjek pembanding LFM2.5-1.2B-Base.
+
+2.3.4.	Termux dan llama.cpp
+Termux adalah aplikasi terminal emulator + Linux environment yang berjalan pada Android non-root. Termux memungkinkan instalasi toolchain GCC/Clang, Python, serta build llama.cpp menggunakan NDK Android. llama.cpp sendiri adalah library inferensi C++ open-source berlisensi MIT yang mendukung CPU ARM dengan optimasi NEON, dotprod, dan i8mm. llama.cpp menjadi runtime de facto untuk format GGUF dan menawarkan utilitas llama-bench, llama-cli, perplexity, dan quantize.

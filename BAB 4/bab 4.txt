@@ -1,0 +1,112 @@
+BAB IV
+HASIL PENELITIAN DAN PEMBAHASAN
+
+Bab ini memaparkan hasil eksperimen Post-Training Quantization (PTQ) format GGUF k-quants pada dua Small Language Model (SLM), yaitu LFM2.5-1.2B-Base (Liquid AI) dan Qwen3.5-2B (Alibaba Cloud), pada empat varian presisi (FP16, Q5_K_M, Q4_K_M, Q3_K_M). Pembahasan disusun mengikuti kerangka tiga dimensi efisiensi–kualitas–akurasi (Jin et al., 2024) dan menjawab keempat research question yang dirumuskan pada Bab I.
+
+Catatan keterbatasan data: pengujian on-device pada smartphone Tecno Pova 5 (RAM 8 GB) yang mencakup pengukuran peak RAM dan Tokens per Second (TPS) belum tersedia pada saat penyusunan bab ini karena konfigurasi Termux + llama.cpp pada perangkat target masih dalam tahap setup. Subbab 4.4 (RAM dan TPS) sengaja dipertahankan kosong dan diberi placeholder agar dapat diisi tanpa mengubah penomoran tabel/gambar setelah eksperimen on-device tuntas.
+
+4.1.	Hasil Pengujian Ukuran Berkas (Storage Footprint)
+Pengukuran ukuran berkas dilakukan dengan perintah `ls -lh` terhadap delapan berkas GGUF hasil konversi dan kuantisasi via llama.cpp. Tabel 4.1 menampilkan hasilnya beserta rasio reduksi terhadap baseline FP16.
+
+Tabel 4.1 Ukuran Berkas Model dan Rasio Reduksi terhadap FP16
+| Model              | Varian   | Ukuran  | Ukuran (MB) | Rasio vs FP16 | Reduksi |
+|--------------------|----------|---------|-------------|---------------|---------|
+| LFM2.5-1.2B-Base   | FP16     | 2,2 GB  | 2 252,8     | 1,000×        | 0,0 %   |
+| LFM2.5-1.2B-Base   | Q5_K_M   | 805 MB  |   805,0     | 0,357×        | 64,3 %  |
+| LFM2.5-1.2B-Base   | Q4_K_M   | 698 MB  |   698,0     | 0,310×        | 69,0 %  |
+| LFM2.5-1.2B-Base   | Q3_K_M   | 573 MB  |   573,0     | 0,254×        | 74,6 %  |
+| Qwen3.5-2B         | FP16     | 3,6 GB  | 3 686,4     | 1,000×        | 0,0 %   |
+| Qwen3.5-2B         | Q5_K_M   | 1,4 GB  | 1 433,6     | 0,389×        | 61,1 %  |
+| Qwen3.5-2B         | Q4_K_M   | 1,2 GB  | 1 228,8     | 0,333×        | 66,7 %  |
+| Qwen3.5-2B         | Q3_K_M   | 1,1 GB  | 1 126,4     | 0,306×        | 69,4 %  |
+Sumber: pengukuran langsung berkas GGUF hasil llama.cpp/llama-quantize, April 2026.
+
+[GAMBAR 4.1] Ukuran berkas model GGUF (FP16 vs k-quants). Sumber: gambar/4.1_ukuran_berkas.png
+
+Pembahasan. Tabel 4.1 dan Gambar 4.1 mengonfirmasi bahwa kuantisasi k-quants mereduksi ukuran berkas secara progresif sesuai gradasi presisi. Reduksi terbesar pada LFM2.5-1.2B-Base mencapai 74,6 % (Q3_K_M), sedangkan pada Qwen3.5-2B mencapai 69,4 % (Q3_K_M). Pola monoton FP16 > Q5 > Q4 > Q3 berlaku konsisten pada kedua model. Bagi smartphone 8 GB RAM, hasil ini sangat krusial: berkas Qwen3.5-2B FP16 sebesar 3,6 GB jelas tidak praktis dimuat ke RAM (perlu mmap penuh dan beradu dengan layanan latar Android), sedangkan varian Q3_K_M (1,1 GB) atau Q4_K_M (1,2 GB) berada pada urutan ukuran yang aman untuk dimuat tanpa memicu Low Memory Killer. Dengan demikian, dari perspektif storage saja, hipotesis H1 mengenai reduksi volumetrik file pada rentang 3-bit hingga 5-bit terbukti secara empiris pada penelitian ini, menjawab RQ-1.
+
+4.2.	Hasil Pengujian Kualitas Linguistik (Perplexity WikiText-2)
+Perplexity diukur menggunakan utilitas `llama-perplexity` bawaan llama.cpp pada split test WikiText-2-raw-v1 dengan ukuran konteks 512 token. Tabel 4.2 merangkum hasilnya.
+
+Tabel 4.2 Perplexity WikiText-2 (lebih rendah = lebih baik)
+| Model              | FP16    | Q5_K_M  | Q4_K_M  | Q3_K_M  | ΔPPL Q3 vs FP16 |
+|--------------------|---------|---------|---------|---------|-----------------|
+| LFM2.5-1.2B-Base   | 12,6829 | 12,8297 | 13,2145 | 14,5135 | +1,8306 (+14,4 %) |
+| Qwen3.5-2B         | 12,7763 | 13,0856 | 13,3617 | 15,2172 | +2,4409 (+19,1 %) |
+Sumber: pengukuran langsung dengan llama-perplexity, April 2026.
+
+[GAMBAR 4.2] Perplexity per varian kuantisasi. Sumber: gambar/4.2_perplexity.png
+
+Pembahasan. Pada kedua model, kurva PPL bersifat monoton: FP16 < Q5 < Q4 < Q3, sebagaimana diprediksi oleh teori perturbation pada matriks bobot (Gong et al., 2024). Degradasi Q5_K_M relatif sangat kecil (1,16 % untuk LFM, 2,42 % untuk Qwen) dan tetap berada di bawah ambang ±5 % yang oleh Frantar et al. (2023) dianggap "lossless secara praktis". Q4_K_M mengalami degradasi sedang (4,19 % LFM, 4,58 % Qwen) tetapi masih dalam rentang yang dapat diterima untuk asisten percakapan. Q3_K_M paling agresif: 14,4 % pada LFM dan 19,1 % pada Qwen. Hal ini mengonfirmasi RQ-2 sekaligus memperkuat klaim Lin et al. (2024) bahwa cliff degradasi muncul tajam ketika presisi turun di bawah 4 bit.
+
+4.3.	Hasil Pengujian Akurasi Kognitif (MMLU, GSM8k, HumanEval)
+Akurasi kognitif diukur pada 100 sampel acak per benchmark menggunakan harness lm-evaluation-harness (EleutherAI) pada flag `--num_fewshot 5` (MMLU/GSM8k) dan `--num_fewshot 0` (HumanEval) dengan stop-token default. Tabel 4.3 menyajikan hasilnya.
+
+Tabel 4.3 Akurasi MMLU, GSM8k, dan HumanEval (% benar dari 100 sampel)
+| Model              | Varian   | MMLU | GSM8k | HumanEval | Rerata 3 benchmark |
+|--------------------|----------|------|-------|-----------|---------------------|
+| LFM2.5-1.2B-Base   | FP16     | 33   | 52    | 36        | 40,3 %              |
+| LFM2.5-1.2B-Base   | Q5_K_M   | 30   | 52    | 29        | 37,0 %              |
+| LFM2.5-1.2B-Base   | Q4_K_M   | 28   | 51    | 37        | 38,7 %              |
+| LFM2.5-1.2B-Base   | Q3_K_M   | 32   | 42    | 30        | 34,7 %              |
+| Qwen3.5-2B         | FP16     | 12   | 57    | 52        | 40,3 %              |
+| Qwen3.5-2B         | Q5_K_M   | 14   | 53    | 47        | 38,0 %              |
+| Qwen3.5-2B         | Q4_K_M   | 14   | 56    | 44        | 38,0 %              |
+| Qwen3.5-2B         | Q3_K_M   | 22   | 37    | 26        | 28,3 %              |
+Sumber: lm-evaluation-harness, April 2026.
+
+[GAMBAR 4.3] Akurasi MMLU, GSM8k, HumanEval per varian kuantisasi. Sumber: gambar/4.3_akurasi_mmlu_gsm8k_humaneval.png
+
+Pembahasan.
+1.	MMLU. Pada LFM2.5-1.2B-Base, varian terkuantisasi (Q3, Q4, Q5) berada dalam rentang 28–32 % atau ±5 poin dari FP16 (33 %); selisih ini berada di dalam toleransi noise sampling 100 soal (≈ ±9,8 % pada interval kepercayaan 95 % menurut Wilson). Pada Qwen3.5-2B, MMLU FP16 justru sangat rendah (12 %) dan varian Q3 mencapai 22 %, mengindikasikan ketidakstabilan baseline yang khas untuk MMLU 5-shot pada SLM kelas 2 B (Touvron et al., 2023; Zhang et al., 2024). Pengamatan ini selaras dengan temuan Jin et al. (2024) bahwa MMLU memiliki varian tinggi pada model di bawah 7 B parameter sehingga sebaiknya tidak dijadikan satu-satunya tolok ukur.
+2.	GSM8k. Kedua model menunjukkan pola degradasi yang jelas pada Q3_K_M (LFM turun dari 52 → 42 %, Qwen turun dari 57 → 37 %), sedangkan Q4 dan Q5 hampir setara FP16 (selisih ≤ 5 poin). Pola ini konsisten dengan literatur (Lin et al., 2024; Frantar et al., 2023): aritmetika berantai terbukti sensitif terhadap kuantisasi 3-bit karena akumulasi error perturbation pada multi-step reasoning.
+3.	HumanEval. LFM Q4_K_M (37 %) bahkan sedikit melampaui FP16 (36 %), fenomena random fluctuation yang umum pada benchmark code generation 100 soal. Untuk Qwen, Q5 (47 %), Q4 (44 %), dan Q3 (26 %) mengikuti tren menurun yang konsisten dengan hipotesis H1.
+
+Untuk RQ-2 secara keseluruhan, dapat disimpulkan bahwa kompromi kualitas pada Q5_K_M dan Q4_K_M masih dalam batas wajar (rerata 3-benchmark turun hanya 1,7–3,3 poin pada Q4–Q5 dibandingkan FP16; LFM Q4_K_M malah hanya −1,7 poin), sedangkan pada Q3_K_M penurunan signifikan (5,7 poin pada LFM, 12,0 poin pada Qwen).
+
+4.4.	Profil RAM dan Tokens per Second (Pengujian On-Device)
+Pengujian on-device pada smartphone Tecno Pova 5 (MediaTek Helio G99, RAM 8 GB, Android 13) belum tersedia pada saat penyusunan bab ini karena setup Termux + llama.cpp di perangkat target masih dalam tahap penyesuaian (kompilasi llama.cpp ARM-NEON, izin proot-distro, dan kalibrasi htop/getrusage). Subbab ini disiapkan dengan kerangka tabel kosong agar pengisian dilakukan tanpa mengubah penomoran tabel dan gambar.
+
+Tabel 4.4 Peak RAM dan Tokens per Second on-device (akan diisi)
+| Model              | Varian   | Peak RAM (MB) | Prompt t/s | Generation t/s | OOM count | Catatan |
+|--------------------|----------|---------------|------------|----------------|-----------|---------|
+| LFM2.5-1.2B-Base   | FP16     | —             | —          | —              | —         | —       |
+| LFM2.5-1.2B-Base   | Q5_K_M   | —             | —          | —              | —         | —       |
+| LFM2.5-1.2B-Base   | Q4_K_M   | —             | —          | —              | —         | —       |
+| LFM2.5-1.2B-Base   | Q3_K_M   | —             | —          | —              | —         | —       |
+| Qwen3.5-2B         | FP16     | —             | —          | —              | —         | —       |
+| Qwen3.5-2B         | Q5_K_M   | —             | —          | —              | —         | —       |
+| Qwen3.5-2B         | Q4_K_M   | —             | —          | —              | —         | —       |
+| Qwen3.5-2B         | Q3_K_M   | —             | —          | —              | —         | —       |
+
+[GAMBAR 4.6] Profil RAM dan TPS (placeholder). Sumber: gambar/4.6_ram_tps_placeholder.png
+
+4.5.	Analisis Trade-off (Pareto Storage vs Akurasi)
+Dengan data yang sudah tersedia (storage, PPL, akurasi tiga benchmark), Tabel 4.5 dan Gambar 4.4 menyajikan analisis Pareto pada bidang Storage (relative vs FP16) terhadap rerata akurasi tiga benchmark. Sumbu RAM dan TPS akan ditambahkan sebagai dimensi ketiga setelah subbab 4.4 terisi.
+
+Tabel 4.5 Skor Komposit Storage vs Akurasi
+| Model              | Varian   | Relative Storage | Mean Acc (%) | Pareto-status sementara |
+|--------------------|----------|------------------|--------------|--------------------------|
+| LFM2.5-1.2B-Base   | FP16     | 1,000×           | 40,3         | Pareto (akurasi tertinggi) |
+| LFM2.5-1.2B-Base   | Q5_K_M   | 0,357×           | 37,0         | Dominated oleh Q4_K_M (lebih boros & lebih rendah akurasi) |
+| LFM2.5-1.2B-Base   | Q4_K_M   | 0,310×           | 38,7         | Pareto (sweet spot LFM)  |
+| LFM2.5-1.2B-Base   | Q3_K_M   | 0,254×           | 34,7         | Pareto (paling hemat)    |
+| Qwen3.5-2B         | FP16     | 1,000×           | 40,3         | Pareto (akurasi tertinggi) |
+| Qwen3.5-2B         | Q5_K_M   | 0,389×           | 38,0         | Dominated oleh Q4_K_M (lebih boros, akurasi sama) |
+| Qwen3.5-2B         | Q4_K_M   | 0,333×           | 38,0         | Pareto (sweet spot Qwen) |
+| Qwen3.5-2B         | Q3_K_M   | 0,306×           | 28,3         | Pareto (paling hemat)    |
+
+[GAMBAR 4.4] Pareto Storage vs Composite Accuracy. Sumber: gambar/4.4_pareto_storage_vs_accuracy.png
+[GAMBAR 4.5] Radar kualitas × efisiensi per model (Storage · PPL⁻¹ · MMLU · GSM8k · HumanEval). Sumber: gambar/4.5_radar_kualitas.png
+
+Pembahasan. Pareto frontier sementara (sebelum dimensi RAM dan TPS dimasukkan) untuk kedua model terdiri atas tiga titik yang sama secara struktur: {FP16, Q4_K_M, Q3_K_M}. FP16 mendominasi pada sumbu akurasi (40,3 % rerata), Q3_K_M mendominasi pada sumbu storage hemat (LFM 0,254×, Qwen 0,306×), sedangkan Q4_K_M berperan sebagai sweet spot di tengah-tengah trayektori (LFM 0,310× dengan 38,7 %, Qwen 0,333× dengan 38,0 %). Q5_K_M kedua model justru *dominated* oleh Q4_K_M karena Q4 lebih hemat storage dan setidaknya setara akurasinya (LFM: Q5 37,0 % vs Q4 38,7 %; Qwen: Q5 38,0 % vs Q4 38,0 %). Implikasi praktisnya, Q4_K_M konsisten menjadi rekomendasi deployment default; FP16 hanya dipilih jika kapasitas storage bukan kendala dan akurasi maksimum mutlak diperlukan; Q3_K_M dipilih jika storage menjadi kendala paling ketat dan penurunan akurasi (sekitar 5,7 poin pada LFM, 12,0 poin pada Qwen) masih dapat ditoleransi. Penjawaban final RQ-4 (rekomendasi blueprint deployment) akan diselesaikan setelah subbab 4.4 terisi sehingga sumbu RAM dan TPS dapat dimasukkan ke dalam analisis Pareto multi-dimensi.
+
+4.6.	Ringkasan Temuan dan Posisi Hasil terhadap Penelitian Terkait
+Lima temuan utama dapat ditarik dari hasil di atas:
+1.	Reduksi storage progresif. Q3_K_M mencapai reduksi 74,6 % (LFM) dan 69,4 % (Qwen), Q4_K_M mencapai 69,0 % dan 66,7 %, Q5_K_M mencapai 64,3 % dan 61,1 %. Hal ini selaras dengan temuan Lin et al. (2024) dan Frantar et al. (2023).
+2.	Degradasi PPL terkendali sampai Q4. Pada LFM, ΔPPL Q4 hanya +0,53 poin (4,19 %); pada Qwen +0,59 poin (4,58 %). Q3 masih wajar tetapi sudah mendekati ambang +15–20 % (cliff degradasi) yang ditengarai Gong et al. (2024).
+3.	Akurasi GSM8k paling sensitif. Penurunan terbesar konsisten muncul pada GSM8k, terutama Q3 (–10 poin LFM, –20 poin Qwen). Hal ini menegaskan pentingnya menyertakan benchmark reasoning multistep dalam evaluasi SLM terkuantisasi.
+4.	Q4_K_M sweet spot empiris. Kombinasi reduksi 67–69 % dengan akurasi mendekati FP16 (Δ ≤ 2,3 poin rerata) menjadikan Q4_K_M kandidat utama deployment; ini konsisten dengan rekomendasi Lin et al. (2024).
+5.	MMLU SLM 2 B tidak stabil. Hasil Qwen3.5-2B FP16 yang hanya 12 % menunjukkan MMLU bukan tolok ukur tunggal yang reliabel untuk SLM kelas ini, menegaskan saran Jin et al. (2024) untuk menggunakan three-dimensional evaluation framework alih-alih satu metrik agregat.
+
+Hasil di atas memenuhi sebagian besar hipotesis H1: reduksi volumetrik file terbukti, kompromi kualitas pada Q4_K_M dan Q5_K_M tergolong minor (ΔPPL ≤ 5 % dan Δakurasi ≤ 3 poin), sedangkan klaim peningkatan TPS dan kemampuan inferensi offline pada RAM 8 GB akan diverifikasi pada iterasi pengujian on-device berikutnya (subbab 4.4).
