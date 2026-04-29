@@ -33,8 +33,8 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 **Maksud / pesan utama.** Memvisualkan alur konversi bobot dari presisi FP16 ke tiga varian kuantisasi GGUF k-quants. Setelah membaca gambar ini pembaca paham bahwa skripsi ini menghasilkan **tiga artefak terkuantisasi per model** (Q5_K_M, Q4_K_M, Q3_K_M) dengan trade-off berbeda.
 
 **Komponen yang ditampilkan.**
-- Input kiri: Bobot FP16 (presisi tinggi) + Calibration set (WikiText-2).
-- PTQ Engine (kotak oranye, llama.cpp quantize) — proses utama yang menerima bobot + kalibrasi.
+- Input tunggal: Bobot FP16 (presisi tinggi). Default `llama-quantize` untuk k-quants melakukan pembulatan matematis langsung pada bobot dan TIDAK memerlukan dataset kalibrasi (kalibrasi hanya dipakai bila pengguna secara eksplisit men-generate importance matrix / `imatrix`, yang tidak dilakukan pada penelitian ini).
+- PTQ Engine (kotak biru, llama.cpp quantize) — proses utama yang menerima bobot FP16.
 - Tiga output:
   - Q5_K_M ≈ 5,5 bit/weight, kualitas mendekati FP16 (kotak hijau).
   - Q4_K_M ≈ 4,5 bit/weight, default sweet-spot (kotak oranye).
@@ -55,8 +55,8 @@ Catatan ini menjelaskan tujuan, isi, dan konteks pemunculan tiap gambar pada BAB
 **Komponen yang ditampilkan.**
 - Tier 1: Cloud Tier (GPU clusters), latensi tinggi.
 - Tier 2: Edge Server (MEC, Radio Access Network), latensi menengah.
-- Tier 3: Edge Device (Smartphone Android Helio G99, 8 GB RAM), latensi rendah—**fokus penelitian**.
-- Kotak biru di bawah: optimasi yang lazim dilakukan di Edge Intelligence (quantization, KV-cache compression, speculative decoding, batching dinamis).
+- Tier 3: Edge Device (Smartphone Android Helio G99, 8 GB RAM), latensi rendah — **★ Fokus Penelitian Ini** (kotak hijau dengan border tebal + label di atasnya untuk mempertegas batasan ruang lingkup skripsi).
+- Kotak biru di bawah: optimasi yang lazim dilakukan di Edge Intelligence (quantization, KV-cache compression, speculative decoding, batching dinamis). Diposisikan tepat di bawah Edge Server + Edge Device saja (tidak di bawah Cloud) karena daftar optimasi tersebut spesifik untuk Edge Intelligence, bukan untuk tier Cloud.
 
 **Kapan dirujuk.** Sub-bab 2.1.5 Edge Computing dan Edge Intelligence.
 

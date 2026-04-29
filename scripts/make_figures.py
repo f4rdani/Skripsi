@@ -355,9 +355,8 @@ def fig_2_2_skema_ptq_kquants():
         "Gambar 2.2 Skema Post-Training Quantization GGUF k-quants (FP16 → Q5/Q4/Q3_K_M)"
     )
 
-    # FP16 weights
+    # FP16 weights — input tunggal (default llama-quantize tanpa imatrix tidak butuh kalibrasi)
     box(ax, (0.2, 2.3), (2.2, 1.0), "Bobot FP16\n(presisi tinggi)", PALETTE["lightblue"], PALETTE["blue"], 10, "bold")
-    box(ax, (0.2, 0.8), (2.2, 1.0), "Calibration set\n(WikiText-2)", PALETTE["lightgray"], PALETTE["gray"], 10)
 
     # Process box
     box(
@@ -371,7 +370,6 @@ def fig_2_2_skema_ptq_kquants():
         "bold",
     )
     arrow(ax, (2.4, 2.8), (3.0, 2.8))
-    arrow(ax, (2.4, 1.3), (3.0, 2.4))
 
     # Outputs
     variants = [
@@ -407,6 +405,27 @@ def fig_2_3_edge_intelligence():
     box(ax, (3.6, 3.6), (2.4, 1.2), "Edge Server\n(MEC, RAN)", PALETTE["lightorange"], PALETTE["orange"], 10, "bold")
     box(ax, (6.8, 3.6), (2.8, 1.2), "Edge Device\nSmartphone Android\n(Helio G99, 8 GB RAM)", PALETTE["lightgreen"], PALETTE["green"], 10, "bold")
 
+    # Highlight Edge Device sebagai fokus penelitian (border tebal + label)
+    highlight = FancyBboxPatch(
+        (6.75, 3.55),
+        2.9,
+        1.3,
+        boxstyle="round,pad=0.02,rounding_size=0.08",
+        linewidth=3.2,
+        facecolor="none",
+        edgecolor=PALETTE["green"],
+    )
+    ax.add_patch(highlight)
+    ax.text(
+        8.2,
+        4.95,
+        "★ Fokus Penelitian Ini",
+        ha="center",
+        fontsize=10,
+        fontweight="bold",
+        color=PALETTE["green"],
+    )
+
     arrow(ax, (2.8, 4.2), (3.6, 4.2))
     arrow(ax, (6.0, 4.2), (6.8, 4.2))
 
@@ -414,20 +433,17 @@ def fig_2_3_edge_intelligence():
     ax.text(4.8, 3.2, "Latency\nmenengah", ha="center", fontsize=9, color=PALETTE["orange"])
     ax.text(8.2, 3.2, "Latency\nrendah", ha="center", fontsize=9, color=PALETTE["green"])
 
+    # Kotak optimasi diposisikan tepat di bawah Edge Server + Edge Device (tidak di bawah Cloud)
     box(
         ax,
-        (0.4, 1.4),
-        (9.2, 1.4),
-        "Optimasi yang lazim di Edge Intelligence:\n• Quantization (PTQ/QAT)  • KV-cache compression  • Speculative decoding  • Batching dinamis (Zhang et al., 2024)",
+        (3.6, 1.2),
+        (6.0, 1.6),
+        "Optimasi yang lazim di Edge Intelligence:\n• Quantization (PTQ/QAT)\n• KV-cache compression\n• Speculative decoding\n• Batching dinamis (Zhang et al., 2024)",
         PALETTE["lightblue"],
         PALETTE["blue"],
         10,
         "bold",
     )
-
-    arrow(ax, (1.6, 3.6), (3.5, 2.8))
-    arrow(ax, (4.8, 3.6), (5.0, 2.8))
-    arrow(ax, (8.2, 3.6), (6.5, 2.8))
 
     save(fig, REPO / "BAB 2" / "gambar" / "2.3_arsitektur_edge_intelligence.png")
 
