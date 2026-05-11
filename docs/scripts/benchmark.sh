@@ -41,10 +41,15 @@ CTX_SIZE=${CTX_SIZE:-512}
 TEMP=${TEMP:-0.5}
 TOP_P=${TOP_P:-0.9}
 REP_PEN=${REP_PEN:-1.1}
-# Flag tambahan untuk llama-cli. Default kosong; bisa di-override mis.
-#   EXTRA_LLAMA_FLAGS="--no-conversation" bash benchmark.sh
-# untuk versi llama.cpp yang default-nya masuk conversation mode.
+# Watchdog timeout (detik). Lindungi dari conversation-mode loop yang menolak
+# exit walau stdin EOF. Default 300 s (5 menit) per run; cukup untuk
+# 200 tokens bahkan di Q3_K_M yang paling lambat.
+RUN_TIMEOUT=${RUN_TIMEOUT:-300}
+# Flag tambahan untuk llama-cli (default kosong). DEFAULT_LLAMA_FLAGS diisi
+# otomatis oleh detect_llama_flags() di bawah — jangan diubah manual kecuali
+# tahu apa yang dilakukan.
 EXTRA_LLAMA_FLAGS=${EXTRA_LLAMA_FLAGS:-}
+DEFAULT_LLAMA_FLAGS=""
 
 RUNS_PER_PROMPT=${RUNS_PER_PROMPT:-3}         # N=3 untuk mean+/-std
 COOLDOWN_BETWEEN_RUNS=${COOLDOWN_BETWEEN_RUNS:-60}  # detik antar run dalam model yang sama
@@ -67,6 +72,31 @@ Jelaskan secara singkat apa itu kecerdasan buatan.
 )
 
 mkdir -p "$OUT_DIR" "$RAW_LOG_DIR"
+
+# Deteksi flag non-interactive yang didukung oleh llama-cli ini.
+# Tujuan: paksa exit setelah satu respons (vs default conversation-mode pada
+# banyak model 2024+, yang setelah respons pertama balik ke prompt "> > >").
+detect_llama_flags() {
+  if [ ! -x "$LLAMA_CLI" ]; then
+    echo "[ERROR] LLAMA_CLI tidak executable: $LLAMA_CLI" >&2
+    exit 1
+  fi
+  local help_text
+  help_text=$("$LLAMA_CLI" --help 2>&1 || true)
+  for candidate in "-no-cnv" "--no-conversation" "--single-turn"; do
+    # cek apakah string flag tampil di help
+    if echo "$help_text" | grep -qF -- "$candidate"; then
+      DEFAULT_LLAMA_FLAGS="$candidate"
+      echo "[info] llama-cli flag non-interactive: $candidate"
+      return 0
+    fi
+  done
+  echo "[WARN] Tidak menemukan flag -no-cnv / --no-conversation / --single-turn di --help." >&2
+  echo "[WARN] llama-cli mungkin masuk conversation-mode dan di-kill watchdog setelah ${RUN_TIMEOUT}s." >&2
+  DEFAULT_LLAMA_FLAGS=""
+}
+
+detect_llama_flags
 
 # Header CSV (per-run granularity)
 if [ ! -f "$RAW_CSV" ]; then
@@ -202,11 +232,10 @@ for m_idx in "${!MODELS[@]}"; do
       TEMP_RAM=$(mktemp); TEMP_CPU=$(mktemp); TEMP_T=$(mktemp)
       START=$(date +%s)
 
-      # Jalankan llama-cli langsung di background.
-      # PENTING: tanpa pipa `echo "/exit" | ...`, supaya $! = PID llama-cli,
-      # bukan PID subshell pembungkus. </dev/null untuk paksa EOF di stdin
-      # (gantikan fungsi "/exit" pada v1) sehingga llama-cli tidak masuk
-      # mode interaktif.
+      # Jalankan llama-cli langsung di background (tanpa pipa) sehingga $! =
+      # PID llama-cli, bukan subshell pembungkus. Stdin di-close via
+      # </dev/null. Flag $DEFAULT_LLAMA_FLAGS (auto-detected) memaksa exit
+      # setelah satu respons; $EXTRA_LLAMA_FLAGS untuk override manual.
       "$LLAMA_CLI" -m "$MODEL" \
             -p "$P_TEXT" \
             -n "$MAX_TOKENS" \
@@ -216,17 +245,31 @@ for m_idx in "${!MODELS[@]}"; do
             --top-p "$TOP_P" \
             --repeat-penalty "$REP_PEN" \
             --no-warmup \
+            $DEFAULT_LLAMA_FLAGS \
             $EXTRA_LLAMA_FLAGS \
             </dev/null > "$RUN_LOG" 2>&1 &
       LLAMA_PID=$!
+
+      # Watchdog: kalau llama-cli tidak exit dalam RUN_TIMEOUT detik (misal
+      # masih masuk conversation-mode loop), bunuh paksa TERM lalu KILL.
+      (
+        sleep "$RUN_TIMEOUT"
+        if kill -0 "$LLAMA_PID" 2>/dev/null; then
+          echo "[watchdog] timeout ${RUN_TIMEOUT}s, kill $LLAMA_PID" >&2
+          kill -TERM "$LLAMA_PID" 2>/dev/null
+          sleep 5
+          kill -KILL "$LLAMA_PID" 2>/dev/null
+        fi
+      ) &
+      WATCHDOG_PID=$!
 
       monitor_resources "$LLAMA_PID" "$TEMP_RAM" "$TEMP_CPU" "$TEMP_T" &
       MON_PID=$!
 
       wait "$LLAMA_PID"
       LLAMA_RC=$?
-      kill "$MON_PID" 2>/dev/null
-      wait "$MON_PID" 2>/dev/null
+      kill "$WATCHDOG_PID" 2>/dev/null; wait "$WATCHDOG_PID" 2>/dev/null
+      kill "$MON_PID" 2>/dev/null;       wait "$MON_PID" 2>/dev/null
 
       END=$(date +%s)
       TOTAL_T=$((END-START))
