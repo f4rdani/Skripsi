@@ -1,0 +1,10 @@
+# Build artifacts
+docs/.cache/
+*.aux
+*.log
+*.out
+*.tmp
+
+# OS artifacts
+.DS_Store
+Thumbs.db
