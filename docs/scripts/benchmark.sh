@@ -41,6 +41,10 @@ CTX_SIZE=${CTX_SIZE:-512}
 TEMP=${TEMP:-0.5}
 TOP_P=${TOP_P:-0.9}
 REP_PEN=${REP_PEN:-1.1}
+# Flag tambahan untuk llama-cli. Default kosong; bisa di-override mis.
+#   EXTRA_LLAMA_FLAGS="--no-conversation" bash benchmark.sh
+# untuk versi llama.cpp yang default-nya masuk conversation mode.
+EXTRA_LLAMA_FLAGS=${EXTRA_LLAMA_FLAGS:-}
 
 RUNS_PER_PROMPT=${RUNS_PER_PROMPT:-3}         # N=3 untuk mean+/-std
 COOLDOWN_BETWEEN_RUNS=${COOLDOWN_BETWEEN_RUNS:-60}  # detik antar run dalam model yang sama
@@ -198,8 +202,12 @@ for m_idx in "${!MODELS[@]}"; do
       TEMP_RAM=$(mktemp); TEMP_CPU=$(mktemp); TEMP_T=$(mktemp)
       START=$(date +%s)
 
-      # Jalankan llama-cli ke background supaya kita pegang PID asli
-      ( echo "/exit" | "$LLAMA_CLI" -m "$MODEL" \
+      # Jalankan llama-cli langsung di background.
+      # PENTING: tanpa pipa `echo "/exit" | ...`, supaya $! = PID llama-cli,
+      # bukan PID subshell pembungkus. </dev/null untuk paksa EOF di stdin
+      # (gantikan fungsi "/exit" pada v1) sehingga llama-cli tidak masuk
+      # mode interaktif.
+      "$LLAMA_CLI" -m "$MODEL" \
             -p "$P_TEXT" \
             -n "$MAX_TOKENS" \
             -t "$THREADS" \
@@ -208,7 +216,8 @@ for m_idx in "${!MODELS[@]}"; do
             --top-p "$TOP_P" \
             --repeat-penalty "$REP_PEN" \
             --no-warmup \
-            2>&1 ) > "$RUN_LOG" &
+            $EXTRA_LLAMA_FLAGS \
+            </dev/null > "$RUN_LOG" 2>&1 &
       LLAMA_PID=$!
 
       monitor_resources "$LLAMA_PID" "$TEMP_RAM" "$TEMP_CPU" "$TEMP_T" &
@@ -243,6 +252,13 @@ for m_idx in "${!MODELS[@]}"; do
 
       echo "  -> total=${TOTAL_T}s prompt_tps=$P_TPS gen_tps=$G_TPS ttft=${TTFT_MS}ms"
       echo "     peak_ram=${PEAK_RAM_MB}MB cpu=${PEAK_CPU}% cpu_temp=${PEAK_TEMP}C bat_dT=${BAT_DTEMP}C rc=$LLAMA_RC"
+
+      # Diagnostic: kalau parsing menghasilkan 0 padahal llama-cli sukses,
+      # cetak ekor log supaya format aslinya terlihat tanpa harus dump manual
+      if [[ "$P_TPS" == "0" && "$G_TPS" == "0" && "$LLAMA_RC" == "0" && "$TOTAL_T" -gt 2 ]]; then
+        echo "     [WARN] TPS=0 padahal llama-cli rc=0. 30 baris terakhir log:"
+        tail -n 30 "$RUN_LOG" 2>/dev/null | sed 's/^/      | /'
+      fi
 
       if (( r < RUNS_PER_PROMPT )) || [[ "$p_entry" != "${PROMPTS[-1]}" ]]; then
         echo "  cooldown ${COOLDOWN_BETWEEN_RUNS}s ..."
