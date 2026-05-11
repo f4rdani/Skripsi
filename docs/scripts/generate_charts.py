@@ -58,10 +58,11 @@ save(fig, "4_1_ukuran_berkas.png")
 # ---------------------------------------------------------------------------
 # Gambar 4.2 -- Kecepatan inferensi (Prompt vs Generation) per varian
 # ---------------------------------------------------------------------------
-prompt_lfm = [12.8, 19.3, 28.3, 8.5]
-gen_lfm = [3.2, 7.7, 8.8, 8.6]
-prompt_qwen = [4.0, 14.8, 19.9, 11.1]
-gen_qwen = [1.7, 4.2, 4.7, 4.7]
+# Rerata Tecno Pova 5 (Tabel 4.2)
+prompt_lfm = [33.47, 35.33, 43.67, 18.27]
+gen_lfm = [5.57, 10.63, 13.67, 11.07]
+prompt_qwen = [22.70, 22.55, 27.00, 14.55]
+gen_qwen = [1.87, 4.60, 4.95, 4.25]
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.6), sharey=False)
 for ax, prompt, gen, title in [
@@ -71,9 +72,9 @@ for ax, prompt, gen, title in [
     ax.plot(QUANTS, prompt, marker="o", linewidth=2, label="Prompt Speed (t/s)", color="#2ca02c")
     ax.plot(QUANTS, gen, marker="s", linewidth=2, label="Generation Speed (t/s)", color="#ff7f0e")
     for xi, yi in enumerate(prompt):
-        ax.annotate(f"{yi}", (xi, yi), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=9)
+        ax.annotate(f"{yi:.2f}", (xi, yi), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=9)
     for xi, yi in enumerate(gen):
-        ax.annotate(f"{yi}", (xi, yi), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=9)
+        ax.annotate(f"{yi:.2f}", (xi, yi), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=9)
     ax.set_title(title)
     ax.set_xlabel("Varian Kuantisasi")
     ax.set_ylabel("Tokens per Second (t/s)")
@@ -87,8 +88,9 @@ save(fig, "4_2_kecepatan_inferensi.png")
 # ---------------------------------------------------------------------------
 # Gambar 4.3 -- Konsumsi RAM (Peak) per varian kuantisasi
 # ---------------------------------------------------------------------------
-peak_lfm = [2280.02, 1639.57, 1427.73, 883.66]
-peak_qwen = [3664.08, 2833.89, 2540.23, 1874.91]
+# Peak RAM rerata Tecno Pova 5 (Tabel 4.2)
+peak_lfm = [2303.47, 1665.28, 1452.97, 911.97]
+peak_qwen = [3744.25, 2856.29, 2562.88, 1897.97]
 
 fig, ax = plt.subplots(figsize=(8, 4.8))
 b1 = ax.bar(x - width / 2, peak_lfm, width, label="LFM 2.5 (1.2B)", color=COLOR_LFM)
