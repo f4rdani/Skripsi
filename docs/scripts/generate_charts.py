@@ -69,7 +69,7 @@ prompt_qwen_std = [1.71, 0.25, 2.60, 0.95]
 gen_qwen = [1.87, 4.60, 4.95, 4.25]
 gen_qwen_std = [0.19, 0.30, 0.25, 0.35]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.8), sharey=False)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5.4), sharey=False)
 for ax, prompt, pstd, gen, gstd, title in [
     (ax1, prompt_lfm, prompt_lfm_std, gen_lfm, gen_lfm_std, "LFM 2.5 (1.2B)"),
     (ax2, prompt_qwen, prompt_qwen_std, gen_qwen, gen_qwen_std, "Qwen 3.5 (2B)"),
@@ -86,10 +86,20 @@ for ax, prompt, pstd, gen, gstd, title in [
     ax.set_xlabel("Varian Kuantisasi")
     ax.set_ylabel("Tokens per Second (t/s)")
     ax.grid(linestyle="--", alpha=0.4)
-    ax.legend(loc="upper right")
+    # Pad upper limit so the data line and labels do not collide with the legend later
+    top = max(p + s for p, s in zip(prompt, pstd))
+    ax.set_ylim(0, top * 1.18)
 
+# Shared legend placed BELOW the plots, fully outside the data boxes, so the
+# "Prompt Speed" / "Generation Speed" keterangan no longer overlaps the lines.
+handles, labels = ax1.get_legend_handles_labels()
+fig.legend(handles, labels, loc="lower center", bbox_to_anchor=(0.5, -0.02),
+           ncol=2, frameon=True, fontsize=11)
 fig.suptitle("Kecepatan Inferensi (Prompt vs Generation) per Varian Kuantisasi", fontsize=13, fontweight="bold")
-save(fig, "4_2_kecepatan_inferensi.png")
+fig.tight_layout(rect=[0, 0.06, 1, 0.96])
+fig.savefig(OUT / "4_2_kecepatan_inferensi.png", bbox_inches="tight")
+plt.close(fig)
+print(f"  wrote {OUT / '4_2_kecepatan_inferensi.png'}")
 
 
 # ---------------------------------------------------------------------------
@@ -119,22 +129,31 @@ save(fig, "4_3_konsumsi_ram.png")
 
 # ---------------------------------------------------------------------------
 # Gambar 4.4 -- Perplexity WikiText-2 per varian kuantisasi
+# Disajikan dalam dua sub-panel terpisah (LFM dan Qwen) supaya label nilai
+# tidak saling tumpang tindih seperti versi single-axis sebelumnya.
 # ---------------------------------------------------------------------------
 ppl_lfm = [12.6829, 12.8297, 13.2145, 14.5135]
 ppl_qwen = [12.7763, 13.0856, 13.3617, 15.2172]
 
-fig, ax = plt.subplots(figsize=(8, 4.6))
-ax.plot(QUANTS, ppl_lfm, marker="o", linewidth=2, label="LFM 2.5 (1.2B)", color=COLOR_LFM)
-ax.plot(QUANTS, ppl_qwen, marker="s", linewidth=2, label="Qwen 3.5 (2B)", color=COLOR_QWEN)
-for xi, yi in enumerate(ppl_lfm):
-    ax.annotate(f"{yi:.3f}", (xi, yi), textcoords="offset points", xytext=(0, 9), ha="center", fontsize=9, color=COLOR_LFM)
-for xi, yi in enumerate(ppl_qwen):
-    ax.annotate(f"{yi:.3f}", (xi, yi), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=9, color=COLOR_QWEN)
-ax.set_xlabel("Varian Kuantisasi")
-ax.set_ylabel("Perplexity (lebih rendah = lebih baik)")
-ax.set_title("Degradasi Perplexity pada Dataset WikiText-2")
-ax.legend(loc="upper left")
-ax.grid(linestyle="--", alpha=0.4)
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.8), sharey=False)
+for ax, ppl, title, color in [
+    (ax1, ppl_lfm, "LFM 2.5 (1.2B)", COLOR_LFM),
+    (ax2, ppl_qwen, "Qwen 3.5 (2B)", COLOR_QWEN),
+]:
+    ax.plot(QUANTS, ppl, marker="o", linewidth=2.2, color=color)
+    for xi, yi in enumerate(ppl):
+        ax.annotate(f"{yi:.3f}", (xi, yi), textcoords="offset points",
+                    xytext=(0, 10), ha="center", fontsize=10, color=color,
+                    fontweight="bold")
+    ax.set_title(title, fontsize=12, fontweight="bold")
+    ax.set_xlabel("Varian Kuantisasi")
+    ax.set_ylabel("Perplexity (lebih rendah = lebih baik)")
+    ax.grid(linestyle="--", alpha=0.4)
+    pmin, pmax = min(ppl), max(ppl)
+    pad = (pmax - pmin) * 0.25 + 0.15
+    ax.set_ylim(pmin - pad * 0.6, pmax + pad)
+
+fig.suptitle("Degradasi Perplexity pada Dataset WikiText-2", fontsize=13, fontweight="bold")
 save(fig, "4_4_perplexity.png")
 
 
@@ -179,10 +198,12 @@ save(fig, "4_5_akurasi_benchmark.png")
 
 
 # ---------------------------------------------------------------------------
-# Gambar 4.6 -- Radar/Trade-off (efisiensi normalisasi)
+# Gambar 4.6 -- Trade-off multi-dimensi (grouped bar chart)
+# Versi sebelumnya menggunakan radar chart yang sulit dibaca karena keempat
+# poligon saling menumpuk. Diganti menjadi grouped horizontal bar chart
+# (sumbu Y = dimensi metrik, sumbu X = skor normalisasi 0..1) sehingga
+# perbandingan antar varian kuantisasi langsung terbaca per dimensi.
 # ---------------------------------------------------------------------------
-# Normalize: higher is better. Use Q4_K_M-centric comparison vs F16 baseline.
-# Dimensions: Storage Eff., RAM Eff., Gen Speed, Prompt Speed, 1/Perplexity, Akurasi rata-rata.
 def norm(vals):
     arr = np.asarray(vals, dtype=float)
     lo, hi = arr.min(), arr.max()
@@ -190,36 +211,54 @@ def norm(vals):
         return np.ones_like(arr)
     return (arr - lo) / (hi - lo)
 
-# build per-variant scores using LFM data (representative)
-storage_eff = norm([1 / s for s in lfm_size_mb])      # smaller is better -> invert
+# Build per-variant scores using LFM data (representative).
+# All dimensions are normalised so that higher = better.
+storage_eff = norm([1 / s for s in lfm_size_mb])
 ram_eff = norm([1 / r for r in peak_lfm])
 gen_speed = norm(gen_lfm)
 prompt_speed = norm(prompt_lfm)
 ppl_inv = norm([1 / p for p in ppl_lfm])
-acc_mean = norm([(a + b + c) / 3 for a, b, c in zip(lfm_acc["F16"], lfm_acc["Q5_K_M"], lfm_acc["Q4_K_M"])])  # placeholder
-# rebuild acc_mean properly per variant
 acc_per_variant = [np.mean(lfm_acc[q]) for q in QUANTS]
 acc_mean = norm(acc_per_variant)
 
-dims = ["Storage Eff.", "RAM Eff.", "Gen Speed", "Prompt Speed", "1/Perplexity", "Akurasi Rata-rata"]
-data = np.vstack([storage_eff, ram_eff, gen_speed, prompt_speed, ppl_inv, acc_mean]).T  # rows: variants
+dims = [
+    "Efisiensi\nStorage",
+    "Efisiensi\nRAM",
+    "Generation\nSpeed",
+    "Prompt\nSpeed",
+    "1 / Perplexity",
+    "Akurasi\nRata-rata",
+]
+# data shape: (n_dimensions, n_variants)
+data = np.vstack([storage_eff, ram_eff, gen_speed, prompt_speed, ppl_inv, acc_mean])
 
-angles = np.linspace(0, 2 * np.pi, len(dims), endpoint=False).tolist()
-angles += angles[:1]
-
-fig, ax = plt.subplots(figsize=(7.5, 7.5), subplot_kw=dict(polar=True))
+fig, ax = plt.subplots(figsize=(10.5, 6.2))
+y = np.arange(len(dims))
+bar_h = 0.20
 for i, q in enumerate(QUANTS):
-    vals = data[i].tolist() + data[i][:1].tolist()
-    ax.plot(angles, vals, linewidth=2, label=q, color=palette[i])
-    ax.fill(angles, vals, alpha=0.10, color=palette[i])
-ax.set_xticks(angles[:-1])
-ax.set_xticklabels(dims, fontsize=10)
-ax.set_yticks([0.25, 0.5, 0.75, 1.0])
-ax.set_yticklabels(["0,25", "0,50", "0,75", "1,00"], fontsize=8)
-ax.set_ylim(0, 1.05)
-ax.set_title("Trade-off Multi-Dimensi LFM 2.5 (1,2B) per Varian Kuantisasi", pad=36, fontsize=12, fontweight="bold")
-ax.legend(loc="lower center", bbox_to_anchor=(0.5, -0.18), ncol=4, frameon=False)
-save(fig, "4_6_tradeoff_radar.png")
+    offs = (i - 1.5) * bar_h
+    bars = ax.barh(y + offs, data[:, i], bar_h, label=q, color=palette[i],
+                   edgecolor="white", linewidth=0.6)
+    ax.bar_label(bars, fmt="%.2f", padding=2, fontsize=8)
+
+ax.set_yticks(y)
+ax.set_yticklabels(dims, fontsize=10)
+ax.invert_yaxis()  # supaya "Efisiensi Storage" tampil paling atas
+ax.set_xlabel("Skor Normalisasi (0 = terburuk, 1 = terbaik)")
+ax.set_xlim(0, 1.18)
+ax.set_xticks([0.0, 0.25, 0.5, 0.75, 1.0])
+ax.set_xticklabels(["0,00", "0,25", "0,50", "0,75", "1,00"])
+ax.grid(axis="x", linestyle="--", alpha=0.4)
+ax.set_axisbelow(True)
+ax.set_title("Trade-off Multi-Dimensi LFM 2.5 (1,2B) per Varian Kuantisasi",
+             fontsize=12, fontweight="bold", pad=12)
+# Legend placed BELOW the axes so it never overlaps the bars
+ax.legend(title="Varian Kuantisasi", loc="lower center",
+          bbox_to_anchor=(0.5, -0.22), ncol=4, frameon=True, fontsize=10)
+fig.tight_layout()
+fig.savefig(OUT / "4_6_tradeoff_radar.png", bbox_inches="tight")
+plt.close(fig)
+print(f"  wrote {OUT / '4_6_tradeoff_radar.png'}")
 
 
 # ---------------------------------------------------------------------------
