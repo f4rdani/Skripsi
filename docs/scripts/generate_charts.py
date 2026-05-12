@@ -313,4 +313,32 @@ ax.set_title("Hierarki Edge Intelligence untuk Inferensi SLM", fontsize=12, font
 save(fig, "2_2_edge_intelligence.png")
 
 
+# ---------------------------------------------------------------------------
+# Gambar 4.7 -- Delta akurasi LFM 2.5 per varian kuantisasi (relatif F16)
+# Sumber: Tabel 4.4 (MMLU, GSM8K, HumanEval) dan Tabel 4.6
+# ---------------------------------------------------------------------------
+benchmarks = ["MMLU", "GSM8K", "HumanEval", "MT-Bench TTR"]
+delta_q5 = [+2, -3, -7, -1.7]
+delta_q4 = [-7, -8, +1, -5.8]
+delta_q3 = [-4, -18, -6, -12.3]
+
+x = np.arange(len(benchmarks))
+width = 0.26
+fig, ax = plt.subplots(figsize=(9.5, 5.2))
+b1 = ax.bar(x - width, delta_q5, width, label="Q5_K_M", color="#2ca02c")
+b2 = ax.bar(x, delta_q4, width, label="Q4_K_M", color="#1f77b4")
+b3 = ax.bar(x + width, delta_q3, width, label="Q3_K_M", color="#d62728")
+
+ax.axhline(0, color="#333", linewidth=1.0)
+ax.set_xticks(x, benchmarks)
+ax.set_ylabel("Delta vs F16 (poin)")
+ax.set_title("Penurunan Kepintaran LFM 2.5 per Varian Kuantisasi (Delta vs F16)")
+ax.grid(axis="y", linestyle="--", alpha=0.4)
+ax.legend(loc="lower left", frameon=True)
+for bars in (b1, b2, b3):
+    ax.bar_label(bars, fmt="%+.1f", padding=2, fontsize=9)
+ax.set_ylim(min(delta_q3) - 4, max(delta_q5 + delta_q4 + delta_q3) + 4)
+save(fig, "4_7_delta_akurasi.png")
+
+
 print("\nAll charts generated successfully.")
