@@ -114,7 +114,7 @@ Membuka cakrawala pemahaman teoretis maupun operasional bagi pembaca akademik da
 
 ## 1.5 Metode Penelitian
 
-Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental**. Kerangka kerja dirancang untuk memfasilitasi pemantauan utilitas perangkat keras yang presisi, merekam indikator efisiensi memori, dan menguji tingkat kecerdasan AI pada ekosistem komputasi seluler. Eksperimen dilangsungkan sepenuhnya *on-device* pada *smartphone* Tecno Pova 5 melalui *terminal emulator* Termux, dengan mesin inferensi `llama.cpp` yang dikompilasi ulang secara natif untuk CPU ARM Helio G99. Setiap varian PTQ dijalankan melalui skenario terstandardisasi yang sama (jumlah token *prompt*, jumlah *thread*, dan dataset evaluasi) agar perbedaan performa benar-benar dapat dikaitkan dengan tingkat kompresi, bukan variabel eksternal.
+Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental** dengan kerangka *ablation study* yang membandingkan empat tingkat presisi bobot model (FP16 sebagai *baseline*, lalu Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M sebagai varian terkompresi) di atas dua jenis *host* yang saling melengkapi. *Host* pertama adalah **PC dengan WSL2 Ubuntu dan GPU NVIDIA RTX 3060**, dipakai untuk tahap persiapan berkas `.gguf` melalui utilitas `huggingface-cli`, `convert_hf_to_gguf.py`, dan `./llama-quantize`, serta untuk mengukur metrik intrinsik model (Perplexity WikiText-2 dan akurasi MMLU/GSM8K/HumanEval/MT-Bench) yang memerlukan akselerasi paralel. *Host* kedua adalah ***smartphone* Tecno Pova 5** dengan emulator terminal *non-root* Termux dan mesin inferensi `llama.cpp` yang dikompilasi ulang secara natif untuk CPU ARM Helio G99, dipakai untuk mengukur metrik performa pada lingkungan *target* deployment: *peak* RAM proses, beban CPU, serta *Tokens per Second* (TPS). Setiap varian dijalankan melalui skenario terstandardisasi yang sama (parameter inferensi, anggaran *token*, jumlah *thread*, dan dataset evaluasi) agar perbedaan performa benar-benar dapat dikaitkan dengan tingkat kompresi, bukan variabel eksternal.
 
 ## 1.6 Teknik Pengumpulan Data
 
@@ -122,7 +122,11 @@ Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental**. Ker
 
 Observasi dilakukan dengan mengekstraksi log secara objektif atas seluruh dinamika perangkat keras dan perangkat lunak ketika siklus inferensi AI berlangsung. Pengukuran dibagi ke dalam dua *host*: (1) PC NVIDIA RTX 3060 (WSL Ubuntu) untuk mengukur *Perplexity* (modul `./llama-perplexity`) dan akurasi *benchmark* MMLU/GSM8K/HumanEval/MT-Bench karena tahap evaluasi akurasi membutuhkan waktu komputasi yang panjang; serta (2) perangkat Android Tecno Pova 5 melalui Termux untuk mengukur *peak* RAM proses (`VmRSS` dari `/proc/<pid>/status`)—dengan `htop` interaktif sebagai pembanding visual—beban CPU (`%CPU` dari `ps`), serta *Tokens per Second* (TPS) yang dibaca dari keluaran statistik `llama-cli` (fungsi `monitor_resources` pada skrip `docs/scripts/benchmark.sh`). Berkas `.gguf` yang dieksekusi pada kedua *host* berasal dari satu *source-of-truth* sehingga hasil pengukuran tetap dapat diperbandingkan apple-to-apple. Pencatatan dilakukan pada setiap transisi resolusi kompresi (FP16, Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M) untuk kedua model.
 
-### B. Studi Pustaka
+### B. Wawancara
+
+Karena penelitian ini bersifat **kuantitatif eksperimental** dan seluruh variabel dependennya berupa indikator komputasi objektif (TPS, *peak* RAM, beban CPU, *Perplexity*, dan skor akurasi *benchmark*) yang dapat diekstraksi langsung dari log sistem dan log mesin inferensi, teknik wawancara tidak diterapkan. Data primer sepenuhnya berasal dari instrumen pengukuran otomatis pada kedua *host* (PC dan *smartphone*) sebagaimana dijelaskan pada bagian A, sehingga tidak diperlukan instrumen opini subjektif dari narasumber. Validitas data dijaga melalui pengulangan ujian (tiga *run* per varian untuk LFM 2.5 dan dua *run* per varian untuk Qwen 3.5) yang dilanjutkan dengan uji statistik signifikansi (Welch's *t*-test + one-way ANOVA) sebagaimana disajikan pada Sub-bab 4.4.6.
+
+### C. Studi Pustaka
 
 Studi pustaka dilakukan dengan menghimpun dan memetakan referensi dari berbagai karya tulis ilmiah, baik jurnal nasional maupun internasional, yang dipublikasikan pada rentang 2023–2026. Fokus telaah literatur mencakup teori fundamental arsitektur LLM/SLM (Touvron dkk., 2023), teori gangguan matematis pada kuantisasi (Gong dkk., 2024), pedoman *Edge Intelligence* (Zhang dkk., 2024), serta validasi empiris penerapan `llama.cpp` di perangkat ARM dengan sumber daya terbatas (Ray & Pradhan, 2026). Referensi pilar dari Dettmers dkk. (2023), Frantar dkk. (2023), Lin dkk. (2023), dan Jin dkk. (2024) digunakan sebagai instrumen landasan teori sekaligus pemandu standar parameter kalibrasi pada tahap evaluasi.
 
@@ -248,9 +252,9 @@ Pemaparan ringkas tujuh penelitian pilar paling representatif yang mendasari ris
 | Laskaridis dkk. (2024) — *MELTing point: Mobile Evaluation of Language Transformers* | Mengevaluasi kelayakan dan keterbatasan eksekusi LLM pada *smartphone* Android dan iOS secara sistematis. | Studi empiris pertama yang membandingkan beberapa LLM (1–13B) pada perangkat seluler nyata dengan metrik *throughput*, RAM, dan *thermal*. | Mengonfirmasi inferensi LLM bersifat *memory-bound* pada *smartphone*; kuantisasi efektif menekan jejak memori dengan kompensasi akurasi. Acuan utama klaim *memory-bound* di skripsi. |
 | Lu dkk. (2025) — *Demystifying Small Language Models for Edge Deployment* | Memetakan lanskap SLM yang layak diimplementasikan pada perangkat *edge* termasuk *smartphone*. | Survei komprehensif >60 SLM mencakup arsitektur, ukuran, *benchmark* akurasi, dan profil inferensi pada perangkat *edge*. | SLM *state-of-the-art* terbukti dapat mengungguli model 7B pada *task* umum; memperkuat justifikasi pemilihan LFM 2.5 (1,2B) dan Qwen 3.5 (2B) untuk skripsi. |
 
-## 2.3 Tinjauan Objek Penelitian
+## 2.3 Tinjauan Organisasi (Objek Penelitian)
 
-Objek penelitian dibagi menjadi dua kategori fundamental: ekosistem perangkat keras/perangkat lunak Android, dan spesifikasi arsitektur *Small Language Model* yang diuji.
+Penelitian ini bersifat **independen dan berbasis laboratorium**, sehingga tidak terikat pada organisasi atau institusi eksternal sebagai tempat riset. Seluruh kegiatan pengujian, mulai dari persiapan berkas model hingga eksekusi *benchmark*, dilakukan secara mandiri oleh penulis menggunakan perangkat pribadi. Mengingat tidak adanya struktur organisasi formal yang relevan, bagian *Tinjauan Organisasi* pada panduan resmi diadaptasi menjadi tinjauan terhadap **objek penelitian**, yakni ekosistem perangkat keras dan perangkat lunak yang berfungsi sebagai *unit of analysis* dalam eksperimen. Objek penelitian dibagi menjadi dua kategori fundamental: ekosistem perangkat keras/perangkat lunak Android sebagai *host target* deployment, dan spesifikasi arsitektur *Small Language Model* yang diuji.
 
 ### 2.3.1 Ekosistem Uji Keras: Tecno Pova 5 dengan Termux
 
@@ -334,7 +338,7 @@ Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan 
 
 ## 3.3 Metode Pengumpulan Data
 
-Penelitian terapan ini berfokus pada ekstraksi data komputasional yang objektif (*System Logging Benchmarking*), tanpa bergantung pada instrumen opini subjektif. Metode pengumpulan data yang diaplikasikan mencakup pengamatan langsung dan studi pustaka.
+Penelitian terapan ini berfokus pada ekstraksi data komputasional yang objektif (*System Logging Benchmarking*), tanpa bergantung pada instrumen opini subjektif. Sejalan dengan karakteristik kuantitatif eksperimental tersebut, metode pengumpulan data yang diaplikasikan dibatasi pada dua teknik: **pengamatan langsung** (observasi eksperimental terhadap log sistem) dan **studi pustaka** (telaah referensi ilmiah). Teknik wawancara tidak diterapkan karena seluruh variabel dependen bersifat instrumental komputasional dan dapat diekstraksi otomatis dari log perangkat, sehingga tidak diperlukan data opini dari narasumber.
 
 ### A. Pengamatan Langsung (Observasi Eksperimental)
 
@@ -624,25 +628,9 @@ Tiga temuan inferensial yang dapat ditarik dari Tabel 4.8 adalah sebagai berikut
 
 Dengan demikian, hasil uji statistik di atas memberikan dukungan kuantitatif yang konsisten dengan kerangka rekomendasi Tabel 4.7: Q4\_K\_M unggul signifikan dibanding Q3\_K\_M pada dua metrik *throughput* utama (*Gen* dan *Prompt* TPS) sekaligus tetap mempertahankan *peak* RAM yang lebih rendah dibanding Q5\_K\_M secara signifikan—gabungan yang menjadikannya varian dengan profil efisiensi paling kokoh untuk perangkat Tecno Pova 5.
 
-\newpage
+## 4.5 Keterbatasan Penelitian (*Threats to Validity*)
 
-# BAB V — PENUTUP
-
-## 5.1 Kesimpulan
-
-Berdasarkan serangkaian eksperimen mengenai optimasi arsitektur *Small Language Model* pada ekosistem *Mobile Edge Computing* berbasis Android, dapat ditarik empat kesimpulan utama sebagai jawaban atas rumusan masalah penelitian, yaitu:
-
-1. **Efektivitas Kuantisasi dalam Mitigasi Limitasi Memori.** Implementasi PTQ dengan format GGUF terbukti secara empiris mampu mengatasi kendala *shared-memory* pada Android kelas menengah. Penggunaan FP16 dengan parameter 2 miliar (Qwen 3.5) menyebabkan dominasi penggunaan RAM hingga **3,74 GB**—nyaris 47% kapasitas RAM sistem—dan berisiko tinggi memicu *Force Close*. Melalui reduksi presisi ke Q4\_K\_M dan Q3\_K\_M, beban memori dikompresi melampaui **60% (storage)** dan **30–60% (RAM)**, sehingga menjamin stabilitas operasional perangkat. Hipotesis **H1 terkonfirmasi**.
-
-2. **Optimalisasi Kecepatan Inferensi dan Anomali Arsitektur ARM.** Reduksi ukuran berkas berbanding lurus dengan peningkatan *Generation Speed* — LFM 2.5 Q4\_K\_M mencapai **2,45× baseline** (5,57 → 13,67 t/s), Qwen 3.5 Q4\_K\_M mencapai **2,65× baseline** (1,87 → 4,95 t/s). Magnitudo speedup yang lebih besar pada arsitektur 2B mengonfirmasi dalil *memory-bound* (Zhang dkk., 2024). Namun, penelitian ini juga mengidentifikasi adanya anomali pada CPU ARM, di mana Q3\_K\_M mengalami degradasi signifikan pada *Prompt Speed* karena kompleksitas *unpacking* susunan bit ganjil yang memaksa CPU melakukan operasi *bit-shifting* tambahan. Hal ini membuktikan bahwa ukuran berkas yang lebih kecil tidak selalu menghasilkan latensi yang lebih rendah pada arsitektur ARM. Hipotesis **H3 terkonfirmasi dengan kavet anomali Q3**.
-
-3. **Integritas Kognitif dan Titik Keseimbangan Operasional (*Sweet Spot*).** Kompresi ekstrem pada Q3\_K\_M menyebabkan degradasi kualitas kognitif yang signifikan, ditandai dengan anjloknya akurasi GSM8K LFM (52→42%) dan HumanEval Qwen (52→26%) serta pelebaran *Perplexity* (>1,5 poin). Penurunan ini disebabkan oleh hilangnya *outliers* pada matriks bobot yang esensial bagi nalar eksak. Sementara itu, Q5\_K\_M dan Q4\_K\_M mempertahankan kualitas linguistik dengan margin kenaikan *Perplexity* <1 poin. Dengan demikian, **Q4\_K\_M ditetapkan sebagai *sweet spot* operasional** karena mampu memberikan efisiensi penggunaan RAM dan kecepatan inferensi yang optimal tanpa mengorbankan integritas nalar dan logika fungsional model. Hipotesis **H2 dan H4 terkonfirmasi**.
-
-4. **Disparitas Paradigma *Reasoning* vs *Non-Reasoning* sebagai Faktor Dominan Latensi *User-Perceived*.** Penelitian ini menemukan bahwa pada konfigurasi *edge* RAM 8 GB, perbedaan paradigma kognitif (Qwen *reasoning* vs LFM *non-reasoning*) menghasilkan disparitas total waktu eksekusi **15×–25×** (LFM: 7–16 detik, Qwen: 181–393 detik) untuk *prompt* identik—jauh melampaui pengaruh tingkat kuantisasi yang hanya menggeser latensi maksimum 2× lipat. Implikasi *deployment*-nya adalah **pemilihan paradigma harus mendahului pemilihan tingkat kuantisasi**: untuk skenario asisten percakapan *real-time*, LFM 2.5 Q4\_K\_M (1B *non-reasoning*) merupakan konfigurasi optimal; sedangkan untuk skenario analisis *offline* yang memprioritaskan kualitas penalaran, Qwen 3.5 Q4\_K\_M (2B *reasoning*) tetap layak meskipun total waktu eksekusi berada pada rentang 3–5 menit per *prompt*. Temuan ini menegaskan bagian terakhir dari hipotesis **H4 mengenai dominasi paradigma kognitif terhadap pengalaman pengguna**.
-
-## 5.2 Keterbatasan Penelitian (*Threats to Validity*)
-
-Guna menjaga objektivitas pelaporan ilmiah dan memberikan ruang interpretasi yang akurat, penulis menggariskan keterbatasan utama yang melekat pada desain eksperimen ini, dikelompokkan menurut kerangka *threats to validity* (validitas internal, eksternal, dan konstruk):
+Guna menjaga objektivitas pelaporan ilmiah dan memberikan ruang interpretasi yang akurat atas seluruh temuan empiris di Sub-bab 4.2–4.4, penulis menggariskan keterbatasan utama yang melekat pada desain eksperimen ini, dikelompokkan menurut kerangka *threats to validity* (validitas eksternal, internal, dan konstruk). Daftar ini sekaligus menjadi rujukan kontekstual bagi rekomendasi pada Sub-bab 5.2 Saran.
 
 **Validitas Eksternal — Generalisasi Hasil**
 
@@ -666,13 +654,44 @@ Guna menjaga objektivitas pelaporan ilmiah dan memberikan ruang interpretasi yan
 
 8. **Pengukuran Termal dan Konsumsi Energi yang Belum Disertakan.** Penelitian belum menyertakan pengukuran suhu CPU secara periodik (`/sys/class/thermal/thermal_zone*/temp`) maupun konsumsi baterai per 1.000 *token* yang diproduksi. Keduanya merupakan metrik krusial untuk evaluasi praktis dalam konteks *Mobile Edge AI* yang sangat sensitif terhadap *thermal throttling* dan ketahanan baterai. Pendekatan metodologis untuk pengukuran energi *high-resolution* berbasis sensor arus eksternal yang dipaparkan oleh Husom dkk. (2024) pada *Raspberry Pi* dapat menjadi acuan adopsi pada penelitian lanjutan di perangkat Android.
 
-## 5.3 Saran
+\newpage
 
-Berdasarkan batasan dan temuan penelitian, penulis merekomendasikan beberapa pengembangan untuk penelitian selanjutnya di bidang *Edge Intelligence*:
+# BAB V — PENUTUP
 
-1. **Eksplorasi Akselerator Komputasi Heterogen.** Penelitian selanjutnya disarankan mengintegrasikan kerangka inferensi yang mendukung delegasi beban kalkulasi pada modul AI khusus, seperti *Neural Processing Unit* (NPU) atau akselerasi GPU mobile via Vulkan/OpenCL, untuk menembus limitasi komputasi yang bersifat CPU-*bound*.
-2. **Evaluasi Algoritma Kuantisasi Berbasis Aktivasi.** Guna mempertahankan kualitas kognitif pada tingkat kompresi rendah, disarankan melakukan komparasi metode *k-quants* dengan algoritma mutakhir seperti AWQ (Lin dkk., 2023) yang lebih adaptif dalam melindungi bobot *outliers*.
-3. **Integrasi Antarmuka Pengguna Grafis (*Native* GUI).** Untuk meningkatkan utilitas bagi pengguna akhir, disarankan mengembangkan purwarupa terminal ini ke dalam bentuk aplikasi Android *native* menggunakan *Java Native Interface* (JNI). Tujuannya adalah mentransformasi sistem berbasis CLI menjadi asisten AI interaktif yang lebih intuitif dan aksesibel. Pengembangan lanjutan terhadap teknik *prompting*, *alignment*, dan *inference* yang efisien sebagaimana diuraikan oleh Xiao dan Zhu (2025) dapat ditambahkan untuk meningkatkan kualitas respons asisten.
+## 5.1 Kesimpulan
+
+Berdasarkan serangkaian eksperimen mengenai optimasi arsitektur *Small Language Model* pada ekosistem *Mobile Edge Computing* berbasis Android, dapat ditarik empat kesimpulan utama sebagai jawaban atas rumusan masalah penelitian, yaitu:
+
+1. **Efektivitas Kuantisasi dalam Mitigasi Limitasi Memori.** Implementasi PTQ dengan format GGUF terbukti secara empiris mampu mengatasi kendala *shared-memory* pada Android kelas menengah. Penggunaan FP16 dengan parameter 2 miliar (Qwen 3.5) menyebabkan dominasi penggunaan RAM hingga **3,74 GB**—nyaris 47% kapasitas RAM sistem—dan berisiko tinggi memicu *Force Close*. Melalui reduksi presisi ke Q4\_K\_M dan Q3\_K\_M, beban memori dikompresi melampaui **60% (storage)** dan **30–60% (RAM)**, sehingga menjamin stabilitas operasional perangkat. Hipotesis **H1 terkonfirmasi**.
+
+2. **Optimalisasi Kecepatan Inferensi dan Anomali Arsitektur ARM.** Reduksi ukuran berkas berbanding lurus dengan peningkatan *Generation Speed* — LFM 2.5 Q4\_K\_M mencapai **2,45× baseline** (5,57 → 13,67 t/s), Qwen 3.5 Q4\_K\_M mencapai **2,65× baseline** (1,87 → 4,95 t/s). Magnitudo speedup yang lebih besar pada arsitektur 2B mengonfirmasi dalil *memory-bound* (Zhang dkk., 2024). Namun, penelitian ini juga mengidentifikasi adanya anomali pada CPU ARM, di mana Q3\_K\_M mengalami degradasi signifikan pada *Prompt Speed* karena kompleksitas *unpacking* susunan bit ganjil yang memaksa CPU melakukan operasi *bit-shifting* tambahan. Hal ini membuktikan bahwa ukuran berkas yang lebih kecil tidak selalu menghasilkan latensi yang lebih rendah pada arsitektur ARM. Hipotesis **H3 terkonfirmasi dengan kavet anomali Q3**.
+
+3. **Integritas Kognitif dan Titik Keseimbangan Operasional (*Sweet Spot*).** Kompresi ekstrem pada Q3\_K\_M menyebabkan degradasi kualitas kognitif yang signifikan, ditandai dengan anjloknya akurasi GSM8K LFM (52→42%) dan HumanEval Qwen (52→26%) serta pelebaran *Perplexity* (>1,5 poin). Penurunan ini disebabkan oleh hilangnya *outliers* pada matriks bobot yang esensial bagi nalar eksak. Sementara itu, Q5\_K\_M dan Q4\_K\_M mempertahankan kualitas linguistik dengan margin kenaikan *Perplexity* <1 poin. Dengan demikian, **Q4\_K\_M ditetapkan sebagai *sweet spot* operasional** karena mampu memberikan efisiensi penggunaan RAM dan kecepatan inferensi yang optimal tanpa mengorbankan integritas nalar dan logika fungsional model. Hipotesis **H2 dan H4 terkonfirmasi**.
+
+4. **Disparitas Paradigma *Reasoning* vs *Non-Reasoning* sebagai Faktor Dominan Latensi *User-Perceived*.** Penelitian ini menemukan bahwa pada konfigurasi *edge* RAM 8 GB, perbedaan paradigma kognitif (Qwen *reasoning* vs LFM *non-reasoning*) menghasilkan disparitas total waktu eksekusi **15×–25×** (LFM: 7–16 detik, Qwen: 181–393 detik) untuk *prompt* identik—jauh melampaui pengaruh tingkat kuantisasi yang hanya menggeser latensi maksimum 2× lipat. Implikasi *deployment*-nya adalah **pemilihan paradigma harus mendahului pemilihan tingkat kuantisasi**: untuk skenario asisten percakapan *real-time*, LFM 2.5 Q4\_K\_M (1B *non-reasoning*) merupakan konfigurasi optimal; sedangkan untuk skenario analisis *offline* yang memprioritaskan kualitas penalaran, Qwen 3.5 Q4\_K\_M (2B *reasoning*) tetap layak meskipun total waktu eksekusi berada pada rentang 3–5 menit per *prompt*. Temuan ini menegaskan bagian terakhir dari hipotesis **H4 mengenai dominasi paradigma kognitif terhadap pengalaman pengguna**.
+
+## 5.2 Saran
+
+Berdasarkan temuan penelitian, hasil uji statistik, serta keterbatasan yang teridentifikasi sepanjang eksperimen (lihat Sub-bab 4.5 *Threats to Validity*), penulis mengajukan rekomendasi pengembangan yang dikelompokkan ke dalam **tiga aspek** sebagaimana panduan penulisan, yaitu aspek manajerial, aspek sistem, dan aspek penelitian lanjutan. Setiap rekomendasi dipasangkan dengan keterbatasan yang relevan agar dapat ditelusuri konteksnya.
+
+### 5.2.1 Aspek Manajerial
+
+1. **Adopsi Q4\_K\_M sebagai Konfigurasi Produksi.** Bagi pengembang aplikasi *Mobile AI* yang menargetkan perangkat Android kelas menengah (RAM 8 GB), varian **Q4\_K\_M** direkomendasikan sebagai konfigurasi *default*. Berdasarkan Tabel 4.7, varian ini mereduksi *peak* RAM proses sebesar 36,9% dan mempercepat *Generation Speed* hingga 2,45× baseline FP16, dengan retensi akurasi rata-rata 88,9% dan CPU *peak* yang terkontrol di kisaran 300% (jauh dari ambang *thermal throttling*).
+2. **Pemisahan Tahap Persiapan Model dan Eksekusi *Runtime*.** Hasil penelitian menunjukkan bahwa tahap kuantisasi berkas `.gguf` lebih efisien dilakukan di PC ber-GPU (lihat Lampiran B), sedangkan eksekusi *runtime* dilakukan di perangkat *target*. Pola kerja dua-*host* ini disarankan diadopsi sebagai standar pengembangan agar siklus iterasi tetap cepat tanpa mengorbankan kemampuan deployment *on-device*.
+3. **Penyiapan SOP Pengujian Multi-perangkat.** Mengingat hasil penelitian saat ini hanya tervalidasi pada satu unit Tecno Pova 5 (Helio G99), tim pengembang produksi disarankan menyusun *Standard Operating Procedure* pengujian lintas-SoC (Snapdragon 6/7/8 gen, Dimensity, Tensor) sebelum merilis aplikasi berbasis SLM ke pasar.
+
+### 5.2.2 Aspek Sistem
+
+1. **Eksplorasi Akselerator Komputasi Heterogen.** Mengingat seluruh inferensi pada penelitian ini bersifat CPU-*bound*, pengembangan selanjutnya disarankan mengintegrasikan kerangka inferensi yang mendukung delegasi beban kalkulasi pada modul AI khusus, seperti *Neural Processing Unit* (NPU) atau akselerasi GPU mobile via Vulkan/OpenCL, agar batas atas TPS dapat didorong lebih jauh.
+2. **Penambahan Instrumen Telemetri Termal dan Energi.** Penelitian belum menyertakan pengukuran suhu CPU (`/sys/class/thermal/thermal_zone*/temp`) dan konsumsi baterai per 1.000 *token* yang diproduksi. Penambahan kedua metrik ini sangat penting untuk evaluasi praktis dalam konteks *Mobile Edge AI* yang sensitif terhadap *thermal throttling* dan ketahanan baterai. Pendekatan pengukuran energi *high-resolution* berbasis sensor arus eksternal yang dipaparkan oleh Husom dkk. (2024) pada *Raspberry Pi* dapat menjadi acuan adopsi pada perangkat Android.
+3. **Integrasi Antarmuka Pengguna Grafis (*Native* GUI).** Untuk meningkatkan utilitas bagi pengguna akhir, purwarupa terminal ini disarankan dikembangkan ke dalam bentuk aplikasi Android *native* menggunakan *Java Native Interface* (JNI). Tujuannya adalah mentransformasi sistem berbasis CLI menjadi asisten AI interaktif yang lebih intuitif dan aksesibel.
+
+### 5.2.3 Aspek Penelitian (Pembahasan) Selanjutnya
+
+1. **Perluasan Lingkup Perangkat Uji.** Replikasi eksperimen pada minimal tiga SoC berbeda (Snapdragon, Dimensity, Tensor) sangat dianjurkan untuk menguji generalisasi temuan *sweet spot* Q4\_K\_M. Variasi karakteristik termal, *governor* CPU, dan skema *power management* berpotensi menggeser titik keseimbangan optimal antar SoC.
+2. **Peningkatan Ukuran Sampel *Benchmark* Akurasi.** Evaluasi MMLU, GSM8K, dan HumanEval saat ini menggunakan 100 sampel acak per *benchmark* yang menyisakan margin *error* statistik 95% CI sebesar ±10 poin. Studi lanjutan disarankan menggunakan minimal 500 sampel per *benchmark* atau melaporkan interval kepercayaan secara eksplisit agar perbedaan antar varian dapat dipertegas.
+3. **Penyempurnaan Instrumen Evaluasi *Reasoning Model*.** Sebagaimana dijabarkan pada Sub-bab 4.3.3, skor akurasi Qwen 3.5 terdampak oleh interaksi antara format keluaran *chain-of-thought* (`<think>...</think>`), anggaran *token*, dan logika *parser* berlapis. Penelitian lanjutan disarankan mengembangkan *parser* khusus *reasoning model* yang mengizinkan anggaran *token* adaptif dan mendukung deteksi multi-pola jawaban (`####`, `\boxed{}`, *final answer*) tanpa *fallback* yang berisiko bias.
+4. **Komparasi dengan Algoritma Kuantisasi Berbasis Aktivasi.** Guna mempertahankan kualitas kognitif pada tingkat kompresi rendah, disarankan melakukan komparasi metode *k-quants* dengan algoritma mutakhir seperti AWQ (Lin dkk., 2023) atau MobileQuant (Tan dkk., 2024) yang lebih adaptif dalam melindungi bobot *outliers*. Pengembangan lanjutan terhadap teknik *prompting*, *alignment*, dan *inference* yang efisien sebagaimana diuraikan oleh Xiao dan Zhu (2025) juga dapat ditambahkan untuk meningkatkan kualitas respons asisten.
 
 \newpage
 
