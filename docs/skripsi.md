@@ -405,7 +405,7 @@ Evaluasi kognitif bertujuan mengukur dampak kompresi terhadap kecerdasan *neural
 
 *Perplexity* digunakan untuk mengukur tingkat ambiguitas model terhadap struktur sintaksis pada dataset WikiText-2. Nilai PPL yang lebih rendah mengindikasikan tingkat pemahaman bahasa yang lebih baik. Hasilnya ditunjukkan pada Tabel 4.3.
 
-**Tabel 4.3** Hasil *Perplexity* (PPL) WikiText-2 per Varian Kuantisasi
+**Tabel 4.3** Hasil *Perplexity* (PPL) WikiText-2 per Varian Kuantisasi \*
 
 | Varian Kompresi | PPL LFM 2.5 (1,2B) | PPL Qwen 3.5 (2B) |
 |---|:---:|:---:|
@@ -413,6 +413,8 @@ Evaluasi kognitif bertujuan mengukur dampak kompresi terhadap kecerdasan *neural
 | Q5\_K\_M | 12,8297 | 13,0856 |
 | Q4\_K\_M | 13,2145 | 13,3617 |
 | Q3\_K\_M | 14,5135 | 15,2172 |
+
+\* Evaluasi PPL dieksekusi pada *host* PC dengan GPU NVIDIA RTX 3060 menggunakan dataset *holdout* `wikitext-2-raw` (subset `wiki.test.raw`) melalui perintah `./llama-perplexity -m <model.gguf> -f wikitext-2-raw/wiki.test.raw -c 512 -ngl 999`. Penggunaan GPU diperlukan agar evaluasi PPL pada keseluruhan korpus selesai dalam waktu wajar; nilai PPL bersifat *model-intrinsic* dan independen terhadap perangkat keras inferensi karena format berkas `.gguf` yang identik dengan yang digunakan pada perangkat Tecno Pova 5.
 
 ![](gambar/4_4_perplexity.png){width=92%}
 
@@ -422,7 +424,7 @@ Evaluasi kognitif bertujuan mengukur dampak kompresi terhadap kecerdasan *neural
 
 Evaluasi akurasi menggunakan tiga instrumen *benchmark* kognitif: MMLU (pemahaman umum berbasis pilihan ganda A/B/C/D), GSM8K (nalar matematika dengan jawaban numerik), dan HumanEval (akurasi pemrograman Python dievaluasi melalui *unit-test*), serta satu instrumen tambahan berupa MT-Bench dengan skor *Type-Token Ratio* (TTR) yang mengukur keragaman leksikal teks generatif. Masing-masing *benchmark* mengeksekusi 100 sampel acak dengan suhu *sampling* deterministik (`temperature=0`). Eksekusi akurasi dijalankan pada *host* PC NVIDIA RTX 3060 untuk menghemat waktu evaluasi, sedangkan validasi performa keluaran model identik dengan eksekusi pada perangkat *target* karena format `.gguf` yang seragam. Data hasil pengujian disajikan pada Tabel 4.4 dan Tabel 4.5.
 
-**Tabel 4.4** Hasil *Benchmark* Akurasi LFM 2.5 (1,2B)
+**Tabel 4.4** Hasil *Benchmark* Akurasi LFM 2.5 (1,2B) \*
 
 | Benchmark | F16 | Q5\_K\_M | Q4\_K\_M | Q3\_K\_M |
 |---|:---:|:---:|:---:|:---:|
@@ -431,17 +433,18 @@ Evaluasi akurasi menggunakan tiga instrumen *benchmark* kognitif: MMLU (pemahama
 | HumanEval (kode) | 36% | 29% | 37% | 30% |
 | MT-Bench TTR | 0,526 | 0,509 | 0,468 | 0,403 |
 
-**Tabel 4.5** Hasil *Benchmark* Akurasi Qwen 3.5 (2B) \*
+\* Eksekusi akurasi dilakukan pada *host* PC NVIDIA RTX 3060 (n=100 sampel acak per *benchmark*, `temperature=0`). Berkas `.gguf` yang dievaluasi identik dengan berkas yang dimuat pada perangkat Tecno Pova 5. Pada n=100 dengan distribusi biner pass/fail, margin *error* statistik 95% CI berada di kisaran ±10 poin persentase—selisih ≤ 10 poin antar varian secara konservatif harus diperlakukan sebagai *noise* statistik, bukan sebagai indikasi perbedaan kualitas yang substantif.
+
+**Tabel 4.5** Hasil *Benchmark* Akurasi Qwen 3.5 (2B) \*\*
 
 | Benchmark | F16 | Q5\_K\_M | Q4\_K\_M | Q3\_K\_M |
 |---|:---:|:---:|:---:|:---:|
-| MMLU (A/B/C/D) \* | 40% | 29% | 37% | 40% |
-| GSM8K (numerik) \*\* | 16% | 17% | 19% | 12% |
+| MMLU (A/B/C/D) | 40% | 29% | 37% | 40% |
+| GSM8K (numerik) | 16% | 17% | 19% | 12% |
 | HumanEval (kode) | 52% | 47% | 40% | 25% |
 | MT-Bench TTR | 0,546 | 0,412 | 0,568 | 0,521 |
 
-\* Qwen 3.5 (2B) merupakan model dengan arsitektur *reasoning* (memproduksi blok `<think>...</think>` sebagai jejak penalaran sebelum jawaban final). Skor akurasi yang dilaporkan menggunakan *parser* berlapis yaitu pencocokan ketat (`####<num>`, `\boxed{...}`, *final answer*) dengan *fallback* pada kandidat angka/huruf terakhir setelah eliminasi blok `<think>`. 
-\*\* Skor GSM8K Qwen sangat rendah karena 60–80% keluaran model tidak menyelesaikan penalaran dalam anggaran 200 *token* yang ditetapkan (`strict_miss` tinggi); detail keterbatasan ini dijelaskan pada Sub-bab 4.3.3.
+\*\* Tabel 4.5 dieksekusi pada *host* PC NVIDIA RTX 3060 dengan kondisi sampling yang sama dengan Tabel 4.4. Qwen 3.5 (2B) merupakan model dengan arsitektur *reasoning* (memproduksi blok `<think>...</think>` sebagai jejak penalaran sebelum jawaban final). Skor akurasi yang dilaporkan menggunakan *parser* berlapis yaitu pencocokan ketat (`####<num>`, `\boxed{...}`, *final answer*) dengan *fallback* pada kandidat angka/huruf terakhir setelah eliminasi blok `<think>`. Skor GSM8K Qwen sangat rendah karena 60–80% keluaran model tidak menyelesaikan penalaran dalam anggaran 200 *token* yang ditetapkan (`strict_miss` tinggi); detail keterbatasan ini dijelaskan pada Sub-bab 4.3.3.
 
 ![](gambar/4_5_akurasi_benchmark.png){width=98%}
 
@@ -501,7 +504,7 @@ Untuk menjawab pertanyaan fundamental "seberapa besar kepintaran yang hilang aki
 Dari Tabel 4.6 terbaca tiga pola utama:
 
 1. **GSM8K (nalar matematika) adalah *benchmark* paling sensitif terhadap kuantisasi.** Penurunan akurasi konsisten dan monoton: Q5 −3, Q4 −8, Q3 −18 poin. Pola ini sejalan dengan temuan Kurtić dkk. (2024) bahwa *task* yang menuntut presisi numerik dan logika berlapis paling rentan terhadap reduksi presisi bobot, karena kuantisasi mengeliminasi tepi *outlier* yang berperan sebagai *anchor* numerik halus pada bobot atensi.
-2. **MMLU dan HumanEval bersifat fluktuatif non-monoton.** MMLU justru *meningkat* +2 poin pada Q5 dan HumanEval *meningkat* +1 poin pada Q4. Fluktuasi ini bukan paradoks; secara teoritis kuantisasi dapat berfungsi sebagai *regularizer* lemah pada *task* dengan distribusi jawaban diskret (pilihan ganda) sehingga *noise* kompresi kadang menggeser jawaban menuju kelas yang benar, namun *gain* tersebut tidak konsisten dan tidak dapat dijadikan dalil umum.
+2. **MMLU dan HumanEval bersifat fluktuatif non-monoton.** MMLU justru *meningkat* +2 poin pada Q5 dan HumanEval *meningkat* +1 poin pada Q4. Fluktuasi seperti turunnya MMLU Q4 (25%) yang lebih rendah dari Q3 (28%)—anomali yang tampak kontra-intuitif—berada dalam rentang margin *error* statistik 95% CI sebesar ±10 poin pada n=100, sehingga selisih 3 poin tersebut tidak signifikan secara statistik dan tidak dapat ditafsirkan sebagai indikasi bahwa Q3 "lebih cerdas" dari Q4. Secara teoritis kuantisasi dapat berfungsi sebagai *regularizer* lemah pada *task* dengan distribusi jawaban diskret (pilihan ganda) sehingga *noise* kompresi kadang menggeser jawaban menuju kelas yang benar, namun *gain* tersebut tidak konsisten dan tidak dapat dijadikan dalil umum.
 3. **MT-Bench TTR turun monoton** (52,6 → 40,3) yang menandakan penyempitan distribusi leksikal akibat hilangnya presisi bobot pada lapisan generatif teks bebas.
 
 Untuk menjawab pertanyaan praktis "varian mana yang terbaik untuk Tecno Pova 5?", Tabel 4.7 mengintegrasikan retensi kepintaran dengan tiga metrik operasional yang sudah disajikan pada Tabel 4.2, kemudian menghitung *Compound Score* yang menggambarkan *throughput* efektif relatif terhadap konsumsi RAM dan retensi akurasi.
@@ -528,6 +531,32 @@ Dengan demikian, **Q4\_K\_M ditetapkan sebagai varian operasional paling tepat u
 ![](gambar/4_7_delta_akurasi.png){width=92%}
 
 **Gambar 4.7** *Delta* akurasi LFM 2.5 per varian kuantisasi (relatif terhadap F16, dalam poin persentase). Sumber: olahan penulis.
+
+### 4.4.6 Uji Statistik Signifikansi Perbedaan Performa Antar Varian (LFM 2.5)
+
+Agar klaim performa pada Tabel 4.2 tidak dilandasi rerata semata, dilakukan uji signifikansi statistik antar varian menggunakan **Welch's *t*-test** (asumsi varian tidak setara, lebih konservatif daripada *t*-test klasik) dengan taraf signifikansi α = 0,05, serta **one-way ANOVA** untuk menilai apakah keempat varian secara keseluruhan memiliki perbedaan rerata yang signifikan. Pengujian difokuskan pada LFM 2.5 (1,2B) karena tersedia tiga ulangan penuh per varian (n=3 × 4 varian = 12 observasi per metrik) yang memenuhi syarat minimum bagi *t*-test berbasis sampel kecil. Data sumber adalah `docs/data/hasilv2_clean.csv` dan *script* replikasi tersedia di `docs/scripts/statistical_tests.py`.
+
+**Tabel 4.8** Welch's *t*-test Antar Varian LFM 2.5 untuk Tiga Metrik Performa Utama (α = 0,05)
+
+| Pasangan Varian | Gen TPS (t, p) | Prompt TPS (t, p) | *Peak* RAM (t, p) |
+|---|---|---|---|
+| F16 vs Q5\_K\_M | t = −11,00; p = 0,004 \*\* | t = −0,40; p = 0,726 (n.s.) | t = 46,59; p < 0,001 \*\* |
+| F16 vs Q4\_K\_M | t = −37,95; p < 0,001 \*\* | t = −2,09; p = 0,145 (n.s.) | t = 61,90; p < 0,001 \*\* |
+| F16 vs Q3\_K\_M | t = −10,81; p = 0,005 \*\* | t = 3,19; p = 0,071 (n.s.) | t = 97,79; p < 0,001 \*\* |
+| Q5\_K\_M vs Q4\_K\_M | t = −6,44; p = 0,012 \*\* | t = −4,41; p = 0,022 \*\* | t = 15,05; p < 0,001 \*\* |
+| Q5\_K\_M vs Q3\_K\_M | t = −0,66; p = 0,548 (n.s.) | t = 11,06; p < 0,001 \*\* | t = 51,65; p < 0,001 \*\* |
+| Q4\_K\_M vs Q3\_K\_M | t = 5,01; p = 0,024 \*\* | t = 11,99; p < 0,001 \*\* | t = 37,00; p < 0,001 \*\* |
+| **One-way ANOVA (4 varian)** | **F = 95,39; p < 0,001 \*\*** | **F = 17,07; p < 0,001 \*\*** | **F = 3.297,73; p < 0,001 \*\*** |
+
+\*\* signifikan pada α = 0,05; n.s. = tidak signifikan secara statistik.
+
+Tiga temuan inferensial yang dapat ditarik dari Tabel 4.8 adalah sebagai berikut.
+
+1. **Perbedaan rerata pada metrik *Generation Speed* dan *Peak* RAM antar varian terbukti signifikan secara statistik** (ANOVA p < 0,001 untuk kedua metrik), sehingga klaim utama penelitian—bahwa kuantisasi PTQ meningkatkan kecepatan inferensi dan mereduksi konsumsi RAM secara substantif—didukung bukti statistik dan bukan sekadar hasil rerata yang kebetulan berbeda.
+2. **Keunggulan Q4\_K\_M atas Q3\_K\_M pada Gen TPS** (mean 13,67 vs 11,07; t = 5,01; p = 0,024) **dan Prompt TPS** (mean 43,67 vs 18,27; t = 11,99; p < 0,001) bersifat signifikan. Hal ini menjadi dasar inferensial yang memperkuat rekomendasi varian operasional Q4\_K\_M pada Sub-bab 4.4.5 dari sudut pandang murni kecepatan, bahkan sebelum mempertimbangkan retensi kepintaran.
+3. **Pengaruh kuantisasi pada *Prompt Speed* tidak homogen.** *Prompt TPS* F16 dan Q3\_K\_M tidak menunjukkan perbedaan signifikan (p = 0,071), sementara F16 dan Q5\_K\_M juga tidak signifikan (p = 0,726). Pola ini mengonfirmasi adanya anomali *unpacking* bit ganjil pada Q3\_K\_M yang sudah dianalisis pada Sub-bab 4.4.2: tahap *prompt processing* memerlukan akses memori berlapis yang biaya komputasinya hampir setara dengan format presisi penuh, sehingga *speedup* Q3 tidak dapat dijamin pada fase ini.
+
+Dengan demikian, hasil uji statistik di atas memberikan dukungan kuantitatif yang konsisten dengan kerangka rekomendasi Tabel 4.7: Q4\_K\_M unggul signifikan dibanding Q3\_K\_M pada dua metrik *throughput* utama (*Gen* dan *Prompt* TPS) sekaligus tetap mempertahankan *peak* RAM yang lebih rendah dibanding Q5\_K\_M secara signifikan—gabungan yang menjadikannya varian dengan profil efisiensi paling kokoh untuk perangkat Tecno Pova 5.
 
 \newpage
 
