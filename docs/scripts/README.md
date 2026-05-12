@@ -7,7 +7,8 @@ Skrip pendukung eksperimen Bab IV. Dirancang untuk perangkat **Tecno Pova 5
 
 | File | Fungsi |
 |---|---|
-| `benchmark.sh` | Eksekusi inferensi `llama-cli` untuk seluruh model GGUF di `$MODEL_DIR`. Multi-prompt × multi-run, log RAM/CPU/TPS/TTFT/suhu/baterai per run. Output: CSV per-run + log lengkap per run. |
+| `benchmark_manual.sh` | **Skrip "manual input v4" yang dipakai untuk menghasilkan `docs/data/hasilv2.csv`** (data yang dianalisis pada Bab IV skripsi). Versi ini menjalankan satu prompt per model dan meminta penulis menyalin nilai TPS langsung dari layar Termux — paling robust ketika label log `llama.cpp` berbeda antar build/fork. Optimasi: `MAX_TOKENS=1024`, `CONTEXT_SIZE=2048` agar keluaran Qwen 3.5 dengan blok *Thinking Process* tidak terpotong. |
+| `benchmark.sh` | Eksekusi inferensi `llama-cli` untuk seluruh model GGUF di `$MODEL_DIR`. Versi otomatis penuh: multi-prompt × multi-run, log RAM/CPU/TPS/TTFT/suhu/baterai per run, parsing TPS otomatis. Output: CSV per-run + log lengkap per run. |
 | `summarize_results.py` | Aggregasi CSV per-run menjadi tabel `mean ± std` (per model dan per model×prompt). Output: CSV summary + Markdown table siap-tempel ke `skripsi.md`. |
 | `generate_charts.py` | Render grafik Bab II / III / IV (matplotlib) dari data agregat. |
 
