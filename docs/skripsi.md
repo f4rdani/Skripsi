@@ -120,7 +120,7 @@ Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental**. Ker
 
 ### A. Observasi (Eksperimental)
 
-Observasi dilakukan dengan mengekstraksi log secara deterministik atas seluruh dinamika perangkat keras dan perangkat lunak di dalam Termux saat siklus inferensi AI berjalan. Konsumsi *peak* RAM diamati melalui utilitas `htop`, sedangkan metrik *Tokens per Second* (TPS) dan *Perplexity* diekstraksi dari keluaran *backend* `llama.cpp` (modul `./llama-bench` dan `./llama-perplexity`). Pencatatan dilakukan pada setiap transisi resolusi kompresi (FP16, Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M) untuk kedua model.
+Observasi dilakukan dengan mengekstraksi log secara objektif atas seluruh dinamika perangkat keras dan perangkat lunak ketika siklus inferensi AI berlangsung. Pengukuran dibagi ke dalam dua *host*: (1) PC NVIDIA RTX 3060 (WSL Ubuntu) untuk mengukur *Perplexity* (modul `./llama-perplexity`) dan akurasi *benchmark* MMLU/GSM8K/HumanEval/MT-Bench karena tahap evaluasi akurasi membutuhkan waktu komputasi yang panjang; serta (2) perangkat Android Tecno Pova 5 melalui Termux untuk mengukur *peak* RAM proses (`VmRSS` dari `/proc/<pid>/status`), beban CPU (`%CPU` dari `ps`), serta *Tokens per Second* (TPS) yang dibaca dari keluaran statistik `llama-cli`. Berkas `.gguf` yang dieksekusi pada kedua *host* berasal dari satu *source-of-truth* sehingga hasil pengukuran tetap dapat diperbandingkan apple-to-apple. Pencatatan dilakukan pada setiap transisi resolusi kompresi (FP16, Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M) untuk kedua model.
 
 ### B. Studi Pustaka
 
@@ -263,9 +263,9 @@ Riset komparatif ini menggunakan dua model SLM. Objek uji utama adalah **LFM 2.5
 Dalam melaksanakan penelitian berbasis komputasi eksperimental pada perangkat seluler, tahapan kerja disusun secara sistematis agar proses pengujian tetap berfokus pada tujuan awal dan menghasilkan data empiris yang valid. Mengacu pada kerangka evaluasi kuantisasi holistik (kapasitas, kelugasan, efisiensi) (Jin dkk., 2024), alur penelitian ini terbagi menjadi **lima tahapan utama** sebagai berikut.
 
 1. **Studi Pendahuluan dan Perumusan Masalah.** Tahap awal mencakup kajian pustaka komprehensif mengenai *Mobile Edge Computing* (Zhang dkk., 2024; Sevim & Ibrahim, 2024) dan *Post-Training Quantization* (Dettmers dkk., 2023; Frantar dkk., 2023). Urgensi lokalisasi pemrosesan AI secara *offline* ditetapkan sebagai landasan utama (Zhan dkk., 2025), sementara batasan kapasitas RAM 8 GB pada Android difokuskan sebagai *bottleneck* arsitektur. Tahap ini dilanjutkan dengan perumusan hipotesis terkait solusi kompresi presisi campuran (Lin dkk., 2023).
-2. **Persiapan Lingkungan Komputasi (*Environment Setup*).** *Testbed* dikonfigurasi di atas Android dengan emulator terminal *non-root* Termux. Tahap ini meliputi pembaruan paket dasar (`pkg update`) serta instalasi *toolchain* C++ (`clang`, `cmake`, `make`). Repositori `llama.cpp` selanjutnya di-*clone* dan dikompilasi secara manual dengan opsi *native ARM build*, sebagaimana pendekatan yang telah divalidasi pada perangkat ARM serupa (Ray & Pradhan, 2026).
-3. **Persiapan Objek Model dan Kuantisasi (*Ablation Setup*).** Berkas FP16 untuk LFM 2.5 (1,2B) dan Qwen 3.5 (2B) disiapkan (Touvron dkk., 2023). Pemilihan Qwen sebagai uji kedua didasarkan pada kompetensi bahasa Indonesia yang telah terbukti (Nurohim dkk., 2025). Untuk mengeksekusi *ablation* gradasi kompresi, berkas FP16 dikonversi menggunakan utilitas `./llama-quantize` di dalam Termux untuk menghasilkan tiga varian *k-quants*, yakni **Q5\_K\_M.gguf**, **Q4\_K\_M.gguf**, dan **Q3\_K\_M.gguf** (Dettmers dkk., 2023).
-4. **Eksekusi Eksperimen (*System Benchmarking*).** Pengujian beban kerja dilakukan melalui CLI Termux. Evaluasi dijalankan sekuensial dari FP16 (variabel kontrol), dilanjutkan Q5, Q4, dan Q3. Pada fase ini, *peak* RAM dicatat melalui `htop`, TPS diekstraksi dari log sistem (Zhang dkk., 2024), dan *Perplexity* dieksekusi melalui `./llama-perplexity` untuk mengidentifikasi *perturbation* akibat kompresi (Gong dkk., 2024).
+2. **Persiapan Lingkungan Komputasi (*Environment Setup*).** *Testbed* dikonfigurasi pada dua *host* yang saling melengkapi. *Host* pertama adalah **PC dengan WSL2 Ubuntu** dan GPU NVIDIA RTX 3060, dipakai untuk tahap persiapan berkas model dan evaluasi akurasi karena membutuhkan akselerasi paralel. Pada PC ini diinstal *toolchain* C++ (`build-essential`, `cmake`), Python (`python3`, `python3-venv`), CUDA Toolkit, serta *library* `huggingface_hub`. Repositori `llama.cpp` di-*clone* dan dikompilasi dengan opsi `-DGGML_CUDA=ON` agar utilitas `llama-quantize` dan `llama-perplexity` memanfaatkan GPU. *Host* kedua adalah perangkat **Android Tecno Pova 5** dengan emulator terminal *non-root* Termux, dipakai untuk pengukuran performa komputasi pada lingkungan *target*. Pada Termux diinstal paket dasar (`pkg update`) serta *toolchain* C++ (`clang`, `cmake`, `make`), dan `llama.cpp` dikompilasi ulang secara natif untuk arsitektur ARM (Ray & Pradhan, 2026). Skrip persiapan lingkungan PC tersedia di `docs/scripts/quantize_pc.sh`.
+3. **Persiapan Objek Model dan Kuantisasi (*Ablation Setup*).** Bobot model LFM 2.5 (1,2B) dan Qwen 3.5 (2B) diunduh dari HuggingFace ke *host* PC menggunakan `huggingface-cli` (Touvron dkk., 2023). Pemilihan Qwen sebagai uji kedua didasarkan pada kompetensi bahasa Indonesia yang telah terbukti (Nurohim dkk., 2025). Bobot mentah berformat `.safetensors` selanjutnya dikonversi ke `F16.gguf` melalui skrip `convert_hf_to_gguf.py`. Untuk mengeksekusi *ablation* gradasi kompresi, berkas `F16.gguf` dikuantisasi menggunakan utilitas `./llama-quantize` **pada PC** (memanfaatkan akselerasi CPU/GPU) sehingga menghasilkan tiga varian *k-quants*: **Q5\_K\_M.gguf**, **Q4\_K\_M.gguf**, dan **Q3\_K\_M.gguf** (Dettmers dkk., 2023). Keempat varian per model (F16 + 3 *k-quants*) lalu ditransfer ke direktori `/storage/emulated/0/Download/SLM` pada perangkat Android sebagai objek uji yang seragam.
+4. **Eksekusi Eksperimen (*System Benchmarking*).** Pengujian beban kerja dilaksanakan pada dua *host* sesuai pembagian metrik. Pada **PC NVIDIA RTX 3060**, *Perplexity* dieksekusi melalui `./llama-perplexity` dengan dataset WikiText-2 (Gong dkk., 2024) dan akurasi *benchmark* MMLU, GSM8K, HumanEval, serta MT-Bench dijalankan melalui skrip Python kustom. Pada **perangkat Android Tecno Pova 5** (Termux), *peak* RAM proses (`VmRSS`), beban CPU (`%CPU`), serta TPS *Prompt*/*Generation* diukur melalui skrip otomatisasi `benchmark.sh` (Lampiran A) dengan konfigurasi inferensi `--temp 0,35`, `--top-p 0,9`, `--min-p 0,05`, `--repeat-penalty 1,1`, anggaran token `-n 1024`, ukuran konteks `-c 2048`, dan 6 *threads* (Zhang dkk., 2024). Evaluasi dijalankan sekuensial dari FP16 (variabel kontrol), dilanjutkan Q5, Q4, dan Q3 dengan *cooldown* manual 3–5 menit antar model untuk mencegah *thermal throttling*.
 5. **Analisis Komparatif dan Penarikan Kesimpulan.** Data mentah dari Termux diekstraksi ke dalam tabulasi matriks. Data dimensi efisiensi (*hardware*) dan dimensi kognitif (*software*) dikomparasikan menggunakan kerangka evaluasi tiga dimensi (Jin dkk., 2024) untuk mengidentifikasi titik *sweet spot*.
 
 Alur tahapan penelitian ini direpresentasikan secara visual pada Gambar 3.1.
@@ -276,27 +276,32 @@ Alur tahapan penelitian ini direpresentasikan secara visual pada Gambar 3.1.
 
 ## 3.2 Instrumen Penelitian
 
-Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan sumber daya terbatas (*resource-constrained edge*) (Ray & Pradhan, 2026). Instrumen yang digunakan terdiri atas perangkat keras konsumen (*off-the-shelf*) dan ekosistem perangkat lunak *open-source* berkinerja tinggi, sebagaimana dirinci pada Tabel 3.1 dan Tabel 3.2.
+Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan sumber daya terbatas (*resource-constrained edge*) (Ray & Pradhan, 2026). Instrumen yang digunakan terdiri atas dua himpunan perangkat keras (PC sebagai *host* persiapan model dan evaluasi akurasi, serta *smartphone* sebagai *host target* deployment) dan ekosistem perangkat lunak *open-source* berkinerja tinggi, sebagaimana dirinci pada Tabel 3.1 dan Tabel 3.2.
 
 **Tabel 3.1** Spesifikasi Perangkat Keras (*Hardware*)
 
-| Komponen | Spesifikasi | Keterangan |
-|---|---|---|
-| Perangkat | Tecno Pova 5 | *Smartphone* kelas menengah. |
-| SoC | MediaTek Helio G99 (ARM *big.LITTLE*) | CPU-*bound inference*. |
-| Memori Utama (RAM) | 8 GB LPDDR4x | *Shared-memory* dengan Host OS — alat ukur sekaligus *bottleneck Force Close* (Zhang dkk., 2024). |
-| Penyimpanan Internal | UFS 2.2 256 GB | Menampung seluruh variasi berkas `.gguf`. |
+| Peran | Komponen | Spesifikasi | Keterangan |
+|---|---|---|---|
+| Host persiapan & evaluasi akurasi | PC + GPU | NVIDIA RTX 3060 (WSL2 Ubuntu) | Eksekusi kuantisasi (`llama-quantize`), evaluasi *Perplexity*, dan akurasi MMLU/GSM8K/HumanEval/MT-Bench. |
+| *Host target* deployment | Perangkat | Tecno Pova 5 | *Smartphone* kelas menengah. |
+| *Host target* deployment | SoC | MediaTek Helio G99 (ARM *big.LITTLE*) | CPU-*bound inference*. |
+| *Host target* deployment | Memori Utama (RAM) | 8 GB LPDDR4x | *Shared-memory* dengan Host OS — alat ukur sekaligus *bottleneck Force Close* (Zhang dkk., 2024). |
+| *Host target* deployment | Penyimpanan Internal | UFS 2.2 256 GB | Menampung seluruh variasi berkas `.gguf`. |
 
 **Tabel 3.2** Spesifikasi Perangkat Lunak (*Software*)
 
-| Komponen | Versi/Tooling | Keterangan |
-|---|---|---|
-| Sistem Operasi Dasar | Android 13 | Lapisan manajemen memori inti (*Host OS*). |
-| Lingkungan Simulasi Terminal | Termux *non-root* | Menyediakan fondasi paket Linux murni tanpa membuka enkripsi partisi sistem. |
-| Mesin Inferensi | `llama.cpp` (C/C++ *bare-metal*) | Dipilih karena dapat dikompilasi natif ke instruksi CPU ARM (Ray & Pradhan, 2026). |
-| Pemantauan Memori | `htop` interaktif | Menangkap metrik *Peak RAM Usage*. |
-| Evaluasi Kognitif | `./llama-perplexity` | Mengkalkulasi degradasi linguistik (PPL) pada dataset WikiText-2 (Gong dkk., 2024). |
-| Evaluasi Akurasi | Skrip kustom (MMLU, GSM8K, HumanEval) | Menjalankan 100 sampel per *benchmark* melalui CLI `llama.cpp`. |
+| Peran | Komponen | Versi/Tooling | Keterangan |
+|---|---|---|---|
+| PC persiapan | Sistem Operasi | Windows 11 + WSL2 Ubuntu | Lingkungan persiapan berkas `.gguf` dan eksekusi evaluasi akurasi. |
+| PC persiapan | Akselerator | CUDA Toolkit + NVIDIA RTX 3060 | Mempercepat `llama-quantize` dan `llama-perplexity`. |
+| PC persiapan | Akuisisi model | `huggingface_hub` | Mengunduh bobot resmi (`.safetensors`) dari HuggingFace. |
+| PC persiapan | Konversi & kuantisasi | `convert_hf_to_gguf.py`, `./llama-quantize` | Konversi ke `F16.gguf` lalu kuantisasi ke Q3/Q4/Q5\_K\_M (Dettmers dkk., 2023). |
+| PC persiapan | Evaluasi Kognitif | `./llama-perplexity` | Mengkalkulasi degradasi linguistik (PPL) pada dataset WikiText-2 (Gong dkk., 2024). |
+| PC persiapan | Evaluasi Akurasi | Skrip Python kustom (MMLU, GSM8K, HumanEval, MT-Bench) | Menjalankan 100 sampel acak per *benchmark*. |
+| Android *target* | Sistem Operasi Dasar | Android 13 | Lapisan manajemen memori inti (*Host OS*). |
+| Android *target* | Lingkungan Simulasi Terminal | Termux *non-root* | Menyediakan fondasi paket Linux murni tanpa membuka enkripsi partisi sistem. |
+| Android *target* | Mesin Inferensi | `llama.cpp` (C/C++ *bare-metal*, ARM-native) | Dikompilasi natif untuk instruksi CPU ARM (Ray & Pradhan, 2026). |
+| Android *target* | Skrip Otomatisasi | `benchmark.sh` v4 (Lampiran A) | Menjalankan inferensi, memantau `VmRSS` + `%CPU`, dan mencatat TPS ke CSV. |
 
 ## 3.3 Metode Pengumpulan Data
 
@@ -304,7 +309,7 @@ Penelitian terapan ini berfokus pada ekstraksi data komputasional yang objektif 
 
 ### A. Pengamatan Langsung (Observasi Eksperimental)
 
-Observasi dilakukan melalui *system benchmarking logging* dengan memantau indikator performa perangkat keras dan perangkat lunak saat SLM mengeksekusi instruksi di dalam Termux. Peneliti mencatat konsumsi RAM absolut (dalam MB/GB) melalui monitor `htop` pada setiap transisi resolusi kompresi (FP16, Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M). Selanjutnya, data kuantitatif berupa rasio kecepatan pemrosesan kata atau *Tokens per Second* (TPS) dan nilai *Perplexity* disalin secara langsung dari layar log terminal pada detik ketika kalkulasi inferensi dinyatakan selesai oleh sistem (Jin dkk., 2024; Zhang dkk., 2024).
+Observasi dilakukan melalui *system benchmarking logging* dengan memantau indikator performa perangkat keras dan perangkat lunak saat SLM mengeksekusi instruksi pada kedua *host*. Pada *host* PC NVIDIA RTX 3060, peneliti mencatat nilai *Perplexity* WikiText-2 dari keluaran `./llama-perplexity` serta skor akurasi MMLU/GSM8K/HumanEval/MT-Bench dari skrip Python kustom. Pada *host* perangkat Android Tecno Pova 5 (Termux), konsumsi RAM proses (`VmRSS` dari `/proc/<pid>/status`), beban CPU (`%CPU` dari `ps`), dan rasio kecepatan pemrosesan kata atau *Tokens per Second* (TPS) dicatat secara periodik melalui *resource monitor* di dalam skrip `benchmark.sh` (Lampiran A). Pencatatan dilakukan pada setiap transisi resolusi kompresi (FP16, Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M) sehingga dapat dianalisis lintas-*host* untuk menemukan kombinasi optimal antara retensi kepintaran (PC) dan efisiensi *runtime* (Android) (Jin dkk., 2024; Zhang dkk., 2024).
 
 ### B. Studi Pustaka
 
@@ -638,3 +643,166 @@ Xiao, T., & Zhu, J. (2025). *Foundations of Large Language Models* (arXiv:2501.0
 Zhan, H., Wei, S., He, Y., Liu, M., Gao, Y., Ma, Y., Yu, J., Wang, B., Yu, X., Zhang, S., & Wang, X. (2025). Quantized Large Language Models in Biomedical NLP: Evaluation and Recommendations. *npj Digital Medicine*, 8(1), 1–12.
 
 Zhang, X., Nie, J., Huang, Y., Xie, G., Xiong, Z., Liu, J., Niyato, D., & Shen, X. (2024). Edge Intelligence Optimization for Large Language Model Inference with Batching and Quantization. *IEEE Wireless Communications*, 31(4), 12–18.
+
+\newpage
+
+# LAMPIRAN
+
+## Lampiran A — Skrip Otomatisasi `benchmark.sh` (Termux Android)
+
+Skrip Bash berikut adalah versi `benchmark.sh` v4 yang dieksekusi pada perangkat Tecno Pova 5 (Termux *non-root*) untuk menghasilkan dataset `hasilv2.csv` yang menjadi dasar Tabel 4.2 dan Tabel 4.8. Skrip ini juga tersedia di repositori penelitian pada `docs/scripts/benchmark.sh`. Parameter inferensi dipilih agar dapat menjalankan kedua keluarga model—baik LFM 2.5 yang non-*reasoning* maupun Qwen 3.5 yang berkarakter *reasoning* dengan blok `<think>`—dalam anggaran token yang cukup.
+
+```bash
+#!/bin/bash
+# ==============================================================================
+# Skripsi Benchmark - Clean Manual Input v4
+# Lingkungan : Termux (non-root) di Tecno Pova 5 (Helio G99, RAM 8 GB)
+# Mesin      : llama.cpp build natif ARM
+# Output     : hasilv2.csv  (lihat docs/data/hasilv2_raw.csv pada repositori)
+# ==============================================================================
+
+MODEL_DIR="/storage/emulated/0/Download/SLM"
+LLAMA_CLI="$HOME/llama.cpp/build/bin/llama-cli"
+CSV_FILE="hasilv2.csv"
+THREADS=6
+
+# Limit diperbesar agar Qwen Thinking tidak terpotong di tengah penalaran.
+MAX_TOKENS=1024
+CONTEXT_SIZE=2048
+
+# Strong anti-thinking prompt — agar model fokus ke jawaban final.
+PROMPT="### Instruction:
+Explain briefly what artificial intelligence is.
+Answer directly and concisely. Do not use Thinking Process,
+reasoning steps, analysis, or lists. Give only the final answer
+without any explanation of your thinking.
+
+### Response:"
+
+if [ ! -f "$CSV_FILE" ]; then
+    echo "Timestamp,Model,Total Time (s),Prompt Speed (t/s),Gen Speed (t/s),Free RAM Start (MB),RAM Used (MB),CPU Peak (%),Question,Answer" > "$CSV_FILE"
+fi
+
+mapfile -t MODELS < <(ls "$MODEL_DIR"/*.gguf 2>/dev/null)
+TOTAL_MODELS=${#MODELS[@]}
+
+for i in "${!MODELS[@]}"; do
+    MODEL="${MODELS[$i]}"
+    NAME=$(basename "$MODEL")
+    CURRENT_TIME=$(date "+%Y-%m-%d %H:%M:%S")
+
+    TEMP_RAM=$(mktemp); TEMP_CPU=$(mktemp)
+    echo "0" > "$TEMP_RAM"; echo "0" > "$TEMP_CPU"
+    FREE_RAM_MB=$(grep MemAvailable /proc/meminfo | awk '{printf "%.2f", $2/1024}')
+    START_TIME=$(date +%s)
+
+    # Resource monitor: pantau VmRSS dan %CPU dari proses llama-cli setiap 0,5 s.
+    monitor_resources() {
+        PEAK_RAM=0; PEAK_CPU=0
+        while true; do
+            L_PID=$(pidof llama-cli 2>/dev/null | awk '{print $1}')
+            [ -z "$L_PID" ] && L_PID=$(pgrep -x llama-cli | head -n 1)
+            if [ -n "$L_PID" ]; then
+                CUR_RAM=$(grep VmRSS /proc/$L_PID/status 2>/dev/null | awk '{print $2}')
+                CUR_RAM=${CUR_RAM:-0}
+                (( CUR_RAM > PEAK_RAM )) && { PEAK_RAM=$CUR_RAM; echo "$PEAK_RAM" > "$TEMP_RAM"; }
+                CUR_CPU=$(ps -p $L_PID -o %cpu= 2>/dev/null | tr -d ' ')
+                CUR_CPU=${CUR_CPU:-0}
+                PEAK_CPU=$(awk -v c="$CUR_CPU" -v p="$PEAK_CPU" 'BEGIN {print (c>p)?c:p}')
+                echo "$PEAK_CPU" > "$TEMP_CPU"
+            fi
+            sleep 0.5
+        done
+    }
+    monitor_resources & MONITOR_PID=$!
+
+    echo "/exit" | "$LLAMA_CLI" -m "$MODEL" \
+        -p "$PROMPT" -n $MAX_TOKENS -t $THREADS -c $CONTEXT_SIZE \
+        --temp 0.35 --top-p 0.9 --min-p 0.05 --repeat-penalty 1.1 \
+        2>&1 | grep -A 500 "### Response:" | tee temp_output.log
+
+    kill $MONITOR_PID 2>/dev/null
+    END_TIME=$(date +%s); TOTAL_TIME=$((END_TIME-START_TIME))
+
+    PEAK_RAM_KB=$(cat "$TEMP_RAM"); PEAK_CPU=$(cat "$TEMP_CPU")
+    RAM_USED_MB=$(awk "BEGIN {printf \"%.2f\", ${PEAK_RAM_KB:-0} / 1024}")
+    rm -f "$TEMP_RAM" "$TEMP_CPU"
+
+    read -p "Prompt Speed (t/s)     -> " PROMPT_SPEED
+    read -p "Generation Speed (t/s) -> " GEN_SPEED
+    ANSWER=$(cat)
+
+    [[ -z "$PROMPT_SPEED" ]] && PROMPT_SPEED="0.00"
+    [[ -z "$GEN_SPEED" ]] && GEN_SPEED="0.00"
+    SAFE_PROMPT="${PROMPT//\"/\"\"}"; SAFE_ANSWER="${ANSWER//\"/\"\"}"
+
+    echo "$CURRENT_TIME,$NAME,$TOTAL_TIME,$PROMPT_SPEED,$GEN_SPEED,$FREE_RAM_MB,$RAM_USED_MB,$PEAK_CPU,\"$SAFE_PROMPT\",\"$SAFE_ANSWER\"" >> "$CSV_FILE"
+
+    if [ $((i+1)) -lt $TOTAL_MODELS ]; then
+        read -p "Press [ENTER] to continue to next model..."
+    fi
+done
+```
+
+## Lampiran B — Skrip Persiapan Model di PC (`quantize_pc.sh`)
+
+Berkas `.gguf` yang dieksekusi di Lampiran A disiapkan terlebih dahulu pada PC dengan WSL2 Ubuntu dan GPU NVIDIA RTX 3060. Tahapan persiapan model—mulai dari mengunduh bobot HuggingFace, konversi `.safetensors` ke `F16.gguf`, hingga kuantisasi ke Q3/Q4/Q5\_K\_M—dirinci pada skrip `docs/scripts/quantize_pc.sh`. Ringkasan langkahnya adalah sebagai berikut.
+
+```bash
+# 1) Persiapan WSL Ubuntu + toolchain
+sudo apt update && sudo apt upgrade -y
+sudo apt install -y build-essential git python3-pip python3-venv cmake \
+                    nvidia-cuda-toolkit
+
+# 2) Clone llama.cpp + virtualenv Python
+git clone https://github.com/ggerganov/llama.cpp && cd llama.cpp
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt && pip install huggingface_hub
+
+# 3) Build llama.cpp dengan akselerasi CUDA (RTX 3060)
+cmake -B build -DGGML_CUDA=ON
+cmake --build build --config Release -j 4
+
+# 4) Unduh bobot model dari HuggingFace dan konversi ke F16.gguf
+huggingface-cli download Qwen/Qwen3.5-2B \
+    --local-dir ./models/Qwen3.5-2B --local-dir-use-symlinks False
+python3 convert_hf_to_gguf.py ./models/Qwen3.5-2B \
+    --outtype f16 \
+    --outfile ./models/Qwen3.5-2B/Qwen3.5-2B-F16.gguf
+
+# 5) Kuantisasi F16.gguf -> Q3/Q4/Q5_K_M.gguf
+for V in Q3_K_M Q4_K_M Q5_K_M; do
+  ./build/bin/llama-quantize \
+      ./models/Qwen3.5-2B/Qwen3.5-2B-F16.gguf \
+      ./models/Qwen3.5-2B/Qwen3.5-2B-${V}.gguf "$V"
+done
+
+# 6) Unduh dataset WikiText-2 untuk evaluasi Perplexity (Tabel 4.3)
+wget https://huggingface.co/datasets/ggml-org/ci/resolve/main/wikitext-2-raw-v1.zip
+unzip wikitext-2-raw-v1.zip
+
+# 7) Evaluasi Perplexity per varian
+for V in F16 Q3_K_M Q4_K_M Q5_K_M; do
+  ./build/bin/llama-perplexity \
+      -m ./models/Qwen3.5-2B/Qwen3.5-2B-${V}.gguf \
+      -f wikitext-2-raw/wiki.test.raw -c 512 -ngl 999
+done
+
+# 8) Transfer berkas .gguf ke perangkat Android (folder
+#    /storage/emulated/0/Download/SLM), lalu jalankan Lampiran A di Termux.
+```
+
+## Lampiran C — Berkas Data dan Skrip Reproducibility
+
+Seluruh berkas pendukung yang dirujuk pada bab Hasil dan Pembahasan diarsipkan pada repositori penelitian agar dapat direplikasi oleh penguji.
+
+| Berkas | Lokasi pada Repositori | Keterangan |
+|---|---|---|
+| Raw CSV pengujian Android | `docs/data/hasilv2_raw.csv` | Hasil mentah `benchmark.sh` dari Tecno Pova 5. |
+| Clean CSV (numeric-only) | `docs/data/hasilv2_clean.csv` | Versi tervalidasi untuk analisis statistik. |
+| Aggregated CSV (mean ± std) | `docs/data/hasilv2_aggregated.csv` | Sumber Tabel 4.2. |
+| Output uji statistik | `docs/data/statistical_tests_lfm.txt` | Sumber Tabel 4.8. |
+| Skrip persiapan model | `docs/scripts/quantize_pc.sh` | Eksekusi pada PC WSL Ubuntu. |
+| Skrip *benchmark* Android | `docs/scripts/benchmark.sh` | Eksekusi pada Termux Tecno Pova 5. |
+| Skrip uji statistik | `docs/scripts/statistical_tests.py` | Welch's *t*-test + one-way ANOVA. |
+| Skrip pembuatan grafik | `docs/scripts/generate_charts.py` | Gambar 4.1–4.7. |
