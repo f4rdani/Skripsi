@@ -57,23 +57,31 @@ save(fig, "4_1_ukuran_berkas.png")
 
 # ---------------------------------------------------------------------------
 # Gambar 4.2 -- Kecepatan inferensi (Prompt vs Generation) per varian
+# Data sumber: docs/data/hasilv2_aggregated.csv (Android, Tecno Pova 5)
+# Urutan QUANTS: F16, Q5_K_M, Q4_K_M, Q3_K_M
 # ---------------------------------------------------------------------------
-prompt_lfm = [12.8, 19.3, 28.3, 8.5]
-gen_lfm = [3.2, 7.7, 8.8, 8.6]
-prompt_qwen = [4.0, 14.8, 19.9, 11.1]
-gen_qwen = [1.7, 4.2, 4.7, 4.7]
+prompt_lfm = [33.47, 35.33, 43.67, 18.27]
+prompt_lfm_std = [6.49, 1.21, 2.38, 1.82]
+gen_lfm = [5.57, 10.63, 13.67, 11.07]
+gen_lfm_std = [0.19, 0.62, 0.24, 0.69]
+prompt_qwen = [22.70, 22.55, 27.00, 14.55]
+prompt_qwen_std = [1.71, 0.25, 2.60, 0.95]
+gen_qwen = [1.87, 4.60, 4.95, 4.25]
+gen_qwen_std = [0.19, 0.30, 0.25, 0.35]
 
-fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.6), sharey=False)
-for ax, prompt, gen, title in [
-    (ax1, prompt_lfm, gen_lfm, "LFM 2.5 (1.2B)"),
-    (ax2, prompt_qwen, gen_qwen, "Qwen 3.5 (2B)"),
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 4.8), sharey=False)
+for ax, prompt, pstd, gen, gstd, title in [
+    (ax1, prompt_lfm, prompt_lfm_std, gen_lfm, gen_lfm_std, "LFM 2.5 (1.2B)"),
+    (ax2, prompt_qwen, prompt_qwen_std, gen_qwen, gen_qwen_std, "Qwen 3.5 (2B)"),
 ]:
-    ax.plot(QUANTS, prompt, marker="o", linewidth=2, label="Prompt Speed (t/s)", color="#2ca02c")
-    ax.plot(QUANTS, gen, marker="s", linewidth=2, label="Generation Speed (t/s)", color="#ff7f0e")
+    ax.errorbar(QUANTS, prompt, yerr=pstd, marker="o", linewidth=2, capsize=4,
+                label="Prompt Speed (t/s)", color="#2ca02c")
+    ax.errorbar(QUANTS, gen, yerr=gstd, marker="s", linewidth=2, capsize=4,
+                label="Generation Speed (t/s)", color="#ff7f0e")
     for xi, yi in enumerate(prompt):
-        ax.annotate(f"{yi}", (xi, yi), textcoords="offset points", xytext=(0, 8), ha="center", fontsize=9)
+        ax.annotate(f"{yi:.1f}", (xi, yi), textcoords="offset points", xytext=(0, 10), ha="center", fontsize=9)
     for xi, yi in enumerate(gen):
-        ax.annotate(f"{yi}", (xi, yi), textcoords="offset points", xytext=(0, -14), ha="center", fontsize=9)
+        ax.annotate(f"{yi:.1f}", (xi, yi), textcoords="offset points", xytext=(0, -16), ha="center", fontsize=9)
     ax.set_title(title)
     ax.set_xlabel("Varian Kuantisasi")
     ax.set_ylabel("Tokens per Second (t/s)")
@@ -86,16 +94,21 @@ save(fig, "4_2_kecepatan_inferensi.png")
 
 # ---------------------------------------------------------------------------
 # Gambar 4.3 -- Konsumsi RAM (Peak) per varian kuantisasi
+# Data sumber: docs/data/hasilv2_aggregated.csv (Android, RAM proses VmRSS)
 # ---------------------------------------------------------------------------
-peak_lfm = [2280.02, 1639.57, 1427.73, 883.66]
-peak_qwen = [3664.08, 2833.89, 2540.23, 1874.91]
+peak_lfm = [2303.47, 1665.28, 1452.97, 911.97]
+peak_lfm_std = [13.32, 14.07, 14.15, 15.08]
+peak_qwen = [3744.25, 2856.29, 2562.88, 1897.97]
+peak_qwen_std = [8.05, 0.29, 0.46, 0.02]
 
 fig, ax = plt.subplots(figsize=(8, 4.8))
-b1 = ax.bar(x - width / 2, peak_lfm, width, label="LFM 2.5 (1.2B)", color=COLOR_LFM)
-b2 = ax.bar(x + width / 2, peak_qwen, width, label="Qwen 3.5 (2B)", color=COLOR_QWEN)
+b1 = ax.bar(x - width / 2, peak_lfm, width, yerr=peak_lfm_std, capsize=4,
+            label="LFM 2.5 (1.2B)", color=COLOR_LFM)
+b2 = ax.bar(x + width / 2, peak_qwen, width, yerr=peak_qwen_std, capsize=4,
+            label="Qwen 3.5 (2B)", color=COLOR_QWEN)
 ax.set_xticks(x, QUANTS)
-ax.set_ylabel("Peak RAM (MB)")
-ax.set_title("Konsumsi Peak RAM per Varian Kuantisasi (Helio G99, 8GB)")
+ax.set_ylabel("Peak RAM Proses (MB)")
+ax.set_title("Konsumsi Peak RAM Proses per Varian Kuantisasi (Helio G99, 8 GB)")
 ax.legend(loc="upper right")
 ax.grid(axis="y", linestyle="--", alpha=0.4)
 for bars in (b1, b2):
@@ -127,19 +140,21 @@ save(fig, "4_4_perplexity.png")
 
 # ---------------------------------------------------------------------------
 # Gambar 4.5 -- Akurasi benchmark (MMLU/GSM8K/HumanEval)
+# Sumber: hasil benchmark PC host (RTX 3060) - latest runs
+# Catatan: Qwen GSM8K rendah karena reasoning-model parsing issue (lihat 4.3.3)
 # ---------------------------------------------------------------------------
 benchmarks = ["MMLU", "GSM8K", "HumanEval"]
 lfm_acc = {
-    "F16":    [33, 52, 36],
-    "Q5_K_M": [30, 52, 29],
-    "Q4_K_M": [28, 51, 37],
-    "Q3_K_M": [32, 42, 30],
+    "F16":    [32, 58, 36],
+    "Q5_K_M": [34, 55, 29],
+    "Q4_K_M": [25, 50, 37],
+    "Q3_K_M": [28, 40, 30],
 }
 qwen_acc = {
-    "F16":    [12, 57, 52],
-    "Q5_K_M": [14, 53, 47],
-    "Q4_K_M": [14, 56, 44],
-    "Q3_K_M": [22, 37, 26],
+    "F16":    [40, 16, 52],
+    "Q5_K_M": [29, 17, 47],
+    "Q4_K_M": [37, 19, 40],
+    "Q3_K_M": [40, 12, 25],
 }
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12.5, 5), sharey=True)
