@@ -332,9 +332,9 @@ Pemaparan ringkas tujuh penelitian pilar paling representatif yang mendasari ris
 
 : Tabel II.1 Matriks Perbandingan Penelitian Terkait (*State of the Art*)
 
-## 2.3 Tinjauan Organisasi (Objek Penelitian)
+## 2.3 Tinjauan Objek Penelitian
 
-Penelitian ini bersifat **independen dan berbasis laboratorium**, sehingga tidak terikat pada organisasi atau institusi eksternal sebagai tempat riset. Seluruh kegiatan pengujian, mulai dari persiapan berkas model hingga eksekusi *benchmark*, dilakukan secara mandiri oleh penulis menggunakan perangkat pribadi. Mengingat tidak adanya struktur organisasi formal yang relevan, bagian *Tinjauan Organisasi* pada panduan resmi diadaptasi menjadi tinjauan terhadap **objek penelitian**, yakni ekosistem perangkat keras dan perangkat lunak yang berfungsi sebagai *unit of analysis* dalam eksperimen. Objek penelitian dibagi menjadi dua kategori fundamental: ekosistem perangkat keras/perangkat lunak Android sebagai *host target deployment*, dan spesifikasi arsitektur *Small Language Model* yang diuji.
+Karena penelitian ini bersifat **eksperimental berbasis laboratorium** dan tidak terikat pada organisasi atau institusi eksternal sebagai tempat riset, sub-bab ini difokuskan pada deskripsi **objek penelitian** — yakni satuan analisis (*unit of analysis*) yang menjadi sasaran pengukuran dalam eksperimen kuantisasi *on-device*. Seluruh kegiatan pengujian, mulai dari persiapan berkas model hingga eksekusi *benchmark*, dilakukan secara mandiri oleh penulis menggunakan perangkat pribadi. Objek penelitian dibagi menjadi dua kategori fundamental yang saling berkomplemen: (1) **ekosistem perangkat keras dan perangkat lunak Android** yang berperan sebagai *host target deployment*, dan (2) **arsitektur *Small Language Model*** yang menjadi objek uji kompresi PTQ. Pembagian dua kategori ini memungkinkan analisis trade-off antara dimensi efisiensi *hardware* (RAM, CPU, TPS) dan dimensi kognitif *software* (*perplexity*, akurasi *benchmark*) sebagaimana dianjurkan oleh kerangka evaluasi tiga dimensi Jin dkk. (2024).
 
 ### 2.3.1 Ekosistem Uji Keras: Tecno Pova 5 dengan Termux
 
@@ -788,6 +788,8 @@ Zhang, X., Nie, J., Huang, Y., Xie, G., Xiong, Z., Liu, J., Niyato, D., & Shen, 
 
 # LAMPIRAN
 
+Seluruh berkas lampiran juga diarsipkan sebagai berkas terpisah di direktori `docs/lampiran/` pada repositori penelitian (`f4rdani/Skripsi`), lengkap dengan `README.md` sebagai indeks (Lampiran A – E). Penyertaan berkas terpisah dimaksudkan agar penguji dapat membuka, menjalankan kembali, atau mengutip masing-masing lampiran tanpa harus memindai naskah PDF.
+
 ## Lampiran A, Skrip Otomatisasi `benchmark.sh` (Termux Android)
 
 Skrip Bash berikut adalah versi `benchmark.sh` v4 yang dieksekusi pada perangkat Tecno Pova 5 (Termux *non-root*) untuk menghasilkan dataset `hasilv2.csv` yang menjadi dasar Tabel IV.2 dan Tabel IV.8. Skrip ini juga tersedia di repositori penelitian pada `docs/scripts/benchmark.sh`. Parameter inferensi dipilih agar dapat menjalankan kedua keluarga model, baik LFM 2.5 yang non-*reasoning* maupun Qwen 3.5 yang berkarakter *reasoning* dengan blok `<think>`,dalam anggaran token yang cukup.
@@ -939,10 +941,110 @@ Seluruh berkas pendukung yang dirujuk pada bab Hasil dan Pembahasan diarsipkan p
 | Berkas | Lokasi pada Repositori | Keterangan |
 |---|---|---|
 | Raw CSV pengujian Android | `docs/data/hasilv2_raw.csv` | Hasil mentah `benchmark.sh` dari Tecno Pova 5. |
-| Clean CSV (numeric-only) | `docs/data/hasilv2_clean.csv` | Versi tervalidasi untuk analisis statistik. |
+| Clean CSV (numeric-only) | `docs/data/hasilv2_clean.csv` | Versi tervalidasi untuk analisis statistik (N=3 per varian). |
 | Aggregated CSV (mean ± std) | `docs/data/hasilv2_aggregated.csv` | Sumber Tabel IV.2. |
-| Output uji statistik | `docs/data/statistical_tests_lfm.txt` | Sumber Tabel IV.8. |
+| Output uji statistik LFM | `docs/data/statistical_tests_lfm.txt` | Sumber Tabel IV.8 (lihat Lampiran D). |
+| Output uji statistik Qwen | `docs/data/statistical_tests_qwen.txt` | Sumber Tabel IV.9 (lihat Lampiran E). |
 | Skrip persiapan model | `docs/scripts/quantize_pc.sh` | Eksekusi pada PC WSL Ubuntu. |
 | Skrip *benchmark* Android | `docs/scripts/benchmark.sh` | Eksekusi pada Termux Tecno Pova 5. |
 | Skrip uji statistik | `docs/scripts/statistical_tests.py` | Welch's *t*-test + one-way ANOVA. |
-| Skrip pembuatan grafik | `docs/scripts/generate_charts.py` | Gambar IV.1–4.7. |
+| Skrip pembuatan grafik | `docs/scripts/generate_charts.py` | Gambar IV.1 – Gambar IV.8. |
+| Direktori lampiran terpisah | `docs/lampiran/` | Salinan berkas Lampiran A – E + `README.md` sebagai indeks. |
+
+\newpage
+
+## Lampiran D, Keluaran Uji Statistik LFM 2.5 (Sumber Tabel IV.8)
+
+Keluaran lengkap skrip `docs/scripts/statistical_tests.py` untuk keluarga **LFM 2.5 (1,2B)**. Setiap blok metrik (Generation TPS, Prompt TPS, Peak RAM) berisi enam baris pasangan varian (Welch's *t*-test dua sampel, $\alpha = 0{,}05$) ditutup dengan baris one-way ANOVA antar empat varian. Cuplikan ini menjadi sumber **Tabel IV.8** pada Sub-bab 4.4.6.
+
+```text
+UJI STATISTIK ANTAR VARIAN KUANTISASI -- LFM 2.5 (1,2B) di Tecno Pova 5
+Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian)
+Metode: Welch's t-test (alpha=0,05) + one-way ANOVA
+==============================================================================
+
+## Metrik: Generation TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |      5.57 |     10.63 | -10.998 |    0.0044 | ** signifikan
+F16 vs Q4_K_M          |      5.57 |     13.67 | -37.950 |    0.0000 | ** signifikan
+F16 vs Q3_K_M          |      5.57 |     11.07 | -10.810 |    0.0051 | ** signifikan
+Q5_K_M vs Q4_K_M       |     10.63 |     13.67 |  -6.435 |    0.0121 | ** signifikan
+Q5_K_M vs Q3_K_M       |     10.63 |     11.07 |  -0.657 |    0.5477 | tidak signifikan
+Q4_K_M vs Q3_K_M       |     13.67 |     11.07 |   5.014 |    0.0243 | ** signifikan
+One-way ANOVA (4 varian): F=95.390, p=0.00000  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Prompt TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |     33.47 |     35.33 |  -0.400 |    0.7255 | tidak signifikan
+F16 vs Q4_K_M          |     33.47 |     43.67 |  -2.088 |    0.1447 | tidak signifikan
+F16 vs Q3_K_M          |     33.47 |     18.27 |   3.192 |    0.0708 | tidak signifikan
+Q5_K_M vs Q4_K_M       |     35.33 |     43.67 |  -4.407 |    0.0221 | ** signifikan
+Q5_K_M vs Q3_K_M       |     35.33 |     18.27 |  11.058 |    0.0008 | ** signifikan
+Q4_K_M vs Q3_K_M       |     43.67 |     18.27 |  11.988 |    0.0004 | ** signifikan
+One-way ANOVA (4 varian): F=17.072, p=0.00077  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Peak RAM (MB)
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |   2303.47 |   1665.28 |  46.587 |    0.0000 | ** signifikan
+F16 vs Q4_K_M          |   2303.47 |   1452.97 |  61.896 |    0.0000 | ** signifikan
+F16 vs Q3_K_M          |   2303.47 |    911.97 |  97.789 |    0.0000 | ** signifikan
+Q5_K_M vs Q4_K_M       |   1665.28 |   1452.97 |  15.049 |    0.0001 | ** signifikan
+Q5_K_M vs Q3_K_M       |   1665.28 |    911.97 |  51.653 |    0.0000 | ** signifikan
+Q4_K_M vs Q3_K_M       |   1452.97 |    911.97 |  36.996 |    0.0000 | ** signifikan
+One-way ANOVA (4 varian): F=3297.733, p=0.00000  ->  SIGNIFIKAN (p<0.05)
+```
+
+\newpage
+
+## Lampiran E, Keluaran Uji Statistik Qwen 3.5 (Sumber Tabel IV.9)
+
+Keluaran lengkap skrip `docs/scripts/statistical_tests.py` untuk keluarga **Qwen 3.5 (2B)**. Sebagaimana dicatat pada bagian metodologi, varian Qwen Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M menggunakan *mean replicate* sebagai ulangan ke-3 (lihat catatan kaki Tabel IV.2). Konsekuensinya nilai *p* di bawah ini bersifat **indikatif**, bukan inferensi definitif. Cuplikan ini menjadi sumber **Tabel IV.9** pada Sub-bab 4.4.6.
+
+```text
+UJI STATISTIK ANTAR VARIAN KUANTISASI -- Qwen 3.5 (2B) di Tecno Pova 5
+Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian).
+Catatan: pada varian Q5_K_M / Q4_K_M / Q3_K_M, ulangan ke-3 adalah
+rerata (imputasi 'mean replicate') dari dua ulangan eksperimental
+akibat keterbatasan termal perangkat. Konsekuensinya variansi
+sample ter-deflasi sehingga nilai p menjadi lebih kecil dibanding
+kondisi ulangan eksperimental penuh -- nilai p di bawah harus
+dibaca sebagai indikatif, bukan inferensi definitif.
+Metode: Welch's t-test (alpha=0,05) + one-way ANOVA
+==============================================================================
+
+## Metrik: Generation TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |      1.87 |      4.60 | -12.505 |    0.0003 | ** signifikan
+F16 vs Q4_K_M          |      1.87 |      4.95 | -15.691 |    0.0001 | ** signifikan
+F16 vs Q3_K_M          |      1.87 |      4.25 |  -9.845 |    0.0012 | ** signifikan
+Q5_K_M vs Q4_K_M       |      4.60 |      4.95 |  -1.552 |    0.1978 | tidak signifikan
+Q5_K_M vs Q3_K_M       |      4.60 |      4.25 |   1.315 |    0.2603 | tidak signifikan
+Q4_K_M vs Q3_K_M       |      4.95 |      4.25 |   2.819 |    0.0537 | tidak signifikan
+One-way ANOVA (4 varian): F=71.249, p=0.00000  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Prompt TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |     22.70 |     22.55 |   0.123 |    0.9130 | tidak signifikan
+F16 vs Q4_K_M          |     22.70 |     27.00 |  -2.230 |    0.0926 | tidak signifikan
+F16 vs Q3_K_M          |     22.70 |     14.55 |   6.136 |    0.0107 | ** signifikan
+Q5_K_M vs Q4_K_M       |     22.55 |     27.00 |  -2.951 |    0.0961 | tidak signifikan
+Q5_K_M vs Q3_K_M       |     22.55 |     14.55 |  14.105 |    0.0029 | ** signifikan
+Q4_K_M vs Q3_K_M       |     27.00 |     14.55 |   7.790 |    0.0079 | ** signifikan
+One-way ANOVA (4 varian): F=26.722, p=0.00016  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Peak RAM (MB)
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |   3744.25 |   2856.29 | 156.021 |    0.0000 | ** signifikan
+F16 vs Q4_K_M          |   3744.25 |   2562.88 | 207.439 |    0.0000 | ** signifikan
+F16 vs Q3_K_M          |   3744.25 |   1897.97 | 324.544 |    0.0000 | ** signifikan
+Q5_K_M vs Q4_K_M       |   2856.29 |   2562.88 | 934.566 |    0.0000 | ** signifikan
+Q5_K_M vs Q3_K_M       |   2856.29 |   1897.97 | 5710.088 |    0.0000 | ** signifikan
+Q4_K_M vs Q3_K_M       |   2562.88 |   1897.97 | 2501.241 |    0.0000 | ** signifikan
+One-way ANOVA (4 varian): F=72285.005, p=0.00000  ->  SIGNIFIKAN (p<0.05)
+```

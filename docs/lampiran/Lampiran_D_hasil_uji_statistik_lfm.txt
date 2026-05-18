@@ -1,0 +1,37 @@
+UJI STATISTIK ANTAR VARIAN KUANTISASI -- LFM 2.5 (1,2B) di Tecno Pova 5
+Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian)
+Metode: Welch's t-test (alpha=0,05) + one-way ANOVA
+==============================================================================
+
+## Metrik: Generation TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |      5.57 |     10.63 | -10.998 |    0.0044 | ** signifikan
+F16 vs Q4_K_M          |      5.57 |     13.67 | -37.950 |    0.0000 | ** signifikan
+F16 vs Q3_K_M          |      5.57 |     11.07 | -10.810 |    0.0051 | ** signifikan
+Q5_K_M vs Q4_K_M       |     10.63 |     13.67 |  -6.435 |    0.0121 | ** signifikan
+Q5_K_M vs Q3_K_M       |     10.63 |     11.07 |  -0.657 |    0.5477 | tidak signifikan
+Q4_K_M vs Q3_K_M       |     13.67 |     11.07 |   5.014 |    0.0243 | ** signifikan
+One-way ANOVA (4 varian): F=95.390, p=0.00000  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Prompt TPS
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |     33.47 |     35.33 |  -0.400 |    0.7255 | tidak signifikan
+F16 vs Q4_K_M          |     33.47 |     43.67 |  -2.088 |    0.1447 | tidak signifikan
+F16 vs Q3_K_M          |     33.47 |     18.27 |   3.192 |    0.0708 | tidak signifikan
+Q5_K_M vs Q4_K_M       |     35.33 |     43.67 |  -4.407 |    0.0221 | ** signifikan
+Q5_K_M vs Q3_K_M       |     35.33 |     18.27 |  11.058 |    0.0008 | ** signifikan
+Q4_K_M vs Q3_K_M       |     43.67 |     18.27 |  11.988 |    0.0004 | ** signifikan
+One-way ANOVA (4 varian): F=17.072, p=0.00077  ->  SIGNIFIKAN (p<0.05)
+
+## Metrik: Peak RAM (MB)
+Pasangan               |    mean A |    mean B |       t |   p-value | hasil
+----------------------------------------------------------------------------
+F16 vs Q5_K_M          |   2303.47 |   1665.28 |  46.587 |    0.0000 | ** signifikan
+F16 vs Q4_K_M          |   2303.47 |   1452.97 |  61.896 |    0.0000 | ** signifikan
+F16 vs Q3_K_M          |   2303.47 |    911.97 |  97.789 |    0.0000 | ** signifikan
+Q5_K_M vs Q4_K_M       |   1665.28 |   1452.97 |  15.049 |    0.0001 | ** signifikan
+Q5_K_M vs Q3_K_M       |   1665.28 |    911.97 |  51.653 |    0.0000 | ** signifikan
+Q4_K_M vs Q3_K_M       |   1452.97 |    911.97 |  36.996 |    0.0000 | ** signifikan
+One-way ANOVA (4 varian): F=3297.733, p=0.00000  ->  SIGNIFIKAN (p<0.05)
