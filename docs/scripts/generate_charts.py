@@ -295,64 +295,13 @@ ax.set_title("Tahapan Penelitian", fontsize=13, fontweight="bold", pad=10)
 save(fig, "3_1_tahapan_penelitian.png")
 
 
-# ---------------------------------------------------------------------------
-# Gambar 2.1 -- Skema PTQ k-quants (FP16 → Q5/Q4/Q3)
-# ---------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(9, 4.8))
-ax.set_xlim(0, 12)
-ax.set_ylim(0, 6)
-ax.axis("off")
-
-def box(x, y, w, h, text, color, fontsize=11, weight="normal"):
-    ax.add_patch(plt.Rectangle((x, y), w, h, facecolor=color, edgecolor="#333", linewidth=1.2))
-    ax.text(x + w / 2, y + h / 2, text, ha="center", va="center", fontsize=fontsize, fontweight=weight)
-
-box(0.5, 2.3, 2.6, 1.4, "FP16\nModel Asli\n(2,2 GB)", "#fff2cc", weight="bold")
-
-# arrow to PTQ engine
-ax.annotate("", xy=(4.0, 3.0), xytext=(3.1, 3.0), arrowprops=dict(arrowstyle="->", lw=1.6, color="#333"))
-
-box(4.0, 2.3, 3.4, 1.4, "Post-Training\nQuantization\nllama-quantize", "#d0e0e3", weight="bold")
-
-# arrows to k-quant outputs
-for i, (text, col, y) in enumerate([
-    ("Q5_K_M  (~5-bit)\n805 MB | PPL +0,15", "#cfe2f3", 4.4),
-    ("Q4_K_M  (~4-bit)\n698 MB | PPL +0,53", "#d9ead3", 2.6),
-    ("Q3_K_M  (~3-bit)\n573 MB | PPL +1,83", "#f4cccc", 0.8),
-]):
-    ax.annotate("", xy=(8.4, y + 0.6), xytext=(7.4, 3.0), arrowprops=dict(arrowstyle="->", lw=1.4, color="#333"))
-    box(8.4, y, 3.2, 1.2, text, col)
-
-ax.set_title("Skema Post-Training Quantization GGUF K-Quants (LFM 2.5)", fontsize=12, fontweight="bold", pad=10)
-save(fig, "2_1_skema_ptq_kquants.png")
-
-
-# ---------------------------------------------------------------------------
-# Gambar 2.2 -- Hierarki Edge Intelligence
-# ---------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(8, 5.5))
-ax.set_xlim(0, 10)
-ax.set_ylim(0, 7)
-ax.axis("off")
-
-layers = [
-    ("Aplikasi / User Layer", "Chatbot, Asisten, NLP On-Device", "#cfe2f3", 5.4),
-    ("Framework Inferensi", "llama.cpp (C/C++ • GGUF Loader)", "#d9ead3", 4.0),
-    ("Mesin Kompresi", "Post-Training Quantization (K-Quants)", "#fff2cc", 2.6),
-    ("Hardware Edge Device", "Tecno Pova 5 • Helio G99 • RAM 8 GB", "#f4cccc", 1.2),
-]
-
-for title, subtitle, color, y in layers:
-    ax.add_patch(plt.Rectangle((1.0, y), 8.0, 1.1, facecolor=color, edgecolor="#333", linewidth=1.2))
-    ax.text(5.0, y + 0.75, title, ha="center", va="center", fontsize=12, fontweight="bold")
-    ax.text(5.0, y + 0.30, subtitle, ha="center", va="center", fontsize=10)
-
-# arrows
-for y1, y2 in [(5.4, 5.1), (4.0, 3.7), (2.6, 2.3)]:
-    ax.annotate("", xy=(5.0, y2), xytext=(5.0, y1), arrowprops=dict(arrowstyle="<->", lw=1.5, color="#333"))
-
-ax.set_title("Hierarki Edge Intelligence untuk Inferensi SLM", fontsize=12, fontweight="bold", pad=10)
-save(fig, "2_2_edge_intelligence.png")
+# NOTE: Gambar BAB 2 (skema PTQ k-quants & hierarki Edge Intelligence) sengaja
+# tidak diregenerasi karena aturan penulisan: ilustrasi pada BAB 1 dan BAB 2
+# hanya boleh menggunakan gambar dari jurnal/penelitian orang lain dengan
+# pencantuman sumber, bukan gambar olahan penulis. Konsep yang dulunya
+# divisualisasikan kini dipaparkan dalam bentuk teks pada Sub-bab 2.1.1 dan
+# 2.1.5 dengan rujukan literatur (Dettmers dkk., 2023; Frantar dkk., 2023;
+# Tan dkk., 2024; Zhang dkk., 2024).
 
 
 # ---------------------------------------------------------------------------
