@@ -45,9 +45,25 @@ header-includes:
 
 # ABSTRAK
 
-Pemanfaatan *Small Language Model* (SLM) secara *on-device* di lingkungan Android terkendala oleh kapasitas RAM 8 GB yang dibagi-pakai (*shared memory*) bersama sistem operasi dan layanan latar belakang, sehingga pemuatan model presisi penuh FP16 berisiko memicu *Out of Memory* (OOM) dan *Force Close*. Penelitian ini menganalisis performa metode *Post-Training Quantization* (PTQ) dengan format GGUF *k-quants* pada rentang 3-bit hingga 5-bit (Q3\_K\_M, Q4\_K\_M, dan Q5\_K\_M) terhadap dua arsitektur SLM, yaitu LFM 2.5 (1,2 miliar parameter) dan Qwen 3.5 (2 miliar parameter), pada perangkat Tecno Pova 5 (SoC MediaTek Helio G99, RAM 8 GB) melalui lingkungan terminal Termux dan mesin inferensi `llama.cpp`. Metode yang digunakan adalah eksperimen kuantitatif komparatif (*ablation study*) dengan mengukur (1) reduksi ukuran berkas, (2) konsumsi *peak* RAM proses, (3) kecepatan *prompt* dan *generation* dalam satuan *tokens per second* (TPS), serta (4) degradasi kognitif melalui *Perplexity* (WikiText-2) dan akurasi MMLU, GSM8K, HumanEval, dan MT-Bench. Setiap varian model di Android diuji dua hingga tiga kali untuk memperoleh rerata ± simpangan baku. Hasil menunjukkan bahwa varian Q4\_K\_M merupakan titik keseimbangan (*sweet spot*) terbaik karena mampu menekan ukuran berkas hingga 68%, mereduksi *peak* RAM proses LFM dari 2.303 MB ke 1.453 MB (efisiensi 36,9%), serta mempercepat *generation* LFM dari 5,57 t/s ke 13,67 t/s (akselerasi 2,45×), dengan tambahan *perplexity* di bawah 0,6 poin dan rata-rata penurunan akurasi LFM yang masih dapat ditoleransi. Sebaliknya, varian Q3\_K\_M memicu anomali *bit-shifting* pada CPU ARM serta degradasi GSM8K dan HumanEval yang signifikan, sehingga tidak direkomendasikan sebagai konfigurasi produksi. Penelitian juga mendokumentasikan keterbatasan instrumen evaluasi pada model *reasoning* Qwen 3.5 sebagai catatan metodologis penting untuk replikasi.
+\setstretch{1.0}
+
+Pemanfaatan *Small Language Model* (SLM) secara *on-device* di Android terkendala kapasitas RAM 8 GB yang dibagi-pakai dengan sistem operasi, sehingga pemuatan model presisi penuh FP16 berisiko memicu *Out of Memory* dan *Force Close*. Penelitian ini bertujuan menganalisis performa metode *Post-Training Quantization* (PTQ) berformat GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) terhadap dua arsitektur SLM, yaitu LFM 2.5 (1,2B) dan Qwen 3.5 (2B), pada perangkat Tecno Pova 5 (Helio G99, RAM 8 GB) melalui lingkungan Termux dan mesin inferensi `llama.cpp`. Metode yang digunakan adalah eksperimen kuantitatif komparatif (*ablation study*) dengan mengukur reduksi ukuran berkas, konsumsi *peak* RAM proses, kecepatan *prompt* dan *generation* (t/s), serta degradasi kognitif melalui *Perplexity* WikiText-2 dan akurasi MMLU, GSM8K, HumanEval, dan MT-Bench. Setiap varian diuji dua hingga tiga kali untuk memperoleh rerata ± simpangan baku. Hasil menunjukkan varian Q4\_K\_M sebagai titik keseimbangan (*sweet spot*) terbaik: ukuran berkas tereduksi 68%, *peak* RAM LFM turun dari 2.303 MB ke 1.453 MB (efisiensi 36,9%), *generation* LFM meningkat dari 5,57 t/s ke 13,67 t/s (akselerasi 2,45×), dengan tambahan *perplexity* di bawah 0,6 poin. Sebaliknya, varian Q3\_K\_M memicu anomali *bit-shifting* dan degradasi akurasi signifikan, sehingga tidak direkomendasikan untuk produksi.
 
 **Kata kunci:** *Post-Training Quantization*, *Small Language Model*, *Edge Computing*, GGUF, *k-quants*, Android, Helio G99, *Perplexity*.
+
+\setstretch{1.5}
+
+\newpage
+
+# ABSTRACT
+
+\setstretch{1.0}
+
+On-device deployment of *Small Language Models* (SLM) on Android is constrained by the 8 GB RAM capacity shared with the operating system, putting full-precision FP16 models at risk of *Out of Memory* and *Force Close* events. This study analyzes the performance of *Post-Training Quantization* (PTQ) using GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) on two SLM architectures, namely LFM 2.5 (1.2B) and Qwen 3.5 (2B), running on a Tecno Pova 5 (Helio G99, 8 GB RAM) via Termux and the `llama.cpp` inference engine. The method is a comparative quantitative experiment (*ablation study*) measuring file-size reduction, peak process RAM, prompt and generation speed (t/s), and cognitive degradation through WikiText-2 *Perplexity* and MMLU, GSM8K, HumanEval, and MT-Bench accuracy. Each variant was tested two to three times to obtain mean ± standard deviation. Results show Q4\_K\_M as the optimal *sweet spot*: file size is reduced by 68%, LFM peak RAM drops from 2,303 MB to 1,453 MB (36.9% efficiency), and LFM generation speed accelerates from 5.57 t/s to 13.67 t/s (2.45×), with perplexity penalty below 0.6 points. Conversely, Q3\_K\_M triggers *bit-shifting* anomalies on ARM CPUs and significant accuracy degradation, and is therefore not recommended for production.
+
+**Keywords:** *Post-Training Quantization*, *Small Language Model*, *Edge Computing*, GGUF, *k-quants*, Android, Helio G99, *Perplexity*.
+
+\setstretch{1.5}
 
 \newpage
 
@@ -74,6 +90,56 @@ Penulis,
 \newpage
 
 \listoftables
+
+\newpage
+
+# DAFTAR SIMBOL
+
+**a. Simbol Statistik dan Matematis**
+
+±
+:   Tanda simpangan baku, digunakan untuk menyatakan rerata ± satu standar deviasi (mis. 13,67 ± 0,24 t/s).
+
+×
+:   Tanda faktor pengali, digunakan untuk menyatakan akselerasi relatif terhadap *baseline* (mis. akselerasi 2,45× pada *generation speed*).
+
+α
+:   *Alpha*, tingkat signifikansi pada uji statistik. Pada Tabel IV.8 ditetapkan α = 0,05 (taraf kepercayaan 95%).
+
+\vspace{6pt}
+
+**b. Satuan Pengukuran**
+
+t/s
+:   *Tokens per second*, satuan kecepatan inferensi (*prompt speed* dan *generation speed*).
+
+GB
+:   *Gigabyte*, satuan kapasitas RAM sistem dan ukuran berkas model.
+
+MB
+:   *Megabyte*, satuan konsumsi *peak* RAM proses *llama.cpp*.
+
+\vspace{6pt}
+
+**c. Format Presisi Numerik dan Varian Kuantisasi**
+
+FP16
+:   *Floating-Point* 16-bit, presisi *baseline* tanpa kuantisasi.
+
+FP32
+:   *Floating-Point* 32-bit (digunakan sebagai referensi pada PC).
+
+INT8
+:   *Integer* 8-bit (referensi format kuantisasi non-*k-quants*).
+
+Q3\_K\_M
+:   GGUF *K-Quants* 3-bit varian *Medium*.
+
+Q4\_K\_M
+:   GGUF *K-Quants* 4-bit varian *Medium* (dipilih sebagai *sweet spot*).
+
+Q5\_K\_M
+:   GGUF *K-Quants* 5-bit varian *Medium*.
 
 \newpage
 
