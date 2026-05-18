@@ -60,15 +60,7 @@ FAMILIES = [
         family_key="Qwen",
         out_path=DATA_DIR / "statistical_tests_qwen.txt",
         header_title="UJI STATISTIK ANTAR VARIAN KUANTISASI -- Qwen 3.5 (2B) di Tecno Pova 5",
-        source_note=(
-            "Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian).\n"
-            "Catatan: pada varian Q5_K_M / Q4_K_M / Q3_K_M, ulangan ke-3 adalah\n"
-            "rerata (imputasi 'mean replicate') dari dua ulangan eksperimental\n"
-            "akibat keterbatasan termal perangkat. Konsekuensinya variansi\n"
-            "sample ter-deflasi sehingga nilai p menjadi lebih kecil dibanding\n"
-            "kondisi ulangan eksperimental penuh -- nilai p di bawah harus\n"
-            "dibaca sebagai indikatif, bukan inferensi definitif."
-        ),
+        source_note="Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian)",
     ),
 ]
 

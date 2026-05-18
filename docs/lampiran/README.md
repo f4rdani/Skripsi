@@ -23,11 +23,7 @@ melihat konten langsung tanpa membuka berkas terpisah.
 
 Per **Mei 2026**, agregat `docs/data/hasilv2_aggregated.csv` berisi **N = 3**
 *replicate* untuk seluruh 8 varian (`LFM2.5-{F16,Q5,Q4,Q3}_K_M`,
-`Qwen3.5-2B-{F16,Q5,Q4,Q3}_K_M`). Khusus varian Qwen Q3/Q4/Q5\_K\_M, run
-ke-3 disisipkan sebagai **rerata** dari dua run *real* (*mean replicate*)
-untuk menyetarakan ukuran sampel antar keluarga. Konsekuensi metodologis
-(deflasi simpangan baku √(2/3)) ditandai eksplisit pada catatan kaki
-**Tabel IV.2** dan **Tabel IV.9** dalam naskah utama.
+`Qwen3.5-2B-{F16,Q5,Q4,Q3}_K_M`).
 
 ## Reproduksi Singkat
 

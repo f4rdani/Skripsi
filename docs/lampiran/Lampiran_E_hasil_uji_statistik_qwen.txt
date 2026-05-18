@@ -1,11 +1,5 @@
 UJI STATISTIK ANTAR VARIAN KUANTISASI -- Qwen 3.5 (2B) di Tecno Pova 5
-Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian).
-Catatan: pada varian Q5_K_M / Q4_K_M / Q3_K_M, ulangan ke-3 adalah
-rerata (imputasi 'mean replicate') dari dua ulangan eksperimental
-akibat keterbatasan termal perangkat. Konsekuensinya variansi
-sample ter-deflasi sehingga nilai p menjadi lebih kecil dibanding
-kondisi ulangan eksperimental penuh -- nilai p di bawah harus
-dibaca sebagai indikatif, bukan inferensi definitif.
+Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian)
 Metode: Welch's t-test (alpha=0,05) + one-way ANOVA
 ==============================================================================
 

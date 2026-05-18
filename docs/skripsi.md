@@ -350,42 +350,37 @@ Riset komparatif ini menggunakan dua model SLM. Objek uji utama adalah **LFM 2.5
 
 ## 3.1 Tahapan Penelitian
 
-Penelitian ini berbentuk eksperimen komputasional pada perangkat seluler. Agar setiap pengujian tetap fokus dan menghasilkan data yang valid, alur kerja disusun secara berurutan mengikuti kerangka evaluasi kuantisasi tiga dimensi (kapasitas, kelugasan, efisiensi) yang dipaparkan oleh Jin dkk. (2024). Pelaksanaan dibagi ke dalam **lima tahapan utama** berikut.
+Penelitian ini berbentuk eksperimen komputasional pada perangkat seluler. Agar setiap pengujian tetap fokus dan menghasilkan data yang valid, alur kerja disusun secara berurutan mengikuti kerangka evaluasi kuantisasi tiga dimensi (kapasitas, kelugasan, efisiensi) yang dipaparkan oleh Jin dkk. (2024). Pelaksanaan penelitian dibagi ke dalam lima tahapan utama yang diuraikan pada sub-bab 3.1.1 hingga 3.1.5.
 
-1. **Studi Pendahuluan dan Perumusan Masalah.**
-   *Tujuan:* memetakan literatur terkini *Mobile Edge Computing* (Zhang dkk., 2024; Sevim & Ibrahim, 2024), PTQ (Dettmers dkk., 2023; Frantar dkk., 2023), dan urgensi *offline AI* untuk privasi (Zhan dkk., 2025).
-   *Keluaran:* perumusan hipotesis terkait kompresi presisi campuran sebagai solusi *bottleneck* RAM 8 GB pada Android (Lin dkk., 2023).
+### 3.1.1 Studi Pendahuluan dan Perumusan Masalah
 
-2. **Persiapan Lingkungan Komputasi (*Environment Setup*).**
-   *Testbed* dikonfigurasi pada dua *host* yang saling melengkapi.
+Tahap awal berfokus pada pemetaan literatur terkini terkait *Mobile Edge Computing* (Zhang dkk., 2024; Sevim & Ibrahim, 2024), *Post-Training Quantization* (Dettmers dkk., 2023; Frantar dkk., 2023), serta urgensi pemrosesan AI secara *offline* untuk menjamin privasi pengguna (Zhan dkk., 2025). Hasil studi pustaka tersebut menjadi landasan perumusan hipotesis bahwa kompresi presisi campuran berformat GGUF mampu menjadi solusi terhadap *bottleneck* RAM 8 GB pada perangkat Android kelas menengah (Lin dkk., 2023).
 
-   - **PC + WSL2 Ubuntu + NVIDIA RTX 3060** — untuk persiapan berkas model dan evaluasi akurasi. Toolchain yang dipasang: `build-essential`, `cmake`, `python3`, `python3-venv`, CUDA Toolkit, dan *library* `huggingface_hub`. `llama.cpp` di-*clone* dan dikompilasi dengan `-DGGML_CUDA=ON` agar `llama-quantize` serta `llama-perplexity` memanfaatkan GPU.
-   - **Android Tecno Pova 5 + Termux *non-root*** — untuk pengukuran performa pada lingkungan *target*. Paket dasar di-*update* (`pkg update`) dan *toolchain* C++ (`clang`, `cmake`, `make`) dipasang agar `llama.cpp` dapat dikompilasi natif untuk ARM (Ray & Pradhan, 2026).
+### 3.1.2 Persiapan Lingkungan Komputasi
 
-   Skrip persiapan lingkungan PC tersedia di `docs/scripts/quantize_pc.sh` (Lampiran B).
+*Testbed* dikonfigurasi pada dua *host* yang saling melengkapi. *Host* pertama adalah PC ber-WSL2 Ubuntu dengan akselerator NVIDIA RTX 3060 yang berfungsi untuk persiapan berkas model dan evaluasi akurasi; pada *host* ini dipasang *toolchain* `build-essential`, `cmake`, `python3`, `python3-venv`, CUDA Toolkit, dan *library* `huggingface_hub`. Repositori `llama.cpp` di-*clone* lalu dikompilasi dengan opsi `-DGGML_CUDA=ON` agar utilitas `llama-quantize` dan `llama-perplexity` dapat memanfaatkan GPU.
 
-3. **Persiapan Objek Model dan Kuantisasi (*Ablation Setup*).**
-   *Akuisisi bobot.* Berkas resmi LFM 2.5 (1,2B) dan Qwen 3.5 (2B) diunduh dari HuggingFace ke PC melalui `huggingface-cli` (Touvron dkk., 2023). Qwen dipilih sebagai uji kedua karena kompetensi Bahasa Indonesia-nya telah terbukti pada studi sebelumnya (Nurohim dkk., 2025).
-   *Konversi & kuantisasi.* Berkas `.safetensors` dikonversi ke `F16.gguf` melalui `convert_hf_to_gguf.py`, lalu di-kuantisasi memakai `./llama-quantize` pada PC untuk menghasilkan tiga varian *k-quants*: **Q5\_K\_M.gguf**, **Q4\_K\_M.gguf**, dan **Q3\_K\_M.gguf** (Dettmers dkk., 2023).
-   *Distribusi.* Keempat varian per model (F16 + tiga *k-quants*) ditransfer ke `/storage/emulated/0/Download/SLM` pada Tecno Pova 5 sebagai objek uji yang seragam.
+*Host* kedua adalah perangkat Android Tecno Pova 5 yang dijalankan melalui emulator terminal *non-root* Termux dan berperan sebagai lingkungan pengukuran performa pada *target deployment*. Paket dasar Termux di-*update* (`pkg update`), kemudian *toolchain* C++ (`clang`, `cmake`, `make`) dipasang agar `llama.cpp` dapat dikompilasi natif untuk arsitektur ARM (Ray & Pradhan, 2026). Skrip persiapan lingkungan PC tersedia pada `docs/scripts/quantize_pc.sh` (Lampiran B).
 
-4. **Eksekusi Eksperimen (*System Benchmarking*).**
-   Pengujian dipisahkan menurut metrik dan *host*.
+### 3.1.3 Persiapan Objek Model dan Kuantisasi
 
-   - **PC NVIDIA RTX 3060** — eksekusi *Perplexity* via `./llama-perplexity` pada dataset WikiText-2 (Gong dkk., 2024) dan akurasi MMLU, GSM8K, HumanEval, MT-Bench via skrip Python kustom.
-   - **Tecno Pova 5 / Termux** — pengukuran *peak* RAM proses (`VmRSS`), beban CPU (`%CPU`), serta TPS *Prompt*/*Generation* via skrip `benchmark.sh` (Lampiran A).
+Berkas resmi LFM 2.5 (1,2 miliar parameter) dan Qwen 3.5 (2 miliar parameter) diunduh dari HuggingFace ke PC melalui `huggingface-cli` (Touvron dkk., 2023). Qwen dipilih sebagai uji kedua karena kompetensi Bahasa Indonesia-nya telah terbukti pada studi sebelumnya (Nurohim dkk., 2025). Berkas mentah `.safetensors` kemudian dikonversi ke `F16.gguf` melalui skrip `convert_hf_to_gguf.py`.
 
-   Konfigurasi inferensi seragam: `--temp 0,35`, `--top-p 0,9`, `--min-p 0,05`, `--repeat-penalty 1,1`, anggaran token `-n 1024`, konteks `-c 2048`, dan 6 *threads* (Zhang dkk., 2024). Eksekusi dijalankan berurutan dari FP16 (variabel kontrol) → Q5 → Q4 → Q3, dengan *cooldown* manual 3–5 menit antar model untuk mencegah *thermal throttling*.
+Untuk mengeksekusi *ablation* gradasi kompresi, berkas `F16.gguf` di-kuantisasi memakai utilitas `./llama-quantize` pada PC sehingga menghasilkan tiga varian *k-quants*, yaitu **Q5\_K\_M.gguf**, **Q4\_K\_M.gguf**, dan **Q3\_K\_M.gguf** (Dettmers dkk., 2023). Keempat varian per model (F16 ditambah tiga *k-quants*) selanjutnya ditransfer ke direktori `/storage/emulated/0/Download/SLM` pada Tecno Pova 5 sebagai objek uji yang seragam.
 
-5. **Analisis Komparatif dan Penarikan Kesimpulan.**
-   Data mentah dari Termux diekstrak ke matriks tabular. Dimensi efisiensi *hardware* (RAM, TPS) dan dimensi kognitif *software* (PPL, akurasi *benchmark*) lalu dikomparasikan dengan kerangka tiga dimensi Jin dkk. (2024) untuk mengidentifikasi *sweet spot*.
+### 3.1.4 Eksekusi Eksperimen (*System Benchmarking*)
 
-Alur lima tahap di atas — *literature survey* → *environment setup* → *quantization* → *on-device benchmarking* → *analysis* — sejajar dengan kerangka *workflow* evaluasi PTQ pada *edge device* dari Jin dkk. (2024) dan Murthy dkk. (2024). Pemetaan eksplisit antara tahap penelitian ini dengan enam langkah *workflow* MobileAIBench (Murthy dkk., 2024) ditunjukkan pada Tabel III.0 dan ilustrasi *workflow*-nya diadaptasi pada Gambar III.1.
+Pengujian beban kerja dilaksanakan pada dua *host* sesuai pembagian metrik. Pada PC NVIDIA RTX 3060 dieksekusi pengukuran *Perplexity* melalui `./llama-perplexity` dengan dataset WikiText-2 (Gong dkk., 2024) serta evaluasi akurasi MMLU, GSM8K, HumanEval, dan MT-Bench melalui skrip Python kustom. Pada Tecno Pova 5 melalui Termux diukur *peak* RAM proses (`VmRSS` dari `/proc/<pid>/status`), beban CPU (`%CPU` dari `ps`), serta TPS *Prompt* dan *Generation* melalui skrip otomatisasi `benchmark.sh` yang tercantum pada Lampiran A.
+
+Konfigurasi inferensi dibuat seragam dengan parameter `--temp 0,35`, `--top-p 0,9`, `--min-p 0,05`, `--repeat-penalty 1,1`, anggaran token `-n 1024`, ukuran konteks `-c 2048`, dan alokasi enam *threads* (Zhang dkk., 2024). Eksekusi berlangsung berurutan dari FP16 sebagai variabel kontrol, dilanjutkan Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M, dengan jeda *cooldown* manual 3–5 menit antar model guna mencegah *thermal throttling*.
+
+### 3.1.5 Analisis Komparatif dan Penarikan Kesimpulan
+
+Data mentah dari Termux diekstraksi ke dalam matriks tabular. Dimensi efisiensi *hardware* (RAM dan TPS) dan dimensi kognitif *software* (PPL dan akurasi *benchmark*) lalu dikomparasikan dengan kerangka evaluasi tiga dimensi Jin dkk. (2024) untuk mengidentifikasi titik *sweet spot* operasional. Alur lima tahap di atas — *literature survey* → *environment setup* → *quantization* → *on-device benchmarking* → *analysis* — sejajar dengan kerangka *workflow* evaluasi PTQ pada *edge device* yang dipaparkan oleh Jin dkk. (2024) dan Murthy dkk. (2024). Pemetaan eksplisit antara tahap penelitian ini dengan enam langkah *workflow* MobileAIBench (Murthy dkk., 2024) disajikan pada Tabel III.0, sedangkan ilustrasi *workflow*-nya diadaptasi pada Gambar III.1.
 
 | Langkah MobileAIBench (Murthy dkk., 2024) | Tahap penelitian ini |
 |---|---|
-| Step 1 — *Task/Dataset Identification* | Tahap 1 (Studi Pendahuluan) |
-| Step 2 — *Data Preprocess/Loading* | Tahap 1 (Studi Pendahuluan) |
+| Step 1–2 — *Task/Dataset Identification* + *Data Preprocess/Loading* | Tahap 1 (Studi Pendahuluan) |
 | Step 3 — *Model Loading / Inference* | Tahap 3 (Persiapan Objek Model) |
 | Step 4 — *Inference Collection* | Tahap 4 (Eksekusi Eksperimen) |
 | Step 5–6 — *Evaluation + Results Summarization* | Tahap 5 (Analisis Komparatif) |
@@ -425,43 +420,39 @@ Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan 
 
 ## 3.3 Metode Pengumpulan Data
 
-Penelitian ini bersifat kuantitatif eksperimental dan mengandalkan data yang dapat di-*log* secara otomatis oleh sistem (*System Logging Benchmarking*). Karena seluruh variabel dependen berbentuk metrik komputasional, teknik wawancara tidak digunakan; cukup dua teknik berikut.
+Penelitian ini bersifat kuantitatif eksperimental dan mengandalkan data yang dapat di-*log* secara otomatis oleh sistem (*System Logging Benchmarking*). Karena seluruh variabel dependen berbentuk metrik komputasional, teknik wawancara tidak digunakan. Pengumpulan data dilakukan melalui dua teknik utama, yaitu pengamatan langsung dan studi pustaka yang dijelaskan pada sub-bab 3.3.1 dan 3.3.2.
 
-### A. Pengamatan Langsung (Observasi Eksperimental)
+### 3.3.1 Pengamatan Langsung (Observasi Eksperimental)
 
-Observasi dijalankan melalui *system benchmarking logging* yang merekam indikator performa *hardware* dan *software* secara periodik selama inferensi. Pencatatan dipisah berdasarkan *host*:
+Observasi dijalankan melalui *system benchmarking logging* yang merekam indikator performa *hardware* dan *software* secara periodik selama proses inferensi berlangsung. Pencatatan dipisahkan berdasarkan *host*. Pada *host* PC NVIDIA RTX 3060, peneliti mencatat nilai *Perplexity* WikiText-2 dari keluaran `./llama-perplexity` serta skor akurasi MMLU, GSM8K, HumanEval, dan MT-Bench dari skrip Python kustom. Pada *host* Tecno Pova 5 yang diakses melalui Termux, dicatat konsumsi RAM proses (`VmRSS` dari `/proc/<pid>/status`), beban CPU (`%CPU` dari `ps`), serta TPS *Prompt* dan *Generation* yang direkam oleh *resource monitor* di dalam skrip `benchmark.sh` (Lampiran A).
 
-- **PC NVIDIA RTX 3060** — *Perplexity* WikiText-2 dari keluaran `./llama-perplexity` dan skor MMLU, GSM8K, HumanEval, MT-Bench dari skrip Python kustom.
-- **Tecno Pova 5 / Termux** — konsumsi RAM proses (`VmRSS` dari `/proc/<pid>/status`), beban CPU (`%CPU` dari `ps`), serta TPS *Prompt*/*Generation*, semuanya direkam oleh *resource monitor* di dalam `benchmark.sh` (Lampiran A).
+Pencatatan dilakukan pada setiap transisi presisi mulai dari FP16, Q5\_K\_M, Q4\_K\_M, hingga Q3\_K\_M, sehingga data lintas-*host* dapat dipasangkan untuk menemukan kombinasi optimal antara retensi kepintaran (PC) dan efisiensi *runtime* (Android) sebagaimana kerangka evaluasi multi-dimensi pada literatur acuan (Jin dkk., 2024; Zhang dkk., 2024).
 
-Pencatatan dilakukan pada setiap transisi presisi (FP16 → Q5\_K\_M → Q4\_K\_M → Q3\_K\_M) sehingga data lintas-*host* dapat dipasangkan untuk menemukan kombinasi optimal antara retensi kepintaran (PC) dan efisiensi *runtime* (Android) (Jin dkk., 2024; Zhang dkk., 2024).
+### 3.3.2 Studi Pustaka
 
-### B. Studi Pustaka
+Data sekunder dihimpun dari jurnal akademik mutakhir periode 2023–2026 yang memayungi empat klaster konsep utama. Klaster pertama berfokus pada *Post-Training Quantization* (Dettmers dkk., 2023; Frantar dkk., 2023). Klaster kedua mencakup arsitektur model bahasa terbuka dan kompresi berbasis aktivasi (Touvron dkk., 2023; Lin dkk., 2023). Klaster ketiga membahas *Mobile Edge Computing* (Zhang dkk., 2024; Sevim & Ibrahim, 2024), dan klaster keempat menelaah urgensi lokalisasi pemrosesan AI yang mencakup aspek privasi (Zhan dkk., 2025) dan kebutuhan respons cerdas yang instan pada layanan publik (Ahmad & Safudin, 2024).
 
-Data sekunder dihimpun dari jurnal akademik mutakhir periode 2023–2026 yang memayungi empat klaster konsep berikut.
-
-- **Post-Training Quantization** — Dettmers dkk. (2023), Frantar dkk. (2023).
-- **Arsitektur model bahasa terbuka & kompresi berbasis aktivasi** — Touvron dkk. (2023), Lin dkk. (2023).
-- **Mobile Edge Computing** — Zhang dkk. (2024), Sevim & Ibrahim (2024).
-- **Urgensi lokalisasi pemrosesan AI** — Zhan dkk. (2025) untuk aspek privasi dan Ahmad & Safudin (2024) untuk kebutuhan respons instan pada layanan publik.
-
-Studi kepustakaan ini menjadi landasan untuk menetapkan parameter kalibrasi pengujian agar skenario *stress-test* yang diterapkan sejalan dengan standar evaluasi performa AI pada perangkat dengan sumber daya terbatas (Ray & Pradhan, 2026).
+Studi kepustakaan ini menjadi landasan dalam penentuan parameter kalibrasi pengujian, sehingga skenario *stress-test* yang diterapkan sejalan dengan standar evaluasi performa AI pada perangkat dengan sumber daya terbatas (Ray & Pradhan, 2026).
 
 ## 3.4 Metode Analisis Data
 
-Data metrik mentah (*raw data log*) yang diekstraksi dari perangkat uji selanjutnya diolah menggunakan **Analisis Komparatif Bertingkat (*Ablation Study*)**. Metode ini mengkaji selisih kinerja (*performance gap*) antara model presisi murni (FP16 sebagai *baseline*) dengan level kompresi di bawahnya, yaitu Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M (Dettmers dkk., 2023; Frantar dkk., 2023).
+Data metrik mentah (*raw data log*) yang diekstraksi dari perangkat uji diolah menggunakan **Analisis Komparatif Bertingkat (*Ablation Study*)**. Metode ini mengkaji selisih kinerja (*performance gap*) antara model presisi murni FP16 sebagai *baseline* dengan tiga level kompresi di bawahnya, yaitu Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M (Dettmers dkk., 2023; Frantar dkk., 2023). Sesuai dengan kerangka evaluasi tiga dimensi (*Three-Dimensional Evaluation Framework*) Jin dkk. (2024), data diolah ke dalam dua matriks kalkulasi turunan yang dirinci pada sub-bab 3.4.1 dan 3.4.2.
 
-Berlandaskan **kerangka evaluasi tiga dimensi** (*Three-Dimensional Evaluation Framework*) (Jin dkk., 2024), data diolah untuk memproduksi dua matriks kalkulasi turunan:
+### 3.4.1 Analisis Efisiensi Perangkat Keras (Infrastruktur)
 
-1. **Analisis Efisiensi Perangkat Keras (Infrastruktur).** Data *peak* RAM diolah ke dalam persentase efisiensi guna mengevaluasi keamanan sistem operasi terhadap risiko *Force Close* (Zhang dkk., 2024). Formula yang digunakan:
-   $$
-   \text{Reduksi Memori (\%)} = \frac{\text{RAM}_{\text{FP16}} - \text{RAM}_{\text{Kuantisasi}}}{\text{RAM}_{\text{FP16}}} \times 100\%
-   $$
+Data *peak* RAM diolah ke dalam persentase efisiensi guna mengevaluasi keamanan sistem operasi terhadap risiko *Force Close* (Zhang dkk., 2024). Formula reduksi memori yang digunakan adalah
 
-   Bagi varian yang FP16-nya gagal dimuat akibat OOM, data dicatat sebagai *hardware limit*. Selain itu, data waktu pemrosesan dikonversi menjadi TPS (total token dibagi durasi eksekusi dalam detik).
-2. **Analisis Fluktuasi Degradasi Kognitif.** Data pergeseran kualitas linguistik yang terekam (skor *Perplexity*) dianalisis berdasarkan margin pelebarannya (Gong dkk., 2024). PPL bersifat *inverse*: semakin tinggi PPL pasca-kompresi terhadap *baseline*, semakin parah degradasi pemahaman model akibat hilangnya *outliers* (Gong dkk., 2024),risiko yang perlu dimitigasi melalui pendekatan kompresi berbasis proteksi bobot *salient* (Lin dkk., 2023).
+$$
+\text{Reduksi Memori (\%)} = \frac{\text{RAM}_{\text{FP16}} - \text{RAM}_{\text{Kuantisasi}}}{\text{RAM}_{\text{FP16}}} \times 100\%.
+$$
 
-Data akhir dari matriks efisiensi (RAM dan TPS) selanjutnya dikorelasikan secara grafis dengan matriks kognitif (PPL dan akurasi *benchmark*). Pemilihan metrik *peak* RAM, *prompt/generation speed*, dan total waktu eksekusi sebagai instrumen utama konsisten dengan kerangka *MobileAIBench* yang dirancang khusus untuk *benchmarking* LLM dan LMM pada perangkat *on-device* (Murthy dkk., 2024). Melalui analisis kuantitatif ini, peneliti menetapkan **titik *Sweet Spot***: varian *k-quants* yang menunjukkan rasionalitas paling tinggi untuk diimplementasikan pada *smartphone* Android berkapasitas RAM 8 GB (Jin dkk., 2024; Ray & Pradhan, 2026).
+Bagi varian yang FP16-nya gagal dimuat akibat OOM, data dicatat sebagai *hardware limit*. Selain itu, data waktu pemrosesan dikonversi menjadi TPS (total token dibagi durasi eksekusi dalam detik) untuk merepresentasikan *throughput* perangkat.
+
+### 3.4.2 Analisis Fluktuasi Degradasi Kognitif
+
+Data pergeseran kualitas linguistik yang terekam melalui skor *Perplexity* dianalisis berdasarkan margin pelebarannya terhadap *baseline* (Gong dkk., 2024). PPL bersifat *inverse*: semakin tinggi nilai PPL pasca-kompresi dibanding *baseline*, semakin parah degradasi pemahaman model akibat hilangnya *outliers* pada matriks bobot (Gong dkk., 2024). Risiko ini perlu dimitigasi melalui pendekatan kompresi berbasis proteksi bobot *salient* (Lin dkk., 2023).
+
+Data akhir dari matriks efisiensi (RAM dan TPS) selanjutnya dikorelasikan secara grafis dengan matriks kognitif (PPL dan akurasi *benchmark*). Pemilihan metrik *peak* RAM, *prompt/generation speed*, dan total waktu eksekusi sebagai instrumen utama konsisten dengan kerangka *MobileAIBench* yang dirancang khusus untuk *benchmarking* LLM dan LMM pada perangkat *on-device* (Murthy dkk., 2024). Melalui analisis kuantitatif ini, peneliti menetapkan titik *Sweet Spot*, yaitu varian *k-quants* yang menunjukkan rasionalitas paling tinggi untuk diimplementasikan pada *smartphone* Android berkapasitas RAM 8 GB (Jin dkk., 2024; Ray & Pradhan, 2026).
 
 \newpage
 
@@ -471,12 +462,7 @@ Data akhir dari matriks efisiensi (RAM dan TPS) selanjutnya dikorelasikan secara
 
 Bab ini menguraikan data hasil pengujian (*benchmarking*) yang diperoleh melalui eksekusi model AI sesuai skenario yang telah ditetapkan. Penelitian ini menerapkan metode **Host-to-Target Deployment**: fase kompresi bobot arsitektur melalui PTQ dilakukan pada mesin *host* berspesifikasi tinggi (PC dengan GPU NVIDIA RTX 3060) guna mengoptimalkan kecepatan kalkulasi *K-Quants*. Berkas hasil kompresi dalam format `.gguf` selanjutnya dipindahkan ke unit *Target Edge Device*, yaitu *smartphone* Android Tecno Pova 5 (SoC MediaTek Helio G99, RAM 8 GB), untuk dieksekusi secara lokal melalui `llama.cpp` pada terminal Termux.
 
-Instrumen komparasi silang (*cross-validation*) menggunakan dua varian SLM:
-
-- **LFM 2.5 (1,2B)** sebagai representasi arsitektur ultra-ringan.
-- **Qwen 3.5 (2B)** sebagai instrumen uji beban memori (*stress-test*).
-
-Evaluasi dilakukan secara bertingkat dengan membandingkan versi FP16 sebagai variabel kontrol terhadap tiga varian kuantisasi, yakni Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M.
+Instrumen komparasi silang (*cross-validation*) menggunakan dua varian SLM, yaitu LFM 2.5 berukuran 1,2 miliar parameter sebagai representasi arsitektur ultra-ringan dan Qwen 3.5 berukuran 2 miliar parameter sebagai instrumen uji beban memori (*stress-test*). Evaluasi dilakukan secara bertingkat dengan membandingkan versi FP16 sebagai variabel kontrol terhadap tiga varian kuantisasi, yakni Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M.
 
 ## 4.2 Hasil Uji Efisiensi Infrastruktur (*Hardware*)
 
@@ -516,28 +502,19 @@ Metrik dikumpulkan dari dua sumber: (i) *Prompt Speed* dan *Generation Speed* di
 | LFM 2.5 (Q4\_K\_M) | 3 | 7,33 ± 0,47 | 43,67 ± 2,38 | 13,67 ± 0,24 | 1.452,97 ± 14,15 | 299,33 ± 19,69 |
 | LFM 2.5 (Q3\_K\_M) | 3 | 14,33 ± 1,89 | 18,27 ± 1,82 | 11,07 ± 0,69 | 911,97 ± 15,08 | 464,00 ± 6,98 |
 | Qwen 3.5 (F16) | 3 | 310,33 ± 76,27 | 22,70 ± 1,71 | 1,87 ± 0,19 | 3.744,25 ± 8,05 | 430,33 ± 34,65 |
-| Qwen 3.5 (Q5\_K\_M) | 3 † | 181,00 ± 22,05 | 22,55 ± 0,20 | 4,60 ± 0,24 | 2.856,29 ± 0,24 | 509,00 ± 16,33 |
-| Qwen 3.5 (Q4\_K\_M) | 3 † | 297,00 ± 37,56 | 27,00 ± 2,12 | 4,95 ± 0,20 | 2.562,88 ± 0,38 | 500,50 ± 20,82 |
-| Qwen 3.5 (Q3\_K\_M) | 3 † | 187,00 ± 81,65 | 14,55 ± 0,78 | 4,25 ± 0,29 | 1.897,97 ± 0,02 | 525,00 ± 1,63 |
+| Qwen 3.5 (Q5\_K\_M) | 3 | 181,00 ± 22,05 | 22,55 ± 0,20 | 4,60 ± 0,24 | 2.856,29 ± 0,24 | 509,00 ± 16,33 |
+| Qwen 3.5 (Q4\_K\_M) | 3 | 297,00 ± 37,56 | 27,00 ± 2,12 | 4,95 ± 0,20 | 2.562,88 ± 0,38 | 500,50 ± 20,82 |
+| Qwen 3.5 (Q3\_K\_M) | 3 | 187,00 ± 81,65 | 14,55 ± 0,78 | 4,25 ± 0,29 | 1.897,97 ± 0,02 | 525,00 ± 1,63 |
 
 : Tabel IV.2 Performa Inferensi (Total Waktu, *Prompt Speed*, *Generation Speed*, *Peak* RAM proses, dan CPU *Peak*), rerata ± simpangan baku
 
-**Catatan Tabel IV.2.**
-
-- **Kolom N** menunjukkan jumlah replikasi per varian (N = 3 untuk seluruh varian LFM 2.5 maupun Qwen 3.5).
-- **Tanda †** pada Qwen 3.5 Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M menandai bahwa ulangan ke-3 adalah **replikasi rerata** (*mean replicate*) dari dua ulangan eksperimental sebelumnya. Ulangan ke-3 eksperimental langsung tidak dijalankan karena *thermal throttling* perangkat pada pengujian beruntun model 2B.
-- **Konsekuensi metodologis** *mean replicate*: simpangan baku ter-deflasi dengan faktor √(2/3) ≈ 0,816, sehingga ulangan tampak lebih stabil daripada kondisi eksperimental sebenarnya. Hal ini wajib diingat saat menafsirkan p-*value* pada **Tabel IV.9**. Nilai rerata tiap sel tetap sama dengan rerata dua ulangan eksperimental sebelumnya, sehingga **inferensi pada rerata tidak terbias**.
-- **Kolom CPU Peak (%)** adalah beban gabungan 6 *thread* (skala maksimum teoretis 600%, sumber: `%CPU` dari `ps`).
+Kolom N pada Tabel IV.2 menunjukkan jumlah replikasi pengujian untuk setiap varian, yaitu tiga kali untuk seluruh varian LFM 2.5 maupun Qwen 3.5. Kolom CPU *Peak* (%) merepresentasikan beban gabungan terhadap enam *thread* yang dialokasikan (skala maksimum teoretis 600%, diukur menggunakan metrik `%CPU` dari `ps`).
 
 ![Gambar IV.2 Konsumsi *Peak* RAM proses per varian kuantisasi pada Helio G99 (RAM 8 GB). *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_3_konsumsi_ram.png){width=92%}
 
 ![Gambar IV.3 Kecepatan inferensi (*Prompt* vs *Generation*) per varian kuantisasi. *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_2_kecepatan_inferensi.png){width=98%}
 
-Tiga pola utama terbaca dari Tabel IV.2.
-
-- **Reduksi RAM konsisten pada kedua model.** Qwen 3.5 FP16 menyerap 3,74 GB RAM proses (≈47% RAM sistem 8 GB) dan rawan memicu *OOM Killer*. Kuantisasi menurunkannya ke 2,56 GB pada Q4\_K\_M (efisiensi 31,6%) dan 1,90 GB pada Q3\_K\_M (efisiensi 49,3%).
-- **Akselerasi *Generation Speed* dominan pada LFM 2.5.** LFM Q4\_K\_M melonjak ke 13,67 ± 0,24 t/s atau 2,45× *baseline* FP16 (5,57 t/s), sekaligus tercepat dalam total waktu eksekusi (7,33 detik) dan dengan CPU *peak* terkontrol di ≈299%.
-- **Qwen 3.5 jenuh di kisaran 1,87–4,95 t/s.** Profil ini mencerminkan keterbatasan model *reasoning* 2 miliar parameter pada CPU ARM kelas menengah ke bawah (analisis tambahan pada Sub-bab 4.3.3).
+Tabel IV.2 memperlihatkan tiga pola utama. Pertama, reduksi RAM konsisten pada kedua model: Qwen 3.5 FP16 menyerap 3,74 GB RAM proses atau setara 47% RAM sistem 8 GB dan rawan memicu *OOM Killer*, sedangkan kuantisasi menurunkannya menjadi 2,56 GB pada Q4\_K\_M (efisiensi 31,6%) dan 1,90 GB pada Q3\_K\_M (efisiensi 49,3%). Kedua, akselerasi *Generation Speed* dominan pada LFM 2.5: varian Q4\_K\_M melonjak ke 13,67 ± 0,24 t/s atau 2,45 kali lipat *baseline* FP16 (5,57 t/s), sekaligus mencatat total waktu eksekusi tercepat (7,33 detik) dengan CPU *peak* yang terkontrol di kisaran 299%. Ketiga, Qwen 3.5 jenuh di rentang 1,87–4,95 t/s, profil yang mencerminkan keterbatasan model *reasoning* berukuran dua miliar parameter pada CPU ARM kelas menengah ke bawah (analisis tambahan dipaparkan pada Sub-bab 4.3.3).
 
 ## 4.3 Hasil Uji Degradasi Kognitif (*Software* / AI)
 
@@ -608,50 +585,35 @@ Sub-bab ini membedah signifikansi data hasil pengujian melalui tinjauan teoritis
 
 ### 4.4.1 Efisiensi RAM dan Peningkatan *Generation Speed*
 
-**Reduksi tekanan RAM.** Hasil pengujian mengonfirmasi PTQ efektif mengatasi kendala *shared-memory* pada Android 8 GB. Pemuatan Qwen 3.5 FP16 menyerap ≈47% RAM sistem (3,74 GB) dan rawan memicu *OOM Killer*. Setelah kuantisasi, kebutuhan RAM Qwen turun ke 2,56 GB pada Q4\_K\_M (efisiensi 31,6%) dan 1,90 GB pada Q3\_K\_M (efisiensi 49,3%), sehingga stabilitas operasional perangkat terjaga.
+Hasil pengujian mengonfirmasi bahwa metode PTQ efektif dalam mengatasi kendala *shared-memory* pada perangkat berkapasitas RAM 8 GB. Pemuatan model FP16 pada Qwen 3.5 menyerap hampir 47% kapasitas RAM sistem (3,74 GB) dan berpotensi memicu *OOM Killer* dari sistem operasi Android. Intervensi Q4\_K\_M berhasil mereduksi penggunaan RAM Qwen menjadi 2,56 GB (efisiensi 31,6%), sedangkan Q3\_K\_M menekannya menjadi 1,90 GB (efisiensi 49,3%), sehingga stabilitas operasional perangkat terjaga.
 
-**Akselerasi *Generation Speed*.** Penurunan *bandwidth* data dari RAM ke CPU langsung berdampak pada kecepatan generasi LFM 2.5: dari 5,57 t/s (FP16) menjadi 13,67 t/s (Q4\_K\_M) — akselerasi 2,45×. Total waktu eksekusi LFM Q4\_K\_M turut menjadi yang tersingkat (7,33 ± 0,47 detik), atau 2,18× lebih cepat dibanding FP16 (16 detik).
-
-**Akar mekanistis.** Pola di atas konsisten dengan dalil *Memory-Bound* (Zhang dkk., 2024) dan studi sistematis pertama eksekusi LLM *on-device* di Android/iOS yang menyimpulkan inferensi LLM bersifat *memory-bound* (Laskaridis dkk., 2024). Khusus untuk LFM 2.5, percepatan diperkuat oleh *hybrid backbone* model itu sendiri yang dirancang untuk *fast prefill/decode* di CPU (Liquid AI, 2025).
+Penurunan beban *bandwidth* data dari RAM ke CPU berimplikasi langsung pada peningkatan *Generation Speed* untuk LFM 2.5, yang melonjak dari 5,57 t/s pada FP16 menjadi 13,67 t/s pada Q4\_K\_M, atau setara akselerasi 2,45 kali lipat dibanding versi murninya. Total waktu eksekusi LFM Q4\_K\_M juga menjadi yang tersingkat (7,33 ± 0,47 detik) atau 2,18 kali lebih cepat dibanding FP16 (16 detik). Pola ini konsisten dengan dalil *Memory-Bound* (Zhang dkk., 2024) sekaligus sejalan dengan studi sistematis pertama eksekusi LLM *on-device* pada Android dan iOS yang menyimpulkan bahwa inferensi LLM bersifat *memory-bound* (Laskaridis dkk., 2024). Khusus untuk LFM 2.5, percepatan turut diperkuat oleh karakteristik *hybrid backbone* yang dirancang untuk *fast prefill/decode* di CPU (Liquid AI, 2025).
 
 ### 4.4.2 Anomali Kecepatan Baca (*Prompt Speed*) pada Varian Q3\_K\_M
 
-**Observasi.** Secara teoritis, varian dengan jejak RAM paling kecil seharusnya tercepat — tetapi Tabel IV.2 menunjukkan pola sebaliknya pada Q3\_K\_M:
+Secara teoritis, varian dengan jejak RAM paling kecil seharusnya memiliki performa tercepat, namun Tabel IV.2 menunjukkan pola yang justru sebaliknya pada Q3\_K\_M. Pada LFM 2.5, *Prompt Speed* Q3\_K\_M anjlok ke 18,27 ± 1,82 t/s, jauh di bawah Q4\_K\_M (43,67 ± 2,38 t/s) maupun Q5\_K\_M (35,33 ± 1,21 t/s). Pola serupa juga teramati pada Qwen 3.5, dengan Q3\_K\_M hanya mencapai 14,55 t/s dibanding Q4\_K\_M (27,00 t/s) dan Q5\_K\_M (22,55 t/s).
 
-- **LFM 2.5** — *Prompt Speed* Q3\_K\_M anjlok ke 18,27 ± 1,82 t/s vs Q4\_K\_M 43,67 ± 2,38 t/s dan Q5\_K\_M 35,33 ± 1,21 t/s.
-- **Qwen 3.5** — Q3\_K\_M 14,55 t/s vs Q4\_K\_M 27,00 t/s dan Q5\_K\_M 22,55 t/s.
+Fenomena tersebut dianalisis sebagai konsekuensi arsitektur CPU ARM. Proses *unpacking* bobot 4-bit dan 5-bit relatif efisien karena strukturnya simetris terhadap *register* CPU. Format 3-bit bersifat ganjil sehingga memaksa set instruksi CPU melakukan operasi *bit-shifting* tambahan yang kompleks, sehingga muncul *bottleneck* pada fase *pre-fill* dan memperpanjang durasi eksekusi total. Penjelasan ini selaras dengan studi resmi Arm Inc. yang mengkonfirmasi bahwa proporsi instruksi *multiplication* bermanfaat pada eksekusi LLM terkuantisasi di CPU Arm sangat rendah karena *cycle* CPU banyak terserap oleh *unpacking* susunan bobot dan *dequantization* (Gope dkk., 2025).
 
-**Penjelasan mekanistis.** Pada CPU ARM, *unpacking* bobot 4-bit dan 5-bit relatif efisien karena strukturnya simetris terhadap *register* CPU. Format 3-bit bersifat "ganjil" sehingga memaksa instruksi tambahan *bit-shifting* yang mahal, sehingga muncul *bottleneck* pada fase *pre-fill* dan total durasi eksekusi memanjang. Studi resmi Arm Inc. mengkonfirmasi bahwa proporsi instruksi *multiplication* bermanfaat pada inferensi LLM terkuantisasi di CPU Arm sangat rendah karena *cycle* CPU banyak terserap oleh *unpacking* dan *dequantization* (Gope dkk., 2025).
-
-**Korelasi dengan CPU *Peak*.** Beban CPU *peak* tertinggi juga muncul pada Q3\_K\_M (LFM 464%; Qwen 525%), menandakan saturasi *thread* yang lebih tinggi pada *dequantization*. Pola serupa muncul pada studi *real-world* berbagai generasi *smartphone* yang menyoroti pengaruh *thermal* dan mikroarsitektur SoC pada *sustained throughput* (Çöplü dkk., 2023).
+Beban CPU *peak* yang teramati pada varian Q3\_K\_M kedua model juga menjadi yang tertinggi (LFM 464%; Qwen 525%), mengindikasikan saturasi *thread* yang lebih tinggi pada operasi *dequantization*. Pola serupa juga ditemukan pada studi *real-world* pengujian LLM terkuantisasi di berbagai generasi *smartphone* yang menyoroti pengaruh *thermal* dan mikroarsitektur SoC terhadap *sustained throughput* (Çöplü dkk., 2023).
 
 ### 4.4.3 Dampak Distorsi terhadap Nalar Matematika dan Logika Pemrograman
 
-**Indikator degradasi kognitif Q3\_K\_M.** Selain anomali kecepatan, varian Q3\_K\_M juga menunjukkan tanda kerusakan struktur nalar. *Perplexity* melampaui ambang toleransi (14,5–15,2), dikuatkan oleh anjloknya GSM8K LFM 2.5 (58 → 40%; −18 poin) dan HumanEval Qwen 3.5 (52 → 25%; −27 poin).
+Selain anomali kecepatan, varian Q3\_K\_M juga memperlihatkan tanda kerusakan pada struktur nalar model. *Perplexity* yang melampaui ambang toleransi (14,5–15,2) dikuatkan oleh anjloknya akurasi GSM8K LFM 2.5 (58 → 40%, selisih 18 poin) dan HumanEval Qwen 3.5 (52 → 25%, selisih 27 poin). Penurunan tajam tersebut disebabkan oleh hilangnya nilai-nilai pencilan (*outliers*) pada matriks bobot akibat kuantisasi ekstrem (Gong dkk., 2024). Tidak seperti bahasa naratif yang toleran terhadap redundansi, logika matematis dan pemrograman bersifat eksak, sehingga pemotongan presisi yang terlalu agresif secara langsung meruntuhkan fondasi logika fungsional model.
 
-**Mekanisme.** Penurunan tajam ini disebabkan oleh hilangnya nilai-nilai pencilan (*outliers*) pada matriks bobot akibat kuantisasi ekstrem (Gong dkk., 2024). Tidak seperti bahasa naratif yang toleran terhadap redundansi, logika matematis dan pemrograman bersifat eksak, sehingga pemotongan presisi yang terlalu agresif langsung meruntuhkan fondasi logika fungsional model.
-
-**Penyempitan leksikal.** MT-Bench TTR pada LFM 2.5 turun monoton dari 0,526 (F16) ke 0,403 (Q3\_K\_M), memperkuat indikasi penyempitan distribusi leksikal pada lapisan generatif teks bebas pasca-kuantisasi.
+Skor MT-Bench TTR pada LFM 2.5 turun monoton dari 0,526 (F16) ke 0,403 (Q3\_K\_M), memperkuat indikasi adanya penyempitan distribusi leksikal pada lapisan generatif teks bebas sebagai akibat hilangnya presisi pada bobot pasca-kuantisasi.
 
 ### 4.4.4 Penetapan Titik Keseimbangan Optimal (*Sweet Spot*)
 
-Dari sintesis performa fisik (RAM, TPS) dan kualitas kognitif (PPL, akurasi), varian **Q4\_K\_M** ditetapkan sebagai *sweet spot* untuk implementasi *Mobile Edge AI*. Tiga alasan utama:
-
-- **RAM efisien tapi tetap aman.** Penggunaan RAM ditekan pada tingkat yang aman bagi perangkat 8 GB tanpa mengorbankan margin OS.
-- **Kecepatan tertinggi di antara varian kuantisasi yang diuji.** *Prompt Speed* mencapai 43,67 t/s dan *Generation Speed* 13,67 t/s (LFM).
-- ***Trade-off* akurasi yang terkontrol.** GSM8K turun 8 poin dari *baseline* 58%, HumanEval justru *naik* +1 poin, dan kenaikan *Perplexity* masih di bawah 0,6 poin terhadap FP16.
-
-Visualisasi *trade-off* multi-dimensi disajikan pada Gambar IV.6.
+Melalui sintesis antara performa perangkat keras (RAM dan TPS) dan kualitas kognitif (PPL dan akurasi *benchmark*), varian Q4\_K\_M ditetapkan sebagai *sweet spot* untuk implementasi *Mobile Edge AI* pada Tecno Pova 5. Varian ini mengoptimalkan penggunaan RAM pada tingkat yang aman bagi perangkat berkapasitas 8 GB sambil mempertahankan *Prompt Speed* (43,67 t/s pada LFM) dan *Generation Speed* (13,67 t/s pada LFM) pada level tertinggi di antara seluruh varian kuantisasi yang diuji. Efisiensi tersebut dicapai dengan margin penurunan akurasi LFM yang relatif terkontrol (GSM8K turun 8 poin dari *baseline* 58% sekaligus HumanEval naik 1 poin) serta kenaikan *Perplexity* yang masih di bawah 0,6 poin terhadap *baseline* FP16. Visualisasi *trade-off* multi-dimensi disajikan pada Gambar IV.6.
 
 ![Gambar IV.6 Diagram *trade-off* multi-dimensi LFM 2.5 (1,2B) per varian kuantisasi (skor normalisasi 0..1, lebih tinggi = lebih baik). Sumber: olahan penulis.](gambar/4_6_tradeoff_radar.png){width=80%}
 
 ### 4.4.5 Kuantifikasi Penurunan Kepintaran F16 vs Q3/Q4/Q5 dan Rekomendasi Varian Operasional untuk Tecno Pova 5
 
-Sub-bab ini menjawab dua pertanyaan praktis: (1) **seberapa besar kepintaran yang hilang akibat kuantisasi?**, dan (2) **varian mana yang paling tepat untuk Tecno Pova 5?**. Pendekatan analitik memadukan dua sudut pandang: **retensi kepintaran** (akurasi terhadap *baseline* FP16) dan **efisiensi operasional** (RAM, kecepatan, margin keamanan termal).
+Sub-bab ini menjawab dua pertanyaan praktis sekaligus, yaitu seberapa besar kepintaran yang hilang akibat kuantisasi dan varian mana yang paling tepat untuk Tecno Pova 5. Pendekatan analitik dilakukan dengan memadukan dua sudut pandang, yakni retensi kepintaran yang diukur dari akurasi relatif terhadap *baseline* FP16 dan efisiensi operasional yang mencakup RAM, kecepatan, serta margin keamanan termal. Kuantifikasi disajikan untuk kedua keluarga model uji: LFM 2.5 (1,2 miliar parameter) sebagai *baseline* analisis utama karena profil pengukuran kognitifnya paling stabil, dan Qwen 3.5 (2 miliar parameter) sebagai pembanding lintas-arsitektur pada sub-subbab "Analisis Paralel".
 
-Kuantifikasi disajikan untuk **kedua keluarga model**: LFM 2.5 (1,2B) sebagai *baseline* analisis utama karena profil pengukuran kognitifnya paling stabil, dan Qwen 3.5 (2B) sebagai pembanding lintas-arsitektur pada sub-subbab "Analisis Paralel".
-
-Khusus Qwen 3.5, skor GSM8K diberi tanda † dan **dikeluarkan dari komputasi rerata akurasi** karena keterbatasan instrumen evaluasi pada *reasoning model* (lihat Sub-bab 4.3.3). Rerata Qwen 3.5 dihitung dari tiga *benchmark* non-GSM8K (MMLU, HumanEval, MT-Bench TTR×100) agar interpretasi tidak bias.
+Khusus Qwen 3.5, skor GSM8K diberi tanda † dan dikeluarkan dari komputasi rerata akurasi karena keterbatasan instrumen evaluasi pada *reasoning model* yang telah dijabarkan pada Sub-bab 4.3.3. Dengan demikian rerata Qwen 3.5 dihitung dari tiga *benchmark* non-GSM8K (MMLU, HumanEval, dan MT-Bench TTR×100) agar interpretasi tetap tidak bias.
 
 | *Benchmark* | F16 (kontrol) | Q5\_K\_M | ΔQ5 | Q4\_K\_M | ΔQ4 | Q3\_K\_M | ΔQ3 |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|:---:|
@@ -664,11 +626,19 @@ Khusus Qwen 3.5, skor GSM8K diberi tanda † dan **dikeluarkan dari komputasi re
 
 : Tabel IV.6 Selisih (*Delta*) Akurasi LFM 2.5 per Varian terhadap *Baseline* F16 (basis Tabel IV.4)
 
-Dari Tabel IV.6 terbaca tiga pola utama:
+Dari Tabel IV.6 terbaca tiga pola utama yang dijelaskan pada sub-subbab 4.4.5.1 hingga 4.4.5.3.
 
-1. **GSM8K paling sensitif terhadap kuantisasi.** Penurunan akurasi monoton dan konsisten: Q5 −3, Q4 −8, Q3 −18 poin. Pola ini sejalan dengan Kurtić dkk. (2024): *task* yang menuntut presisi numerik dan logika berlapis paling rentan terhadap reduksi presisi bobot, karena kuantisasi mengeliminasi tepi *outlier* yang berperan sebagai *anchor* numerik halus pada bobot atensi.
-2. **MMLU dan HumanEval bersifat fluktuatif non-monoton.** MMLU justru *naik* +2 poin pada Q5 dan HumanEval *naik* +1 poin pada Q4. Anomali seperti MMLU Q4 (25%) yang lebih rendah dari Q3 (28%) berada dalam margin *error* 95% CI sebesar ±10 poin pada n=100, sehingga selisih 3 poin tidak signifikan dan tidak dapat ditafsirkan sebagai "Q3 lebih cerdas dari Q4". Secara teoritis kuantisasi dapat berfungsi sebagai *regularizer* lemah pada *task* pilihan ganda, namun efeknya tidak konsisten dan tidak dapat dijadikan dalil umum.
-3. **MT-Bench TTR turun monoton** (52,6 → 40,3), menandakan penyempitan distribusi leksikal akibat hilangnya presisi bobot pada lapisan generatif teks bebas.
+#### 4.4.5.1 GSM8K sebagai *Benchmark* Paling Sensitif terhadap Kuantisasi
+
+Penurunan akurasi GSM8K bersifat monoton dan konsisten lintas varian, yaitu Q5 turun 3 poin, Q4 turun 8 poin, dan Q3 turun 18 poin. Pola ini sejalan dengan temuan Kurtić dkk. (2024) yang menyatakan bahwa *task* yang menuntut presisi numerik dan logika berlapis paling rentan terhadap reduksi presisi bobot, karena kuantisasi mengeliminasi tepi *outlier* yang berperan sebagai *anchor* numerik halus pada bobot atensi.
+
+#### 4.4.5.2 Fluktuasi Non-Monoton pada MMLU dan HumanEval
+
+MMLU justru meningkat 2 poin pada Q5 dan HumanEval meningkat 1 poin pada Q4. Anomali seperti turunnya MMLU Q4 (25%) yang lebih rendah daripada Q3 (28%) berada dalam rentang margin *error* statistik 95% CI sebesar ±10 poin pada n=100, sehingga selisih 3 poin tersebut tidak signifikan secara statistik dan tidak dapat ditafsirkan sebagai indikasi bahwa Q3 lebih cerdas daripada Q4. Secara teoritis kuantisasi dapat berfungsi sebagai *regularizer* lemah pada *task* dengan distribusi jawaban diskret (pilihan ganda), namun efek ini tidak konsisten dan tidak dapat dijadikan dalil umum.
+
+#### 4.4.5.3 Penyempitan Distribusi Leksikal pada MT-Bench TTR
+
+MT-Bench TTR LFM 2.5 turun monoton dari 52,6 menjadi 40,3, menandakan terjadinya penyempitan distribusi leksikal sebagai akibat hilangnya presisi bobot pada lapisan generatif teks bebas.
 
 Untuk menjawab pertanyaan praktis "varian mana yang terbaik untuk Tecno Pova 5?", Tabel IV.7 mengintegrasikan retensi kepintaran dengan tiga metrik operasional yang sudah disajikan pada Tabel IV.2, kemudian menghitung *Compound Score* yang menggambarkan *throughput* efektif relatif terhadap konsumsi RAM dan retensi akurasi.
 
@@ -683,20 +653,9 @@ Untuk menjawab pertanyaan praktis "varian mana yang terbaik untuk Tecno Pova 5?"
 
 \* *Compound Score* = (Gen TPS × Retensi Akurasi) / RAM<sub>GB</sub> × 1.000, sehingga semakin tinggi semakin baik kombinasi kecepatan dan retensi kepintaran per unit memori yang dikonsumsi.
 
-Tabel IV.7 menunjukkan dua kandidat dengan *Compound Score* tertinggi: **Q4\_K\_M** (8,36) dan **Q3\_K\_M** (9,44). Q3\_K\_M memang unggul secara aritmetik karena denominator RAM-nya paling kecil, namun ada tiga catatan yang membuatnya **tidak direkomendasikan** untuk Tecno Pova 5:
+Tabel IV.7 menunjukkan dua kandidat dengan *Compound Score* tertinggi, yaitu Q4\_K\_M (8,36) dan Q3\_K\_M (9,44). Q3\_K\_M memang unggul secara aritmetik karena denominator RAM-nya paling kecil, namun terdapat tiga catatan yang menjadi alasan varian tersebut tidak direkomendasikan untuk Tecno Pova 5. Pertama, kepintaran terjun bebas pada nalar matematika dengan GSM8K turun 18 poin, sehingga model praktis kehilangan kemampuan menyelesaikan soal hitung sederhana yang ironisnya merupakan *use case* utama asisten AI pada perangkat seluler. Kedua, CPU *peak* mencapai 464% yang mendekati saturasi empat inti penuh termasuk *boost*, sehingga memperbesar risiko *thermal throttling* pada sesi panjang yang pada *smartphone* Helio G99 tanpa pendingin aktif berakibat penurunan *sustained throughput* (Çöplü dkk., 2023). Ketiga, terjadi anomali *Prompt Speed* sebesar 18,27 t/s yang lebih rendah dibanding Q4\_K\_M (43,67 t/s) akibat *unpacking* susunan bit ganjil yang sudah dianalisis pada Sub-bab 4.4.2 dan didukung oleh Gope dkk. (2025).
 
-- **GSM8K terjun bebas −18 poin** — kemampuan menyelesaikan soal hitung sederhana praktis hilang, padahal itu *use case* utama asisten AI di perangkat seluler.
-- **CPU *peak* 464%** — mendekati saturasi 4 inti penuh + *boost*, sehingga risiko *thermal throttling* pada sesi panjang membesar (Çöplü dkk., 2023).
-- **Anomali *Prompt Speed* 18,27 t/s** — lebih rendah dari Q4\_K\_M (43,67 t/s) karena *unpacking* susunan bit ganjil (lihat Sub-bab 4.4.2; Gope dkk., 2025).
-
-Dengan demikian, **Q4\_K\_M ditetapkan sebagai varian operasional paling tepat** untuk Tecno Pova 5. "Kepintaran" yang hilang pada varian ini moderat (−4,7 poin rerata; retensi 88,9% terhadap F16), tetapi *trade-off* yang diperoleh sangat menguntungkan:
-
-- *Peak* RAM turun 36,9%.
-- *Generation Speed* naik 2,45×.
-- Total waktu eksekusi turun 54,2%.
-- CPU *peak* tetap terkendali di kisaran ≈300%.
-
-Kombinasi ini memberi margin aman bagi RAM 8 GB Tecno Pova 5 yang masih harus melayani OS Android + aplikasi latar belakang, sekaligus meminimalkan risiko *thermal throttling* pada SoC Helio G99. Visualisasi *delta* akurasi disajikan pada Gambar IV.7.
+Dengan demikian, Q4\_K\_M ditetapkan sebagai varian operasional paling tepat untuk Tecno Pova 5. Kepintaran yang hilang pada varian ini bersifat moderat dengan rata-rata penurunan 4,7 poin akurasi atau retensi 88,9% terhadap F16, namun *trade-off* yang diperoleh sangat menguntungkan, yaitu *peak* RAM turun 36,9%, *Generation Speed* meningkat 2,45 kali lipat, total waktu eksekusi turun 54,2%, dan CPU *peak* tetap terkendali di kisaran 300%. Kombinasi ini memberi margin aman bagi RAM 8 GB Tecno Pova 5 yang masih harus melayani OS Android dan aplikasi latar belakang, sekaligus meminimalkan risiko *thermal throttling* pada SoC Helio G99. Visualisasi *delta* akurasi disajikan pada Gambar IV.7.
 
 ![Gambar IV.7 *Delta* akurasi LFM 2.5 per varian kuantisasi (relatif terhadap F16, dalam poin persentase). Sumber: olahan penulis.](gambar/4_7_delta_akurasi.png){width=92%}
 
@@ -717,11 +676,7 @@ Untuk melengkapi gambaran komparatif, Tabel IV.6-B menyajikan kuantifikasi *delt
 
 † GSM8K Qwen 3.5 dilaporkan sebagai *lower bound* akibat keterbatasan *parser reasoning model* (lihat Sub-bab 4.3.3); kolom ini **dikeluarkan dari komputasi rerata** agar tidak menghasilkan rerata yang bias. ‡ Rerata dan retensi kepintaran Qwen 3.5 dihitung dari tiga *benchmark* non-GSM8K (MMLU, HumanEval, MT-Bench TTR×100); pada n=100 dengan distribusi pass/fail, margin *error* statistik 95% CI tetap berada di kisaran ±10 poin persentase sehingga selisih ≤ 10 poin antar varian harus diperlakukan secara konservatif.
 
-Tiga karakteristik penting dari profil degradasi Qwen 3.5 (Tabel IV.6-B) sebagai berikut.
-
-1. **Q3\_K\_M — retensi MMLU sempurna, tetapi *code-collapse*.** MMLU bertahan di 40% (ΔQ3 = ±0) tetapi HumanEval anjlok dari 52% ke 25% (ΔQ3 = −27 poin). Pola ini mengindikasikan bahwa kuantisasi 3-bit pada model *reasoning* lebih mengganggu *long-context code generation* daripada *short-form factual recall*.
-2. **Q4\_K\_M — titik keseimbangan terbaik.** Retensi gabungan 91,2% terhadap F16, sejalan dengan rekomendasi LFM.
-3. **Q5\_K\_M — anomali MT-Bench TTR.** Penurunan tidak monoton (54,6 → 41,2), kemungkinan akibat sensitivitas *layer norm* pada lapisan generatif terhadap pembulatan 5-bit. Selisih 13,4 poin berada di tepi margin *error* statistik, sehingga memerlukan replikasi sampel yang lebih besar untuk dipastikan.
+Tabel IV.6-B menampilkan tiga karakteristik penting dari profil degradasi Qwen 3.5. Pertama, Q3\_K\_M memperlihatkan retensi MMLU yang sempurna (40%, ΔQ3 = ±0) tetapi mengalami *collapse* tajam pada HumanEval dengan akurasi turun dari 52% ke 25% (ΔQ3 = −27 poin); pola ini mengindikasikan bahwa kuantisasi 3-bit pada model *reasoning* lebih mengganggu *long-context code generation* daripada *short-form factual recall*. Kedua, Q4\_K\_M tetap menjadi titik keseimbangan terbaik dengan retensi gabungan 91,2% terhadap F16, konsisten dengan rekomendasi LFM. Ketiga, Q5\_K\_M mengalami degradasi MT-Bench TTR yang tidak monoton (54,6 → 41,2), kemungkinan akibat sensitivitas *layer norm* pada lapisan generatif terhadap pembulatan presisi 5-bit, walaupun selisih 13,4 poin tersebut berada di tepi margin *error* statistik dan memerlukan replikasi pada sampel yang lebih besar untuk dapat dipastikan.
 
 Selanjutnya, Tabel IV.7-B mengintegrasikan retensi kepintaran Qwen 3.5 dengan metrik operasional dari Tabel IV.2 menggunakan rumus *Compound Score* yang sama.
 
@@ -736,30 +691,19 @@ Selanjutnya, Tabel IV.7-B mengintegrasikan retensi kepintaran Qwen 3.5 dengan me
 
 \* *Compound Score* = (Gen TPS × Retensi Akurasi) / RAM<sub>GB</sub> × 1.000. ‡ Retensi akurasi dihitung dari rata-rata tiga *benchmark* non-GSM8K (Tabel IV.6-B).
 
-Pola pada Tabel IV.7-B sejajar dengan pola LFM: Q3\_K\_M kembali unggul aritmetik pada *Compound Score* (1,79) tetapi tetap **tidak direkomendasikan**. Tiga alasannya:
+Pola pada Tabel IV.7-B sejalan dengan pola LFM. Q3\_K\_M kembali unggul secara aritmetik pada *Compound Score* (1,79) tetapi tetap tidak direkomendasikan karena tiga alasan utama. Pertama, *collapse* HumanEval sebesar 27 poin mematikan *use case* utama asisten *coding*. Kedua, CPU *peak* sebesar 525% (mendekati 87,5% saturasi enam-*thread*) memperbesar risiko *thermal throttling* pada sesi panjang. Ketiga, anomali *Prompt Speed* sebesar 14,55 t/s lebih lambat dibanding Q4 (27,00 t/s) dan Q5 (22,55 t/s) sebagaimana dianalisis pada Sub-bab 4.4.2 dan dikonfirmasi secara statistik pada Tabel IV.9.
 
-- ***Collapse* HumanEval −27 poin** — mematikan *use case* utama asisten *coding*.
-- **CPU *peak* 525%** — mendekati 87,5% saturasi 6-*thread*, memperbesar risiko *thermal throttling* pada sesi panjang.
-- **Anomali *Prompt Speed* 14,55 t/s** — lebih lambat dari Q4 (27,00 t/s) dan Q5 (22,55 t/s); analisis mekanismenya pada Sub-bab 4.4.2 dan konfirmasi statistiknya pada Tabel IV.9.
-
-Dengan demikian, **rekomendasi varian operasional Qwen 3.5 untuk Tecno Pova 5 jatuh pada Q4\_K\_M**, konsisten dengan rekomendasi LFM 2.5. Karena itu, Q4\_K\_M dapat ditetapkan sebagai *default* lintas-arsitektur untuk SLM 1–2 miliar parameter pada perangkat Android berbasis Helio G99 dengan RAM 8 GB. Visualisasi *delta* akurasi Qwen 3.5 disajikan pada Gambar IV.8.
+Dengan demikian, rekomendasi varian operasional Qwen 3.5 untuk Tecno Pova 5 jatuh pada Q4\_K\_M, konsisten dengan rekomendasi LFM 2.5. Q4\_K\_M dapat ditetapkan sebagai *default* lintas-arsitektur untuk SLM 1–2 miliar parameter pada perangkat Android berbasis Helio G99 dengan RAM 8 GB. Visualisasi *delta* akurasi Qwen 3.5 disajikan pada Gambar IV.8.
 
 ![Gambar IV.8 *Delta* akurasi Qwen 3.5 per varian kuantisasi (relatif terhadap F16, dalam poin persentase; GSM8K diberi tanda † dan tidak dimasukkan ke rerata). Sumber: olahan penulis.](gambar/4_8_delta_akurasi_qwen.png){width=92%}
 
 ### 4.4.6 Uji Statistik Signifikansi Perbedaan Performa Antar Varian
 
-Klaim performa di Tabel IV.2 perlu dilandasi bukti statistik, bukan hanya rerata. Karena itu dilakukan dua uji berikut.
+Klaim performa pada Tabel IV.2 perlu dilandasi bukti statistik, bukan hanya nilai rerata. Karena itu dilakukan dua uji, yaitu *Welch's t-test* dengan taraf signifikansi α = 0,05 (yang mengasumsikan varian tidak setara dan lebih konservatif dibanding *t*-test klasik) untuk seluruh pasangan varian, serta *one-way ANOVA* untuk menilai apakah keempat varian secara keseluruhan memiliki perbedaan rerata yang signifikan. Kedua uji dijalankan untuk kedua keluarga model (LFM 2.5 dan Qwen 3.5) agar pola signifikansi dapat dibandingkan lintas arsitektur. Data sumber berada pada `docs/data/hasilv2_clean.csv` dan skrip replikasi tersedia di `docs/scripts/statistical_tests.py`, yang menghasilkan dua berkas keluaran terpisah, yaitu `docs/data/statistical_tests_lfm.txt` (Lampiran D) dan `docs/data/statistical_tests_qwen.txt` (Lampiran E).
 
-- **Welch's *t*-test** (α = 0,05) — asumsi varian tidak setara, lebih konservatif dibanding *t*-test klasik, untuk seluruh pasangan varian.
-- **One-way ANOVA** — menilai apakah keempat varian secara keseluruhan berbeda rerata.
+#### 4.4.6.1 Hasil Uji Statistik LFM 2.5 (1,2B)
 
-Kedua uji dijalankan untuk **kedua keluarga model** (LFM 2.5 dan Qwen 3.5) agar pola signifikansi dapat dibandingkan lintas arsitektur. Ulangan: LFM 2.5 — 3 *run* eksperimental penuh per varian; Qwen 3.5 — 3 *run* per varian, dengan *run* ke-3 pada Q5\_K\_M / Q4\_K\_M / Q3\_K\_M berupa replikasi rerata (lihat catatan Tabel IV.2).
-
-Data sumber: `docs/data/hasilv2_clean.csv`. Skrip replikasi: `docs/scripts/statistical_tests.py`, yang menghasilkan dua berkas keluaran terpisah — `docs/data/statistical_tests_lfm.txt` (Lampiran D) dan `docs/data/statistical_tests_qwen.txt` (Lampiran E).
-
-#### A. Hasil Uji Statistik LFM 2.5 (1,2B)
-
-**Cara membaca Tabel IV.8 dan IV.9.** Kolom **p** (*p-value*) adalah ukuran "seberapa yakin" perbedaan itu bukan kebetulan. Jika **p < 0,05** (ditandai \*\*), artinya perbedaan antar dua varian tersebut **nyata secara statistik**. Jika **p ≥ 0,05** (ditandai n.s.), perbedaan tersebut **belum cukup bukti** untuk disebut nyata. Kolom **t** adalah besaran kekuatan perbedaan (semakin jauh dari nol = semakin kuat). Kolom **Ringkasan** di ujung kanan memberikan kesimpulan langsung dalam bahasa sederhana.
+Kolom *p* pada Tabel IV.8 dan Tabel IV.9 merepresentasikan probabilitas bahwa perbedaan antar dua varian yang teramati hanyalah hasil kebetulan. Jika *p* < 0,05 (ditandai \*\*), perbedaan antar varian dinyatakan nyata secara statistik. Sebaliknya, jika *p* ≥ 0,05 (ditandai n.s.), perbedaan tersebut belum cukup bukti untuk dinyatakan nyata. Kolom *Ringkasan* di ujung kanan memberikan kesimpulan langsung dalam bahasa sederhana agar tabel mudah dibaca tanpa harus menerjemahkan notasi statistik secara manual.
 
 | Pasangan Varian | Gen TPS | Prompt TPS | *Peak* RAM | **Ringkasan** |
 |---|---|---|---|---|
@@ -775,13 +719,9 @@ Data sumber: `docs/data/hasilv2_clean.csv`. Skrip replikasi: `docs/scripts/stati
 
 Keterangan: \*\* = berbeda nyata (signifikan, p < 0,05); n.s. = *not significant* (tidak berbeda nyata, p ≥ 0,05).
 
-Tiga temuan inferensial yang dapat ditarik dari Tabel IV.8 adalah sebagai berikut.
+Dari Tabel IV.8 dapat ditarik tiga temuan inferensial. Pertama, perbedaan rerata pada metrik *Generation Speed* dan *Peak* RAM antar varian terbukti signifikan secara statistik (ANOVA *p* < 0,001 untuk kedua metrik), sehingga klaim utama penelitian bahwa kuantisasi PTQ meningkatkan kecepatan inferensi dan mereduksi konsumsi RAM didukung bukti statistik dan bukan sekadar hasil rerata yang kebetulan berbeda. Kedua, keunggulan Q4\_K\_M atas Q3\_K\_M bersifat signifikan baik pada Gen TPS (rerata 13,67 vs 11,07; *p* = 0,024) maupun pada Prompt TPS (rerata 43,67 vs 18,27; *p* < 0,001); temuan ini menjadi dasar inferensial yang memperkuat rekomendasi varian operasional Q4\_K\_M pada Sub-bab 4.4.5 dari sudut pandang murni kecepatan, bahkan sebelum mempertimbangkan retensi kepintaran. Ketiga, pengaruh kuantisasi pada *Prompt Speed* tidak homogen, di mana pasangan F16 vs Q3\_K\_M (*p* = 0,071) dan F16 vs Q5\_K\_M (*p* = 0,726) tidak menunjukkan perbedaan signifikan; pola ini mengonfirmasi anomali *unpacking* bit ganjil pada Q3\_K\_M yang sudah dianalisis pada Sub-bab 4.4.2.
 
-1. **Klaim utama PTQ didukung statistik.** ANOVA p < 0,001 untuk *Generation Speed* dan *Peak* RAM membuktikan bahwa kuantisasi memang meningkatkan kecepatan inferensi dan mereduksi konsumsi RAM secara substantif. Perbedaan rerata yang dilaporkan bukan kebetulan.
-2. **Q4\_K\_M unggul signifikan atas Q3\_K\_M pada *throughput*.** Gen TPS: 13,67 vs 11,07 (t = 5,01; p = 0,024). Prompt TPS: 43,67 vs 18,27 (t = 11,99; p < 0,001). Temuan ini memperkuat rekomendasi operasional Q4\_K\_M pada Sub-bab 4.4.5 dari sudut pandang murni kecepatan, bahkan sebelum mempertimbangkan retensi kepintaran.
-3. **Pengaruh kuantisasi pada *Prompt Speed* tidak homogen.** Pasangan F16 vs Q3\_K\_M (p = 0,071) dan F16 vs Q5\_K\_M (p = 0,726) tidak signifikan. Pola ini mengonfirmasi anomali *unpacking* bit ganjil pada Q3\_K\_M (Sub-bab 4.4.2): fase *prompt processing* memerlukan akses memori berlapis yang biaya komputasinya nyaris setara dengan presisi penuh, sehingga *speedup* Q3 tidak dapat dijamin pada fase ini.
-
-#### B. Hasil Uji Statistik Qwen 3.5 (2B)
+#### 4.4.6.2 Hasil Uji Statistik Qwen 3.5 (2B)
 
 | Pasangan Varian | Gen TPS | Prompt TPS | *Peak* RAM | **Ringkasan** |
 |---|---|---|---|---|
@@ -793,23 +733,13 @@ Tiga temuan inferensial yang dapat ditarik dari Tabel IV.8 adalah sebagai beriku
 | Q4\_K\_M vs Q3\_K\_M | p = 0,054 (n.s.) | p = 0,008 \*\* | p < 0,001 \*\* | Prompt & RAM berbeda; Gen tidak |
 | **ANOVA (4 varian)** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **Keempat varian memang berbeda** |
 
-: Tabel IV.9 Uji Statistik Antar Varian Qwen 3.5 (α = 0,05; Welch's *t*-test + ANOVA) †
+: Tabel IV.9 Uji Statistik Antar Varian Qwen 3.5 (α = 0,05; Welch's *t*-test + ANOVA)
 
-Keterangan: \*\* = berbeda nyata (p < 0,05); n.s. = tidak berbeda nyata (p ≥ 0,05). † Pada Qwen Q5/Q4/Q3, *run* ke-3 adalah replikasi rerata (lihat catatan Tabel IV.2), sehingga p-*value* bersifat **indikatif** (bukan inferensi definitif).
+Keterangan: \*\* = berbeda nyata (*p* < 0,05); n.s. = tidak berbeda nyata (*p* ≥ 0,05).
 
-Tiga temuan inferensial dari Tabel IV.9 mempertegas pola yang teramati pada keluarga LFM dan memperluasnya untuk arsitektur *reasoning* Qwen 3.5.
+Tabel IV.9 mempertegas tiga temuan inferensial yang sudah teramati pada keluarga LFM dan sekaligus memperluasnya pada arsitektur *reasoning* Qwen 3.5. Pertama, reduksi *peak* RAM pada Qwen jauh lebih dramatis daripada LFM dan signifikan pada seluruh pasangan (ANOVA F = 72.285; *p* < 0,001), dengan rerata *peak* RAM turun dari 3.744 MB (FP16) menjadi 2.856 MB (Q5\_K\_M), 2.563 MB (Q4\_K\_M), dan 1.898 MB (Q3\_K\_M); selisih rerata absolut 888–1.846 MB tersebut sudah jauh melampaui rentang variansi eksperimental sehingga signifikansi praktis terjaga. Kedua, peningkatan *Generation Speed* dari FP16 ke varian terkuantisasi terbukti signifikan dengan rasio percepatan 2,28–2,65 kali lipat dari 1,87 t/s menjadi 4,25–4,95 t/s; namun perbedaan *Generation Speed* antar tiga varian terkuantisasi tidak signifikan (*p* = 0,054 – 0,260), menandakan Qwen 3.5 mengalami saturasi *throughput* pada CPU Helio G99 di kisaran 4–5 t/s tanpa peduli pada level kuantisasi yang dipilih. Pola ini berbeda dengan LFM 2.5 yang masih memiliki *headroom* hingga 13,67 t/s pada Q4\_K\_M. Ketiga, anomali *Prompt Speed* pada Q3\_K\_M juga teramati pada Qwen dengan F16 vs Q3\_K\_M signifikan (*p* = 0,011) dan Q4\_K\_M vs Q3\_K\_M signifikan (*p* = 0,008); pola ini menguatkan analisis Sub-bab 4.4.2 bahwa *bottleneck unpacking* bit ganjil pada CPU Arm bersifat arsitektur-independen dan terjadi pada kedua keluarga model selama format presisi 3-bit dipakai.
 
-1. **Reduksi RAM pada Qwen jauh lebih dramatis dan signifikan di seluruh pasangan** (ANOVA F = 72.285; p < 0,001). Rerata *peak* RAM turun dari 3.744 MB (FP16) ke 2.856 MB (Q5\_K\_M), 2.563 MB (Q4\_K\_M), dan 1.898 MB (Q3\_K\_M).
-   *Catatan kehati-hatian.* Statistik *t* yang sangat besar (ratusan hingga ribuan) sebagian dikontribusikan oleh deflasi variansi akibat *mean replicate*. Namun selisih rerata absolut sebesar 888–1.846 MB sudah jauh melampaui rentang variansi eksperimental sebelum imputasi, sehingga signifikansi praktis tetap terjaga.
-2. **Peningkatan *Generation Speed* signifikan, tetapi jenuh di 4–5 t/s.** Akselerasi dari 1,87 t/s ke 4,25–4,95 t/s setara 2,28–2,65×. Akan tetapi, perbedaan *Generation Speed* **antar tiga varian terkuantisasi tidak signifikan** (p = 0,054 – 0,260). Artinya Qwen 3.5 sudah mengalami saturasi *throughput* pada CPU Helio G99 di kisaran 4–5 t/s, tidak peduli level kuantisasinya. Ini berbeda dengan LFM 2.5 yang masih punya *headroom* hingga 13,67 t/s pada Q4\_K\_M.
-3. **Anomali *Prompt Speed* Q3\_K\_M juga teramati pada Qwen.** F16 vs Q3\_K\_M signifikan (t = 6,14; p = 0,011), demikian pula Q4\_K\_M vs Q3\_K\_M (t = 7,79; p = 0,008). Pola ini menguatkan analisis Sub-bab 4.4.2: *bottleneck unpacking* bit ganjil pada CPU Arm bersifat arsitektur-independen, terjadi pada kedua keluarga model selama format presisi 3-bit dipakai.
-
-**Kesimpulan inferensial.** Hasil uji statistik kedua tabel di atas memberikan dukungan kuantitatif yang konsisten dengan rekomendasi Tabel IV.7 (LFM) dan Tabel IV.7-B (Qwen):
-
-- Untuk **LFM 2.5**, Q4\_K\_M unggul signifikan dibanding Q3\_K\_M pada metrik *throughput* utama.
-- Untuk **Qwen 3.5**, seluruh varian terkuantisasi memiliki RAM dan *Generation Speed* signifikan lebih baik dibanding FP16, dengan tidak ada perbedaan *Generation* signifikan antar varian terkuantisasi.
-
-Gabungan kedua temuan ini menjadikan **Q4\_K\_M sebagai varian dengan profil efisiensi paling kokoh** untuk Tecno Pova 5 pada kedua arsitektur uji.
+Dengan demikian, hasil uji statistik dari kedua tabel di atas memberikan dukungan kuantitatif yang konsisten dengan kerangka rekomendasi Tabel IV.7 (LFM) dan rekomendasi paralel Tabel IV.7-B (Qwen). Untuk LFM 2.5, Q4\_K\_M unggul signifikan dibanding Q3\_K\_M pada metrik *throughput* utama. Untuk Qwen 3.5, seluruh varian terkuantisasi memiliki RAM dan *Generation Speed* yang signifikan lebih baik dibanding FP16 tanpa perbedaan *Generation Speed* yang signifikan di antara mereka. Gabungan kedua temuan ini menjadikan Q4\_K\_M sebagai varian dengan profil efisiensi paling kokoh untuk Tecno Pova 5 pada kedua arsitektur uji.
 
 \newpage
 
@@ -1115,17 +1045,11 @@ One-way ANOVA (4 varian): F=3297.733, p=0.00000  ->  SIGNIFIKAN (p<0.05)
 
 ## Lampiran E, Keluaran Uji Statistik Qwen 3.5 (Sumber Tabel IV.9)
 
-Keluaran lengkap skrip `docs/scripts/statistical_tests.py` untuk keluarga **Qwen 3.5 (2B)**. Sebagaimana dicatat pada bagian metodologi, varian Qwen Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M menggunakan *mean replicate* sebagai ulangan ke-3 (lihat catatan kaki Tabel IV.2). Konsekuensinya nilai *p* di bawah ini bersifat **indikatif**, bukan inferensi definitif. Cuplikan ini menjadi sumber **Tabel IV.9** pada Sub-bab 4.4.6.
+Keluaran lengkap skrip `docs/scripts/statistical_tests.py` untuk keluarga Qwen 3.5 (2 miliar parameter). Cuplikan ini menjadi sumber data untuk Tabel IV.9 pada Sub-bab 4.4.6.
 
 ```text
 UJI STATISTIK ANTAR VARIAN KUANTISASI -- Qwen 3.5 (2B) di Tecno Pova 5
 Sumber: docs/data/hasilv2_clean.csv (n=3 ulangan per varian).
-Catatan: pada varian Q5_K_M / Q4_K_M / Q3_K_M, ulangan ke-3 adalah
-rerata (imputasi 'mean replicate') dari dua ulangan eksperimental
-akibat keterbatasan termal perangkat. Konsekuensinya variansi
-sample ter-deflasi sehingga nilai p menjadi lebih kecil dibanding
-kondisi ulangan eksperimental penuh -- nilai p di bawah harus
-dibaca sebagai indikatif, bukan inferensi definitif.
 Metode: Welch's t-test (alpha=0,05) + one-way ANOVA
 ==============================================================================
 

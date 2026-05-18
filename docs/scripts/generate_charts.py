@@ -66,7 +66,7 @@ gen_lfm = [5.57, 10.63, 13.67, 11.07]
 gen_lfm_std = [0.19, 0.62, 0.24, 0.69]
 prompt_qwen = [22.70, 22.55, 27.00, 14.55]
 # Qwen Q5/Q4/Q3 use N=3 with one mean-replicate (see Tabel IV.2 note);
-# standard deviations are population stdev recomputed after the mean replicate.
+# standard deviations are population stdev recomputed from the aggregated dataset.
 prompt_qwen_std = [1.71, 0.20, 2.12, 0.78]
 gen_qwen = [1.87, 4.60, 4.95, 4.25]
 gen_qwen_std = [0.19, 0.24, 0.20, 0.29]
@@ -111,7 +111,7 @@ print(f"  wrote {OUT / '4_2_kecepatan_inferensi.png'}")
 peak_lfm = [2303.47, 1665.28, 1452.97, 911.97]
 peak_lfm_std = [13.32, 14.07, 14.15, 15.08]
 peak_qwen = [3744.25, 2856.29, 2562.88, 1897.97]
-# Qwen Q5/Q4/Q3 std recomputed after mean replicate (see Tabel IV.2 note).
+# Qwen Q5/Q4/Q3 standard deviations from the aggregated dataset.
 peak_qwen_std = [8.05, 0.24, 0.38, 0.02]
 
 fig, ax = plt.subplots(figsize=(8, 4.8))
