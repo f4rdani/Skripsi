@@ -1,7 +1,7 @@
 ---
 title: |
-  ANALISIS PERFORMA POST-TRAINING QUANTIZATION (PTQ) PADA SMALL LANGUAGE MODEL
-  UNTUK IMPLEMENTASI EDGE COMPUTING BERBASIS ANDROID
+  ANALISIS PERFORMA *POST-TRAINING QUANTIZATION* (PTQ) PADA *SMALL LANGUAGE MODEL*
+  UNTUK IMPLEMENTASI *EDGE COMPUTING* BERBASIS ANDROID
 author: "Penulis: [Nama Mahasiswa], NIM: [NIM]"
 date: "Program Studi Teknologi Informasi, Fakultas Teknik dan Informatika, Universitas Bina Sarana Informatika"
 lang: en
@@ -169,8 +169,8 @@ Berdasarkan elaborasi latar belakang, dapat ditarik beberapa permasalahan utama 
 
 Berdasarkan identifikasi permasalahan di atas, rumusan masalah yang akan dijawab oleh penelitian ini adalah:
 
-1. Berapa besar efisiensi penyimpanan (*storage efficiency*) dan reduksi konsumsi RAM yang dihasilkan oleh setiap varian kuantisasi GGUF (Q3\_K\_M, Q4\_K\_M, dan Q5\_K\_M) terhadap baseline FP16 pada model LFM 2.5 (1,2B) dan Qwen 3.5 (2B)?
-2. Bagaimana perbandingan kualitas linguistik, diwakili oleh *Perplexity* (WikiText-2),serta akurasi kognitif (MMLU, GSM8K, dan HumanEval) yang dipertahankan oleh masing-masing varian kuantisasi terhadap baseline FP16?
+1. Berapa besar efisiensi penyimpanan (*storage efficiency*) dan reduksi konsumsi RAM yang dihasilkan oleh setiap varian kuantisasi GGUF (Q3\_K\_M, Q4\_K\_M, dan Q5\_K\_M) terhadap *baseline* FP16 pada model LFM 2.5 (1,2B) dan Qwen 3.5 (2B)?
+2. Bagaimana perbandingan kualitas linguistik, diwakili oleh *Perplexity* (WikiText-2), serta akurasi kognitif (MMLU, GSM8K, dan HumanEval) yang dipertahankan oleh masing-masing varian kuantisasi terhadap *baseline* FP16?
 3. Seberapa besar peningkatan kecepatan inferensi (*Prompt Processing* t/s dan *Text Generation* t/s) yang dapat dicapai pada perangkat MediaTek Helio G99 dengan RAM 8 GB melalui kompresi PTQ?
 4. Berdasarkan tinjauan *trade-off* multi-dimensi (efisiensi penyimpanan, RAM, TPS, *Perplexity*, dan akurasi), varian model dan tingkat kuantisasi mana yang paling optimal untuk diterapkan pada *smartphone* berkapasitas RAM 8 GB?
 
@@ -208,7 +208,7 @@ Membuka cakrawala pemahaman teoretis maupun operasional bagi pembaca akademik da
 
 ## 1.5 Metode Penelitian
 
-Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental** dengan kerangka *ablation study* yang membandingkan empat tingkat presisi bobot model (FP16 sebagai *baseline*, lalu Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M sebagai varian terkompresi) di atas dua jenis *host* yang saling melengkapi. *Host* pertama adalah **PC dengan WSL2 Ubuntu dan GPU NVIDIA RTX 3060**, dipakai untuk tahap persiapan berkas `.gguf` melalui utilitas `huggingface-cli`, `convert_hf_to_gguf.py`, dan `./llama-quantize`, serta untuk mengukur metrik intrinsik model (Perplexity WikiText-2 dan akurasi MMLU/GSM8K/HumanEval/MT-Bench) yang memerlukan akselerasi paralel. *Host* kedua adalah ***smartphone* Tecno Pova 5** dengan emulator terminal *non-root* Termux dan mesin inferensi `llama.cpp` yang dikompilasi ulang secara natif untuk CPU ARM Helio G99, dipakai untuk mengukur metrik performa pada lingkungan *target* deployment: *peak* RAM proses, beban CPU, serta *Tokens per Second* (TPS). Setiap varian dijalankan melalui skenario terstandardisasi yang sama (parameter inferensi, anggaran *token*, jumlah *thread*, dan dataset evaluasi) agar perbedaan performa benar-benar dapat dikaitkan dengan tingkat kompresi, bukan variabel eksternal.
+Penelitian ini menggunakan pendekatan **empiris kuantitatif eksperimental** dengan kerangka *ablation study* yang membandingkan empat tingkat presisi bobot model (FP16 sebagai *baseline*, lalu Q5\_K\_M, Q4\_K\_M, dan Q3\_K\_M sebagai varian terkompresi) di atas dua jenis *host* yang saling melengkapi. *Host* pertama adalah **PC dengan WSL2 Ubuntu dan GPU NVIDIA RTX 3060**, dipakai untuk tahap persiapan berkas `.gguf` melalui utilitas `huggingface-cli`, `convert_hf_to_gguf.py`, dan `./llama-quantize`, serta untuk mengukur metrik intrinsik model (Perplexity WikiText-2 dan akurasi MMLU/GSM8K/HumanEval/MT-Bench) yang memerlukan akselerasi paralel. *Host* kedua adalah ***smartphone* Tecno Pova 5** dengan emulator terminal *non-root* Termux dan mesin inferensi `llama.cpp` yang dikompilasi ulang secara natif untuk CPU ARM Helio G99, dipakai untuk mengukur metrik performa pada lingkungan *target deployment*: *peak* RAM proses, beban CPU, serta *Tokens per Second* (TPS). Setiap varian dijalankan melalui skenario terstandardisasi yang sama (parameter inferensi, anggaran *token*, jumlah *thread*, dan dataset evaluasi) agar perbedaan performa benar-benar dapat dikaitkan dengan tingkat kompresi, bukan variabel eksternal.
 
 ## 1.6 Teknik Pengumpulan Data
 
@@ -254,7 +254,7 @@ Bab ini memaparkan konsep-konsep fundamental dan rujukan literatur terkait kecer
 
 Namun, pengolahan bahasa yang canggih sering menuntut kapabilitas komputasi server *cloud*. Ketergantungan pada komputasi awan menjadi persoalan dalam penanganan kasus yang menuntut kerahasiaan absolut, seperti data diagnosis rekam medis pasien. Sebagai mitigasi risiko keamanan, pengembangan NLP mulai diarahkan pada arsitektur *offline* atau lokalisasi pemrosesan pada perangkat seluler konsumen (*Mobile Edge Computing*). Paradigma *offline* memastikan kelancaran fungsionalitas sistem AI sekaligus menjamin privasi informasi sensitif dari intervensi jaringan internet terbuka (Zhan dkk., 2025).
 
-Untuk memaksimalkan operasi AI di lingkungan gawai berbasis RAM terbatas, pendekatan *Edge Intelligence Optimization* sangat diperlukan. Konsep ini memformulasikan teknik penyesuaian *stack* perangkat lunak agar perangkat Android dengan spesifikasi minim mampu mengeksekusi beban kerja AI tanpa memicu *Force Close* yang diakibatkan oleh keterbatasan arsitektur memori bawaan (Zhang dkk., 2024). Secara hierarkis, ekosistem *Edge Intelligence* terbagi menjadi tiga lapisan: lapisan *cloud* (server pusat untuk pelatihan dan model berskala raksasa), lapisan *edge server* (gateway perantara dengan latensi rendah), dan lapisan *edge device* (perangkat akhir seperti *smartphone*); penelitian ini memfokuskan kontribusi pada lapisan paling bawah, yaitu inferensi SLM pada *smartphone* Android.
+Untuk memaksimalkan operasi AI di lingkungan gawai berbasis RAM terbatas, pendekatan *Edge Intelligence Optimization* sangat diperlukan. Konsep ini memformulasikan teknik penyesuaian *stack* perangkat lunak agar perangkat Android dengan spesifikasi minim mampu mengeksekusi beban kerja AI tanpa memicu *Force Close* yang diakibatkan oleh keterbatasan arsitektur memori bawaan (Zhang dkk., 2024). Secara hierarkis, ekosistem *Edge Intelligence* terbagi menjadi tiga lapisan: lapisan *cloud* (server pusat untuk pelatihan dan model berskala raksasa), lapisan *edge server* (*gateway* perantara dengan latensi rendah), dan lapisan *edge device* (perangkat akhir seperti *smartphone*); penelitian ini memfokuskan kontribusi pada lapisan paling bawah, yaitu inferensi SLM pada *smartphone* Android.
 
 ### 2.1.2 *Large Language Models* (LLM) dan Fleksibilitasnya
 
@@ -334,7 +334,7 @@ Pemaparan ringkas tujuh penelitian pilar paling representatif yang mendasari ris
 
 ## 2.3 Tinjauan Organisasi (Objek Penelitian)
 
-Penelitian ini bersifat **independen dan berbasis laboratorium**, sehingga tidak terikat pada organisasi atau institusi eksternal sebagai tempat riset. Seluruh kegiatan pengujian, mulai dari persiapan berkas model hingga eksekusi *benchmark*, dilakukan secara mandiri oleh penulis menggunakan perangkat pribadi. Mengingat tidak adanya struktur organisasi formal yang relevan, bagian *Tinjauan Organisasi* pada panduan resmi diadaptasi menjadi tinjauan terhadap **objek penelitian**, yakni ekosistem perangkat keras dan perangkat lunak yang berfungsi sebagai *unit of analysis* dalam eksperimen. Objek penelitian dibagi menjadi dua kategori fundamental: ekosistem perangkat keras/perangkat lunak Android sebagai *host target* deployment, dan spesifikasi arsitektur *Small Language Model* yang diuji.
+Penelitian ini bersifat **independen dan berbasis laboratorium**, sehingga tidak terikat pada organisasi atau institusi eksternal sebagai tempat riset. Seluruh kegiatan pengujian, mulai dari persiapan berkas model hingga eksekusi *benchmark*, dilakukan secara mandiri oleh penulis menggunakan perangkat pribadi. Mengingat tidak adanya struktur organisasi formal yang relevan, bagian *Tinjauan Organisasi* pada panduan resmi diadaptasi menjadi tinjauan terhadap **objek penelitian**, yakni ekosistem perangkat keras dan perangkat lunak yang berfungsi sebagai *unit of analysis* dalam eksperimen. Objek penelitian dibagi menjadi dua kategori fundamental: ekosistem perangkat keras/perangkat lunak Android sebagai *host target deployment*, dan spesifikasi arsitektur *Small Language Model* yang diuji.
 
 ### 2.3.1 Ekosistem Uji Keras: Tecno Pova 5 dengan Termux
 
@@ -358,13 +358,11 @@ Dalam melaksanakan penelitian berbasis komputasi eksperimental pada perangkat se
 4. **Eksekusi Eksperimen (*System Benchmarking*).** Pengujian beban kerja dilaksanakan pada dua *host* sesuai pembagian metrik. Pada **PC NVIDIA RTX 3060**, *Perplexity* dieksekusi melalui `./llama-perplexity` dengan dataset WikiText-2 (Gong dkk., 2024) dan akurasi *benchmark* MMLU, GSM8K, HumanEval, serta MT-Bench dijalankan melalui skrip Python kustom. Pada **perangkat Android Tecno Pova 5** (Termux), *peak* RAM proses (`VmRSS`), beban CPU (`%CPU`), serta TPS *Prompt*/*Generation* diukur melalui skrip otomatisasi `benchmark.sh` (Lampiran A) dengan konfigurasi inferensi `--temp 0,35`, `--top-p 0,9`, `--min-p 0,05`, `--repeat-penalty 1,1`, anggaran token `-n 1024`, ukuran konteks `-c 2048`, dan 6 *threads* (Zhang dkk., 2024). Evaluasi dijalankan sekuensial dari FP16 (variabel kontrol), dilanjutkan Q5, Q4, dan Q3 dengan *cooldown* manual 3–5 menit antar model untuk mencegah *thermal throttling*.
 5. **Analisis Komparatif dan Penarikan Kesimpulan.** Data mentah dari Termux diekstraksi ke dalam tabulasi matriks. Data dimensi efisiensi (*hardware*) dan dimensi kognitif (*software*) dikomparasikan menggunakan kerangka evaluasi tiga dimensi (Jin dkk., 2024) untuk mengidentifikasi titik *sweet spot*.
 
-Alur tahapan penelitian ini direpresentasikan secara visual pada Gambar III.1.
-
-![Gambar III.1 Tahapan Penelitian. Sumber: olahan penulis.](gambar/3_1_tahapan_penelitian.png){width=68%}
+Pola alur lima tahap di atas — *literature survey* → *environment setup* → *quantization* → *on-device benchmarking* → *analysis* — sejalan dengan kerangka *workflow* evaluasi PTQ pada *edge device* yang dipaparkan secara skematis oleh Jin dkk. (2024) dan Murthy dkk. (2024).
 
 ## 3.2 Instrumen Penelitian
 
-Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan sumber daya terbatas (*resource-constrained edge*) (Ray & Pradhan, 2026). Instrumen yang digunakan terdiri atas dua himpunan perangkat keras (PC sebagai *host* persiapan model dan evaluasi akurasi, serta *smartphone* sebagai *host target* deployment) dan ekosistem perangkat lunak *open-source* berkinerja tinggi, sebagaimana dirinci pada Tabel III.1 dan Tabel III.2.
+Penelitian ini menitikberatkan pada evaluasi kinerja infrastruktur ujung dengan sumber daya terbatas (*resource-constrained edge*) (Ray & Pradhan, 2026). Instrumen yang digunakan terdiri atas dua himpunan perangkat keras (PC sebagai *host* persiapan model dan evaluasi akurasi, serta *smartphone* sebagai *host target deployment*) dan ekosistem perangkat lunak *open-source* berkinerja tinggi, sebagaimana dirinci pada Tabel III.1 dan Tabel III.2.
 
 | Peran | Komponen | Spesifikasi | Keterangan |
 |---|---|---|---|
@@ -482,7 +480,7 @@ Pengujian performa komputasi dilakukan secara *batch* langsung pada perangkat *t
 
 ![Gambar IV.3 Kecepatan inferensi (*Prompt* vs *Generation*) per varian kuantisasi. *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_2_kecepatan_inferensi.png){width=98%}
 
-Reduksi RAM proses yang konsisten terlihat pada kedua model: pemuatan Qwen 3.5 FP16 menyentuh 3,74 GB, nyaris 47% dari RAM sistem 8 GB, yang berisiko memicu *OOM Killer*. Varian Q4\_K\_M berhasil menekan kebutuhan RAM Qwen menjadi 2,56 GB (efisiensi 31,6%), dan Q3\_K\_M menjadi 1,90 GB (efisiensi 49,3%). Tren ini sejalan dengan akselerasi *Generation Speed*: LFM Q4\_K\_M mencapai 13,67 ± 0,24 t/s, atau 2,45 kali lipat baseline FP16 (5,57 t/s), sekaligus menjadi varian dengan total waktu eksekusi paling singkat (7,33 detik) dan beban CPU yang terkontrol di rentang ~299%. Sebaliknya, ketiga varian Qwen 3.5 menunjukkan *Generation Speed* yang seragam rendah pada rentang 1,87–4,95 t/s, yang menggambarkan keterbatasan model berarsitektur *reasoning* berukuran 2 miliar parameter pada CPU ARM kelas menengah ke bawah (lihat keterbatasan tambahan pada Sub-bab 4.3.3).
+Reduksi RAM proses yang konsisten terlihat pada kedua model: pemuatan Qwen 3.5 FP16 menyentuh 3,74 GB, nyaris 47% dari RAM sistem 8 GB, yang berisiko memicu *OOM Killer*. Varian Q4\_K\_M berhasil menekan kebutuhan RAM Qwen menjadi 2,56 GB (efisiensi 31,6%), dan Q3\_K\_M menjadi 1,90 GB (efisiensi 49,3%). Tren ini sejalan dengan akselerasi *Generation Speed*: LFM Q4\_K\_M mencapai 13,67 ± 0,24 t/s, atau 2,45 kali lipat *baseline* FP16 (5,57 t/s), sekaligus menjadi varian dengan total waktu eksekusi paling singkat (7,33 detik) dan beban CPU yang terkontrol di rentang ~299%. Sebaliknya, ketiga varian Qwen 3.5 menunjukkan *Generation Speed* yang seragam rendah pada rentang 1,87–4,95 t/s, yang menggambarkan keterbatasan model berarsitektur *reasoning* berukuran 2 miliar parameter pada CPU ARM kelas menengah ke bawah (lihat keterbatasan tambahan pada Sub-bab 4.3.3).
 
 ## 4.3 Hasil Uji Degradasi Kognitif (*Software* / AI)
 
@@ -715,8 +713,8 @@ Berdasarkan temuan penelitian, hasil uji statistik, serta keterbatasan yang teri
 
 ### 5.2.1 Aspek Manajerial
 
-1. **Adopsi Q4\_K\_M sebagai Konfigurasi Produksi.** Bagi pengembang aplikasi *Mobile AI* yang menargetkan perangkat Android kelas menengah (RAM 8 GB), varian **Q4\_K\_M** direkomendasikan sebagai konfigurasi *default*. Berdasarkan Tabel IV.7, varian ini mereduksi *peak* RAM proses sebesar 36,9% dan mempercepat *Generation Speed* hingga 2,45× baseline FP16, dengan retensi akurasi rata-rata 88,9% dan CPU *peak* yang terkontrol di kisaran 300% (jauh dari ambang *thermal throttling*).
-2. **Pemisahan Tahap Persiapan Model dan Eksekusi *Runtime*.** Hasil penelitian menunjukkan bahwa tahap kuantisasi berkas `.gguf` lebih efisien dilakukan di PC ber-GPU (lihat Lampiran B), sedangkan eksekusi *runtime* dilakukan di perangkat *target*. Pola kerja dua-*host* ini disarankan diadopsi sebagai standar pengembangan agar siklus iterasi tetap cepat tanpa mengorbankan kemampuan deployment *on-device*.
+1. **Adopsi Q4\_K\_M sebagai Konfigurasi Produksi.** Bagi pengembang aplikasi *Mobile AI* yang menargetkan perangkat Android kelas menengah (RAM 8 GB), varian **Q4\_K\_M** direkomendasikan sebagai konfigurasi *default*. Berdasarkan Tabel IV.7, varian ini mereduksi *peak* RAM proses sebesar 36,9% dan mempercepat *Generation Speed* hingga 2,45× *baseline* FP16, dengan retensi akurasi rata-rata 88,9% dan CPU *peak* yang terkontrol di kisaran 300% (jauh dari ambang *thermal throttling*).
+2. **Pemisahan Tahap Persiapan Model dan Eksekusi *Runtime*.** Hasil penelitian menunjukkan bahwa tahap kuantisasi berkas `.gguf` lebih efisien dilakukan di PC ber-GPU (lihat Lampiran B), sedangkan eksekusi *runtime* dilakukan di perangkat *target*. Pola kerja dua-*host* ini disarankan diadopsi sebagai standar pengembangan agar siklus iterasi tetap cepat tanpa mengorbankan kemampuan *deployment on-device*.
 3. **Penyiapan SOP Pengujian Multi-perangkat.** Mengingat hasil penelitian saat ini hanya tervalidasi pada satu unit Tecno Pova 5 (Helio G99), tim pengembang produksi disarankan menyusun *Standard Operating Procedure* pengujian lintas-SoC (Snapdragon 6/7/8 gen, Dimensity, Tensor) sebelum merilis aplikasi berbasis SLM ke pasar.
 
 ### 5.2.2 Aspek Sistem

@@ -264,44 +264,15 @@ plt.close(fig)
 print(f"  wrote {OUT / '4_6_tradeoff_radar.png'}")
 
 
-# ---------------------------------------------------------------------------
-# Gambar 3.1 -- Flowchart tahapan penelitian (programmatic, no graphviz dep)
-# ---------------------------------------------------------------------------
-fig, ax = plt.subplots(figsize=(8.5, 9))
-ax.set_xlim(0, 10)
-ax.set_ylim(0, 12)
-ax.axis("off")
-
-steps = [
-    ("Studi Pendahuluan &\nPerumusan Masalah", "#cfe2f3"),
-    ("Persiapan Lingkungan\nKomputasi (Termux + llama.cpp)", "#d9ead3"),
-    ("Persiapan Model &\nKuantisasi (FP16 → Q5/Q4/Q3 K_M)", "#fff2cc"),
-    ("Eksekusi Eksperimen\n(System Benchmarking di HP)", "#f4cccc"),
-    ("Analisis Komparatif &\nPenarikan Kesimpulan", "#d0e0e3"),
-]
-
-box_w, box_h, gap = 6.0, 1.4, 0.6
-start_y = 11.0
-for i, (label, color) in enumerate(steps):
-    y = start_y - i * (box_h + gap)
-    ax.add_patch(plt.Rectangle((2, y - box_h), box_w, box_h, facecolor=color, edgecolor="#333", linewidth=1.2))
-    ax.text(2 + box_w / 2, y - box_h / 2, label, ha="center", va="center", fontsize=11, fontweight="bold")
-    if i < len(steps) - 1:
-        ax.annotate("", xy=(2 + box_w / 2, y - box_h - gap + 0.05),
-                    xytext=(2 + box_w / 2, y - box_h - 0.05),
-                    arrowprops=dict(arrowstyle="->", color="#333", lw=1.6))
-
-ax.set_title("Tahapan Penelitian", fontsize=13, fontweight="bold", pad=10)
-save(fig, "3_1_tahapan_penelitian.png")
-
-
-# NOTE: Gambar BAB 2 (skema PTQ k-quants & hierarki Edge Intelligence) sengaja
-# tidak diregenerasi karena aturan penulisan: ilustrasi pada BAB 1 dan BAB 2
-# hanya boleh menggunakan gambar dari jurnal/penelitian orang lain dengan
-# pencantuman sumber, bukan gambar olahan penulis. Konsep yang dulunya
-# divisualisasikan kini dipaparkan dalam bentuk teks pada Sub-bab 2.1.1 dan
-# 2.1.5 dengan rujukan literatur (Dettmers dkk., 2023; Frantar dkk., 2023;
-# Tan dkk., 2024; Zhang dkk., 2024).
+# NOTE: Gambar BAB 1, BAB 2, dan BAB 3 (flowchart tahapan penelitian, skema PTQ
+# k-quants, hierarki Edge Intelligence) sengaja tidak diregenerasi karena
+# aturan penulisan: ilustrasi pada BAB 1-3 hanya boleh menggunakan gambar
+# dari jurnal/penelitian orang lain dengan pencantuman sumber, bukan gambar
+# olahan penulis. Konsep yang dulunya divisualisasikan kini dipaparkan dalam
+# bentuk teks pada Sub-bab 2.1.1, 2.1.5, dan 3.1 dengan rujukan literatur
+# (Dettmers dkk., 2023; Frantar dkk., 2023; Tan dkk., 2024; Zhang dkk., 2024;
+# Jin dkk., 2024; Murthy dkk., 2024). Hanya Gambar pada BAB 4 yang merupakan
+# hasil olahan penulis (sebab itu adalah hasil eksperimen langsung).
 
 
 # ---------------------------------------------------------------------------
