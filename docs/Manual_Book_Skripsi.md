@@ -230,63 +230,56 @@ cukup sebagai dasar rekomendasi.
 ### 1.4.1 N (Jumlah Replikasi)
 Berapa kali eksperimen diulang untuk satu varian. Pada skripsi ini N=3
 untuk seluruh varian, artinya setiap varian (F16, Q5, Q4, Q3) di kedua
-keluarga model (LFM dan Qwen) diuji tiga kali, lalu dihitung rerata dan
-simpangan baku.
+keluarga model (LFM dan Qwen) diuji tiga kali, lalu dihitung rerata
+untuk dilaporkan pada Tabel IV.2.
 
-### 1.4.2 Rerata (*mean*) dan Simpangan Baku (*standard deviation*, *std*)
-Rerata = nilai rata-rata dari N pengulangan. Simpangan baku = ukuran
-"sebaran" data di sekitar rerata. Notasi pada tabel: **rerata ± std**.
+### 1.4.2 Rerata (*Mean*)
+Rerata = nilai rata-rata dari tiga pengulangan untuk tiap metrik.
+Rerata dipilih sebagai bentuk pelaporan utama pada Tabel IV.2 agar
+tabel mudah dibaca tanpa dipenuhi notasi sebaran data.
 
-**Contoh:** Gen TPS LFM 2.5 Q4\_K\_M = 13,67 ± 0,24 t/s artinya
-rata-rata 13,67 t/s, dengan std 0,24 t/s. Std kecil = data konsisten;
-std besar = data bervariasi antar pengulangan.
+**Contoh:** Gen TPS LFM 2.5 Q4\_K\_M = 13,67 t/s adalah rerata dari
+tiga ulangan pengujian pada Tecno Pova 5.
 
-### 1.4.3 *t-test* / *Welch's t-test*
+### 1.4.3 *Welch's t-test*
 Uji statistik untuk menentukan apakah **dua rerata** berbeda secara
-nyata atau hanya kebetulan. *Welch's t-test* adalah varian yang tidak
-mengasumsikan kedua kelompok punya variansi yang sama, sehingga lebih
-**konservatif** (lebih sulit menyatakan "berbeda nyata") dibanding
-*t-test* klasik. Penelitian ini memakai *Welch's t-test* dengan taraf
-signifikansi **α = 0,05**.
+nyata (signifikan) atau hanya kebetulan. *Welch's t-test* adalah
+varian yang lebih **konservatif** (lebih sulit menyatakan "berbeda
+nyata") dibanding *t-test* klasik. Penelitian ini memakai uji ini
+dengan taraf signifikansi **α = 0,05** (toleransi kesalahan 5%).
 
 ### 1.4.4 ANOVA (*Analysis of Variance*)
 Uji statistik untuk menentukan apakah **tiga atau lebih kelompok**
-secara keseluruhan punya rerata yang berbeda. Hasilnya berupa nilai
-**F** dan **p-value**. Pada penelitian ini, ANOVA dipakai untuk menilai
-apakah keempat varian (F16, Q5, Q4, Q3) secara keseluruhan benar-benar
-beda.
+secara keseluruhan punya rerata yang berbeda. Pada penelitian ini,
+ANOVA dipakai untuk menilai apakah keempat varian (F16, Q5, Q4, Q3)
+secara keseluruhan benar-benar berbeda. Detail nilai uji ANOVA
+tersedia pada Lampiran D (LFM 2.5) dan Lampiran E (Qwen 3.5).
 
-### 1.4.5 *p-value* (Nilai *p*)
-Probabilitas (skala 0--1) bahwa perbedaan rerata yang teramati hanyalah
-**kebetulan**.
+### 1.4.5 Notasi pada Tabel IV.8 dan IV.9
+Tabel IV.8 dan IV.9 sengaja disederhanakan supaya mudah dibaca. Tiap
+sel hanya berisi dua kemungkinan:
 
-> **p < 0,05** -> perbedaan dianggap **nyata** secara statistik
-> (signifikan), ditandai dengan dua bintang `**`.
+> **Beda** -- dua varian *berbeda nyata* pada metrik tersebut.
+> Artinya perbedaan yang terlihat kemungkinan besar bukan kebetulan;
+> selisih rerata cukup besar dibanding variasi alami antar ulangan.
 >
-> **p ≥ 0,05** -> perbedaan belum cukup bukti untuk dinyatakan nyata,
-> ditandai dengan `n.s.` (*not significant*).
+> **Tidak** -- dua varian *belum cukup berbeda* untuk disebut nyata.
+> Perbedaannya mungkin hanya selisih kecil yang masih bisa muncul
+> akibat fluktuasi pengukuran.
 
-**Analogi:** Bayangkan kamu melempar dadu dan keluar angka 6 sebanyak
-tiga kali berturut-turut. Apakah dadu curang atau hanya kebetulan?
-*p-value* adalah peluang dadu jujur tetapi tetap menghasilkan tiga
-angka 6 berturut-turut. Kalau peluangnya kurang dari 5%, kita berani
-menyatakan dadu memang curang.
+Kolom **Ringkasan** di ujung kanan menerjemahkan hasil tiap baris
+menjadi satu kalimat agar tabel langsung dipahami tanpa harus membaca
+kata kunci di tiap sel.
 
-### 1.4.6 Notasi pada Tabel IV.8 dan IV.9
-Pada tabel statistik:
+**Analogi sederhana:** Bayangkan kamu menimbang dua kantong gula yang
+seharusnya isinya sama. Kalau selisihnya jauh lebih besar daripada
+fluktuasi timbangan, kamu yakin isinya memang beda (**Beda**). Kalau
+selisihnya kecil dan masih dalam rentang ketidaktelitian timbangan,
+kamu tidak bisa memastikan (**Tidak**).
 
-> `p < 0,001 **` artinya perbedaan **sangat meyakinkan** (peluang
-> kebetulan kurang dari 0,1%).
->
-> `p = 0,024 **` artinya perbedaan **meyakinkan** (peluang kebetulan
-> 2,4%).
->
-> `p = 0,548 (n.s.)` artinya perbedaan **tidak meyakinkan** (peluang
-> kebetulan 54,8%).
-
-Kolom **Ringkasan** di ujung kanan menjelaskan hasil tiap baris dalam
-satu kalimat, agar tabel cepat dibaca tanpa harus menerjemahkan angka
-*p* secara manual.
+Bagi pembaca yang ingin menelusuri angka uji lebih dalam (statistik
+*t*, nilai *p*, F-ratio ANOVA), seluruh detail teknis sudah
+dilampirkan pada **Lampiran D** dan **Lampiran E** skripsi utama.
 
 \newpage
 
@@ -390,14 +383,13 @@ delapan varian (4 varian × 2 keluarga model).
 
 **Cara membaca satu baris (contoh: LFM 2.5 Q4\_K\_M):**
 
-> "3 \| 7,33 ± 0,47 \| 43,67 ± 2,38 \| 13,67 ± 0,24 \| 1.452,97 ± 14,15
-> \| 299,33 ± 19,69"
+> "3 \| 7,33 \| 43,67 \| 13,67 \| 1.452,97 \| 299,33"
 
-Artinya: pada 3 kali pengulangan, sesi inferensi rata-rata selesai
+Artinya: dari tiga ulangan pengujian, sesi inferensi rata-rata selesai
 dalam 7,33 detik, model membaca *prompt* di 43,67 t/s, menulis jawaban
 di 13,67 t/s, memakai RAM puncak 1.452,97 MB, dan CPU puncaknya 299,33%
-(tiga *thread* aktif penuh). Std-nya kecil (mis. 0,47 detik) berarti
-hasil ketiga pengulangan konsisten.
+(tiga *thread* aktif penuh). Seluruh nilai pada Tabel IV.2 adalah
+rerata dari tiga ulangan.
 
 **Cara membandingkan antar varian:**
 
@@ -545,44 +537,52 @@ sehingga model 2B parameter pada CPU kelas menengah otomatis menerima
 skor lebih kecil. Ini bukan berarti Qwen "kalah", melainkan ada
 *hardware ceiling* yang sama-sama dialami semua varian Qwen.
 
-## 3.10 Tabel IV.8 -- Uji Statistik LFM 2.5
+## 3.10 Tabel IV.8 -- Ringkasan Uji Beda LFM 2.5
 
-**Fungsi:** Mengonfirmasi apakah selisih rerata pada Tabel IV.2
-benar-benar nyata atau cuma kebetulan.
+**Fungsi:** Mengonfirmasi apakah selisih rerata yang terlihat di Tabel
+IV.2 benar-benar nyata atau cuma kebetulan. Tabel IV.8 sengaja
+disederhanakan: nilai uji teknis (statistik *t* dan *p*) tidak
+ditampilkan; sebagai gantinya tiap sel hanya berisi kata **Beda** atau
+**Tidak**. Detail nilai uji bisa dicek pada **Lampiran D**.
 
 **Cara baca per baris (contoh: F16 vs Q5\_K\_M):**
 
 > **Pasangan Varian** -- dua varian yang dibandingkan.
 >
-> **Gen TPS \| p = 0,004 \*\*** -> perbedaan Gen TPS antara F16 dan Q5
-> meyakinkan (peluang kebetulan 0,4%).
+> **Gen TPS \| Beda** -> *Generation Speed* F16 dan Q5\_K\_M berbeda
+> nyata.
 >
-> **Prompt TPS \| p = 0,726 (n.s.)** -> perbedaan Prompt TPS antara F16
-> dan Q5 belum cukup bukti meyakinkan (peluang kebetulan 72,6%).
+> **Prompt TPS \| Tidak** -> *Prompt Speed* F16 dan Q5\_K\_M tidak
+> berbeda nyata (selisihnya masih dalam rentang fluktuasi pengukuran).
 >
-> **Peak RAM \| p < 0,001 \*\*** -> perbedaan RAM sangat meyakinkan.
+> **Peak RAM \| Beda** -> konsumsi RAM jelas berbeda.
 >
-> **Ringkasan** -- "Gen & RAM berbeda nyata; Prompt tidak".
+> **Ringkasan** -- terjemahan satu kalimat: "Gen & RAM berbeda; Prompt
+> tidak".
 
-**Baris paling bawah (ANOVA):** Mengukur apakah keempat varian secara
-keseluruhan memang berbeda. ANOVA p < 0,001 pada ketiga metrik
-menunjukkan: ya, kuantisasi benar-benar memberi dampak yang signifikan.
+**Pesan utama dari Tabel IV.8:** *Generation Speed* dan *Peak* RAM
+antar varian terbukti berbeda nyata di hampir seluruh pasangan,
+sehingga klaim utama penelitian (kuantisasi mempercepat inferensi dan
+mereduksi RAM) terdukung secara statistik. Keunggulan Q4\_K\_M atas
+Q3\_K\_M juga terbukti nyata baik di Gen TPS maupun Prompt TPS.
 
-## 3.11 Tabel IV.9 -- Uji Statistik Qwen 3.5
+## 3.11 Tabel IV.9 -- Ringkasan Uji Beda Qwen 3.5
 
 **Fungsi:** Sama dengan Tabel IV.8, tetapi untuk Qwen 3.5.
 
 **Pola penting yang harus diperhatikan:**
 
-1.  **Reduksi RAM Qwen lebih dramatis** dibanding LFM (semua pasangan
-    *p* < 0,001).
-2.  **Gen TPS Qwen saturasi**: F16 vs Q5/Q4/Q3 signifikan (kuantisasi
-    mempercepat), tetapi antar Q5/Q4/Q3 tidak signifikan
-    (*p* = 0,054--0,260). Artinya begitu Qwen dikuantisasi, kecepatannya
-    "menabrak langit-langit" di 4--5 t/s tidak peduli levelnya.
-3.  **Anomali *Prompt Speed* Q3** kembali muncul (F16 vs Q3 signifikan,
-    Q4 vs Q3 signifikan), mengonfirmasi pola *unpacking* bit ganjil
-    pada CPU ARM (Sub-bab 4.4.2).
+1.  **Reduksi RAM Qwen lebih dramatis** dibanding LFM. Seluruh pasangan
+    tertulis **Beda** untuk kolom *Peak* RAM.
+2.  **Gen TPS Qwen saturasi**. F16 vs Q5/Q4/Q3 semuanya **Beda**
+    (kuantisasi mempercepat dari 1,87 t/s ke 4--5 t/s), tetapi antar
+    Q5/Q4/Q3 semua tertulis **Tidak**. Artinya begitu Qwen
+    dikuantisasi, kecepatannya "menabrak langit-langit" CPU di 4--5 t/s
+    tidak peduli level kuantisasinya.
+3.  **Anomali *Prompt Speed* Q3** kembali muncul. F16 vs Q3\_K\_M dan
+    Q4\_K\_M vs Q3\_K\_M sama-sama tertulis **Beda** pada Prompt TPS,
+    mengonfirmasi pola *unpacking* bit ganjil pada CPU ARM yang sudah
+    dibahas di Sub-bab 4.4.2.
 
 \newpage
 

@@ -47,7 +47,7 @@ header-includes:
 
 \setstretch{1.0}
 
-Pemanfaatan *Small Language Model* (SLM) secara *on-device* di Android terkendala kapasitas RAM 8 GB yang dibagi-pakai dengan sistem operasi, sehingga pemuatan model presisi penuh FP16 berisiko memicu *Out of Memory* dan *Force Close*. Penelitian ini bertujuan menganalisis performa metode *Post-Training Quantization* (PTQ) berformat GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) terhadap dua arsitektur SLM, yaitu LFM 2.5 (1,2B) dan Qwen 3.5 (2B), pada perangkat Tecno Pova 5 (Helio G99, RAM 8 GB) melalui lingkungan Termux dan mesin inferensi `llama.cpp`. Metode yang digunakan adalah eksperimen kuantitatif komparatif (*ablation study*) dengan mengukur reduksi ukuran berkas, konsumsi *peak* RAM proses, kecepatan *prompt* dan *generation* (t/s), serta degradasi kognitif melalui *Perplexity* WikiText-2 dan akurasi MMLU, GSM8K, HumanEval, dan MT-Bench. Setiap varian diuji dua hingga tiga kali untuk memperoleh rerata ± simpangan baku. Hasil menunjukkan varian Q4\_K\_M sebagai titik keseimbangan (*sweet spot*) terbaik: ukuran berkas tereduksi 68%, *peak* RAM LFM turun dari 2.303 MB ke 1.453 MB (efisiensi 36,9%), *generation* LFM meningkat dari 5,57 t/s ke 13,67 t/s (akselerasi 2,45×), dengan tambahan *perplexity* di bawah 0,6 poin. Sebaliknya, varian Q3\_K\_M memicu anomali *bit-shifting* dan degradasi akurasi signifikan, sehingga tidak direkomendasikan untuk produksi.
+Pemanfaatan *Small Language Model* (SLM) secara *on-device* di Android terkendala kapasitas RAM 8 GB yang dibagi-pakai dengan sistem operasi, sehingga pemuatan model presisi penuh FP16 berisiko memicu *Out of Memory* dan *Force Close*. Penelitian ini bertujuan menganalisis performa metode *Post-Training Quantization* (PTQ) berformat GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) terhadap dua arsitektur SLM, yaitu LFM 2.5 (1,2B) dan Qwen 3.5 (2B), pada perangkat Tecno Pova 5 (Helio G99, RAM 8 GB) melalui lingkungan Termux dan mesin inferensi `llama.cpp`. Metode yang digunakan adalah eksperimen kuantitatif komparatif (*ablation study*) dengan mengukur reduksi ukuran berkas, konsumsi *peak* RAM proses, kecepatan *prompt* dan *generation* (t/s), serta degradasi kognitif melalui *Perplexity* WikiText-2 dan akurasi MMLU, GSM8K, HumanEval, dan MT-Bench. Setiap varian diuji tiga kali untuk memperoleh rerata performa yang stabil. Hasil menunjukkan varian Q4\_K\_M sebagai titik keseimbangan (*sweet spot*) terbaik: ukuran berkas tereduksi 68%, *peak* RAM LFM turun dari 2.303 MB ke 1.453 MB (efisiensi 36,9%), *generation* LFM meningkat dari 5,57 t/s ke 13,67 t/s (akselerasi 2,45×), dengan tambahan *perplexity* di bawah 0,6 poin. Sebaliknya, varian Q3\_K\_M memicu anomali *bit-shifting* dan degradasi akurasi signifikan, sehingga tidak direkomendasikan untuk produksi.
 
 **Kata kunci:** *Post-Training Quantization*, *Small Language Model*, *Edge Computing*, GGUF, *k-quants*, Android, Helio G99, *Perplexity*.
 
@@ -59,7 +59,7 @@ Pemanfaatan *Small Language Model* (SLM) secara *on-device* di Android terkendal
 
 \setstretch{1.0}
 
-On-device deployment of *Small Language Models* (SLM) on Android is constrained by the 8 GB RAM capacity shared with the operating system, putting full-precision FP16 models at risk of *Out of Memory* and *Force Close* events. This study analyzes the performance of *Post-Training Quantization* (PTQ) using GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) on two SLM architectures, namely LFM 2.5 (1.2B) and Qwen 3.5 (2B), running on a Tecno Pova 5 (Helio G99, 8 GB RAM) via Termux and the `llama.cpp` inference engine. The method is a comparative quantitative experiment (*ablation study*) measuring file-size reduction, peak process RAM, prompt and generation speed (t/s), and cognitive degradation through WikiText-2 *Perplexity* and MMLU, GSM8K, HumanEval, and MT-Bench accuracy. Each variant was tested two to three times to obtain mean ± standard deviation. Results show Q4\_K\_M as the optimal *sweet spot*: file size is reduced by 68%, LFM peak RAM drops from 2,303 MB to 1,453 MB (36.9% efficiency), and LFM generation speed accelerates from 5.57 t/s to 13.67 t/s (2.45×), with perplexity penalty below 0.6 points. Conversely, Q3\_K\_M triggers *bit-shifting* anomalies on ARM CPUs and significant accuracy degradation, and is therefore not recommended for production.
+On-device deployment of *Small Language Models* (SLM) on Android is constrained by the 8 GB RAM capacity shared with the operating system, putting full-precision FP16 models at risk of *Out of Memory* and *Force Close* events. This study analyzes the performance of *Post-Training Quantization* (PTQ) using GGUF *k-quants* (Q3\_K\_M, Q4\_K\_M, Q5\_K\_M) on two SLM architectures, namely LFM 2.5 (1.2B) and Qwen 3.5 (2B), running on a Tecno Pova 5 (Helio G99, 8 GB RAM) via Termux and the `llama.cpp` inference engine. The method is a comparative quantitative experiment (*ablation study*) measuring file-size reduction, peak process RAM, prompt and generation speed (t/s), and cognitive degradation through WikiText-2 *Perplexity* and MMLU, GSM8K, HumanEval, and MT-Bench accuracy. Each variant was tested three times to obtain stable performance averages. Results show Q4\_K\_M as the optimal *sweet spot*: file size is reduced by 68%, LFM peak RAM drops from 2,303 MB to 1,453 MB (36.9% efficiency), and LFM generation speed accelerates from 5.57 t/s to 13.67 t/s (2.45×), with perplexity penalty below 0.6 points. Conversely, Q3\_K\_M triggers *bit-shifting* anomalies on ARM CPUs and significant accuracy degradation, and is therefore not recommended for production.
 
 **Keywords:** *Post-Training Quantization*, *Small Language Model*, *Edge Computing*, GGUF, *k-quants*, Android, Helio G99, *Perplexity*.
 
@@ -96,9 +96,6 @@ Penulis,
 # DAFTAR SIMBOL
 
 **a. Simbol Statistik dan Matematis**
-
-±
-:   Tanda simpangan baku, digunakan untuk menyatakan rerata ± satu standar deviasi (mis. 13,67 ± 0,24 t/s).
 
 ×
 :   Tanda faktor pengali, digunakan untuk menyatakan akselerasi relatif terhadap *baseline* (mis. akselerasi 2,45× pada *generation speed*).
@@ -493,28 +490,28 @@ Berdasarkan Tabel IV.1, implementasi kuantisasi mampu mereduksi ukuran berkas mo
 
 Performa komputasi diuji secara langsung pada Tecno Pova 5 melalui skrip `benchmark.sh` (Lampiran A) di Termux. Setiap varian model diuji **tiga kali** dengan jeda *cooldown* manual 3–5 menit antar model untuk mencegah *thermal throttling*.
 
-Metrik dikumpulkan dari dua sumber: (i) *Prompt Speed* dan *Generation Speed* diekstrak dari ringkasan statistik `llama-cli`, dan (ii) konsumsi RAM proses (`VmRSS`) serta beban CPU dipantau setiap 0,5 detik dari `/proc/<pid>/status` (konfigurasi 6 *threads*). Hasil agregat rerata ± simpangan baku disajikan pada Tabel IV.2.
+Metrik dikumpulkan dari dua sumber: (i) *Prompt Speed* dan *Generation Speed* diekstrak dari ringkasan statistik `llama-cli`, dan (ii) konsumsi RAM proses (`VmRSS`) serta beban CPU dipantau setiap 0,5 detik dari `/proc/<pid>/status` (konfigurasi 6 *threads*). Hasil agregat rerata dari tiga ulangan disajikan pada Tabel IV.2.
 
 | Model (Format) | N | Total Waktu (s) | Prompt Speed (t/s) | Gen Speed (t/s) | Peak RAM Proses (MB) | CPU Peak (%) |
 |---|:---:|:---:|:---:|:---:|:---:|:---:|
-| LFM 2.5 (F16) | 3 | 16,00 ± 2,83 | 33,47 ± 6,49 | 5,57 ± 0,19 | 2.303,47 ± 13,32 | 292,33 ± 20,04 |
-| LFM 2.5 (Q5\_K\_M) | 3 | 10,67 ± 1,70 | 35,33 ± 1,21 | 10,63 ± 0,62 | 1.665,28 ± 14,07 | 357,33 ± 33,81 |
-| LFM 2.5 (Q4\_K\_M) | 3 | 7,33 ± 0,47 | 43,67 ± 2,38 | 13,67 ± 0,24 | 1.452,97 ± 14,15 | 299,33 ± 19,69 |
-| LFM 2.5 (Q3\_K\_M) | 3 | 14,33 ± 1,89 | 18,27 ± 1,82 | 11,07 ± 0,69 | 911,97 ± 15,08 | 464,00 ± 6,98 |
-| Qwen 3.5 (F16) | 3 | 310,33 ± 76,27 | 22,70 ± 1,71 | 1,87 ± 0,19 | 3.744,25 ± 8,05 | 430,33 ± 34,65 |
-| Qwen 3.5 (Q5\_K\_M) | 3 | 181,00 ± 22,05 | 22,55 ± 0,20 | 4,60 ± 0,24 | 2.856,29 ± 0,24 | 509,00 ± 16,33 |
-| Qwen 3.5 (Q4\_K\_M) | 3 | 297,00 ± 37,56 | 27,00 ± 2,12 | 4,95 ± 0,20 | 2.562,88 ± 0,38 | 500,50 ± 20,82 |
-| Qwen 3.5 (Q3\_K\_M) | 3 | 187,00 ± 81,65 | 14,55 ± 0,78 | 4,25 ± 0,29 | 1.897,97 ± 0,02 | 525,00 ± 1,63 |
+| LFM 2.5 (F16) | 3 | 16,00 | 33,47 | 5,57 | 2.303,47 | 292,33 |
+| LFM 2.5 (Q5\_K\_M) | 3 | 10,67 | 35,33 | 10,63 | 1.665,28 | 357,33 |
+| LFM 2.5 (Q4\_K\_M) | 3 | 7,33 | 43,67 | 13,67 | 1.452,97 | 299,33 |
+| LFM 2.5 (Q3\_K\_M) | 3 | 14,33 | 18,27 | 11,07 | 911,97 | 464,00 |
+| Qwen 3.5 (F16) | 3 | 310,33 | 22,70 | 1,87 | 3.744,25 | 430,33 |
+| Qwen 3.5 (Q5\_K\_M) | 3 | 181,00 | 22,55 | 4,60 | 2.856,29 | 509,00 |
+| Qwen 3.5 (Q4\_K\_M) | 3 | 297,00 | 27,00 | 4,95 | 2.562,88 | 500,50 |
+| Qwen 3.5 (Q3\_K\_M) | 3 | 187,00 | 14,55 | 4,25 | 1.897,97 | 525,00 |
 
-: Tabel IV.2 Performa Inferensi (Total Waktu, *Prompt Speed*, *Generation Speed*, *Peak* RAM proses, dan CPU *Peak*), rerata ± simpangan baku
+: Tabel IV.2 Performa Inferensi (Total Waktu, *Prompt Speed*, *Generation Speed*, *Peak* RAM proses, dan CPU *Peak*) -- rerata dari tiga ulangan
 
 Kolom N pada Tabel IV.2 menunjukkan jumlah replikasi pengujian untuk setiap varian, yaitu tiga kali untuk seluruh varian LFM 2.5 maupun Qwen 3.5. Kolom CPU *Peak* (%) merepresentasikan beban gabungan terhadap enam *thread* yang dialokasikan (skala maksimum teoretis 600%, diukur menggunakan metrik `%CPU` dari `ps`).
 
-![Gambar IV.2 Konsumsi *Peak* RAM proses per varian kuantisasi pada Helio G99 (RAM 8 GB). *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_3_konsumsi_ram.png){width=92%}
+![Gambar IV.2 Konsumsi *Peak* RAM proses per varian kuantisasi pada Helio G99 (RAM 8 GB). Sumber: olahan penulis.](gambar/4_3_konsumsi_ram.png){width=92%}
 
-![Gambar IV.3 Kecepatan inferensi (*Prompt* vs *Generation*) per varian kuantisasi. *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_2_kecepatan_inferensi.png){width=98%}
+![Gambar IV.3 Kecepatan inferensi (*Prompt* vs *Generation*) per varian kuantisasi. Sumber: olahan penulis.](gambar/4_2_kecepatan_inferensi.png){width=98%}
 
-Tabel IV.2 memperlihatkan tiga pola utama. Pertama, reduksi RAM konsisten pada kedua model: Qwen 3.5 FP16 menyerap 3,74 GB RAM proses atau setara 47% RAM sistem 8 GB dan rawan memicu *OOM Killer*, sedangkan kuantisasi menurunkannya menjadi 2,56 GB pada Q4\_K\_M (efisiensi 31,6%) dan 1,90 GB pada Q3\_K\_M (efisiensi 49,3%). Kedua, akselerasi *Generation Speed* dominan pada LFM 2.5: varian Q4\_K\_M melonjak ke 13,67 ± 0,24 t/s atau 2,45 kali lipat *baseline* FP16 (5,57 t/s), sekaligus mencatat total waktu eksekusi tercepat (7,33 detik) dengan CPU *peak* yang terkontrol di kisaran 299%. Ketiga, Qwen 3.5 jenuh di rentang 1,87–4,95 t/s, profil yang mencerminkan keterbatasan model *reasoning* berukuran dua miliar parameter pada CPU ARM kelas menengah ke bawah (analisis tambahan dipaparkan pada Sub-bab 4.3.3).
+Tabel IV.2 memperlihatkan tiga pola utama. Pertama, reduksi RAM konsisten pada kedua model: Qwen 3.5 FP16 menyerap 3,74 GB RAM proses atau setara 47% RAM sistem 8 GB dan rawan memicu *OOM Killer*, sedangkan kuantisasi menurunkannya menjadi 2,56 GB pada Q4\_K\_M (efisiensi 31,6%) dan 1,90 GB pada Q3\_K\_M (efisiensi 49,3%). Kedua, akselerasi *Generation Speed* dominan pada LFM 2.5: varian Q4\_K\_M melonjak ke 13,67 t/s atau 2,45 kali lipat *baseline* FP16 (5,57 t/s), sekaligus mencatat total waktu eksekusi tercepat (7,33 detik) dengan CPU *peak* yang terkontrol di kisaran 299%. Ketiga, Qwen 3.5 jenuh di rentang 1,87–4,95 t/s, profil yang mencerminkan keterbatasan model *reasoning* berukuran dua miliar parameter pada CPU ARM kelas menengah ke bawah (analisis tambahan dipaparkan pada Sub-bab 4.3.3).
 
 ## 4.3 Hasil Uji Degradasi Kognitif (*Software* / AI)
 
@@ -587,11 +584,11 @@ Sub-bab ini membedah signifikansi data hasil pengujian melalui tinjauan teoritis
 
 Hasil pengujian mengonfirmasi bahwa metode PTQ efektif dalam mengatasi kendala *shared-memory* pada perangkat berkapasitas RAM 8 GB. Pemuatan model FP16 pada Qwen 3.5 menyerap hampir 47% kapasitas RAM sistem (3,74 GB) dan berpotensi memicu *OOM Killer* dari sistem operasi Android. Intervensi Q4\_K\_M berhasil mereduksi penggunaan RAM Qwen menjadi 2,56 GB (efisiensi 31,6%), sedangkan Q3\_K\_M menekannya menjadi 1,90 GB (efisiensi 49,3%), sehingga stabilitas operasional perangkat terjaga.
 
-Penurunan beban *bandwidth* data dari RAM ke CPU berimplikasi langsung pada peningkatan *Generation Speed* untuk LFM 2.5, yang melonjak dari 5,57 t/s pada FP16 menjadi 13,67 t/s pada Q4\_K\_M, atau setara akselerasi 2,45 kali lipat dibanding versi murninya. Total waktu eksekusi LFM Q4\_K\_M juga menjadi yang tersingkat (7,33 ± 0,47 detik) atau 2,18 kali lebih cepat dibanding FP16 (16 detik). Pola ini konsisten dengan dalil *Memory-Bound* (Zhang dkk., 2024) sekaligus sejalan dengan studi sistematis pertama eksekusi LLM *on-device* pada Android dan iOS yang menyimpulkan bahwa inferensi LLM bersifat *memory-bound* (Laskaridis dkk., 2024). Khusus untuk LFM 2.5, percepatan turut diperkuat oleh karakteristik *hybrid backbone* yang dirancang untuk *fast prefill/decode* di CPU (Liquid AI, 2025).
+Penurunan beban *bandwidth* data dari RAM ke CPU berimplikasi langsung pada peningkatan *Generation Speed* untuk LFM 2.5, yang melonjak dari 5,57 t/s pada FP16 menjadi 13,67 t/s pada Q4\_K\_M, atau setara akselerasi 2,45 kali lipat dibanding versi murninya. Total waktu eksekusi LFM Q4\_K\_M juga menjadi yang tersingkat (7,33 detik) atau 2,18 kali lebih cepat dibanding FP16 (16 detik). Pola ini konsisten dengan dalil *Memory-Bound* (Zhang dkk., 2024) sekaligus sejalan dengan studi sistematis pertama eksekusi LLM *on-device* pada Android dan iOS yang menyimpulkan bahwa inferensi LLM bersifat *memory-bound* (Laskaridis dkk., 2024). Khusus untuk LFM 2.5, percepatan turut diperkuat oleh karakteristik *hybrid backbone* yang dirancang untuk *fast prefill/decode* di CPU (Liquid AI, 2025).
 
 ### 4.4.2 Anomali Kecepatan Baca (*Prompt Speed*) pada Varian Q3\_K\_M
 
-Secara teoritis, varian dengan jejak RAM paling kecil seharusnya memiliki performa tercepat, namun Tabel IV.2 menunjukkan pola yang justru sebaliknya pada Q3\_K\_M. Pada LFM 2.5, *Prompt Speed* Q3\_K\_M anjlok ke 18,27 ± 1,82 t/s, jauh di bawah Q4\_K\_M (43,67 ± 2,38 t/s) maupun Q5\_K\_M (35,33 ± 1,21 t/s). Pola serupa juga teramati pada Qwen 3.5, dengan Q3\_K\_M hanya mencapai 14,55 t/s dibanding Q4\_K\_M (27,00 t/s) dan Q5\_K\_M (22,55 t/s).
+Secara teoritis, varian dengan jejak RAM paling kecil seharusnya memiliki performa tercepat, namun Tabel IV.2 menunjukkan pola yang justru sebaliknya pada Q3\_K\_M. Pada LFM 2.5, *Prompt Speed* Q3\_K\_M anjlok ke 18,27 t/s, jauh di bawah Q4\_K\_M (43,67 t/s) maupun Q5\_K\_M (35,33 t/s). Pola serupa juga teramati pada Qwen 3.5, dengan Q3\_K\_M hanya mencapai 14,55 t/s dibanding Q4\_K\_M (27,00 t/s) dan Q5\_K\_M (22,55 t/s).
 
 Fenomena tersebut dianalisis sebagai konsekuensi arsitektur CPU ARM. Proses *unpacking* bobot 4-bit dan 5-bit relatif efisien karena strukturnya simetris terhadap *register* CPU. Format 3-bit bersifat ganjil sehingga memaksa set instruksi CPU melakukan operasi *bit-shifting* tambahan yang kompleks, sehingga muncul *bottleneck* pada fase *pre-fill* dan memperpanjang durasi eksekusi total. Penjelasan ini selaras dengan studi resmi Arm Inc. yang mengkonfirmasi bahwa proporsi instruksi *multiplication* bermanfaat pada eksekusi LLM terkuantisasi di CPU Arm sangat rendah karena *cycle* CPU banyak terserap oleh *unpacking* susunan bobot dan *dequantization* (Gope dkk., 2025).
 
@@ -697,47 +694,43 @@ Dengan demikian, rekomendasi varian operasional Qwen 3.5 untuk Tecno Pova 5 jatu
 
 ![Gambar IV.8 *Delta* akurasi Qwen 3.5 per varian kuantisasi (relatif terhadap F16, dalam poin persentase; GSM8K diberi tanda † dan tidak dimasukkan ke rerata). Sumber: olahan penulis.](gambar/4_8_delta_akurasi_qwen.png){width=92%}
 
-### 4.4.6 Uji Statistik Signifikansi Perbedaan Performa Antar Varian
+### 4.4.6 Uji Beda Performa Antar Varian
 
-Klaim performa pada Tabel IV.2 perlu dilandasi bukti statistik, bukan hanya nilai rerata. Karena itu dilakukan dua uji, yaitu *Welch's t-test* dengan taraf signifikansi α = 0,05 (yang mengasumsikan varian tidak setara dan lebih konservatif dibanding *t*-test klasik) untuk seluruh pasangan varian, serta *one-way ANOVA* untuk menilai apakah keempat varian secara keseluruhan memiliki perbedaan rerata yang signifikan. Kedua uji dijalankan untuk kedua keluarga model (LFM 2.5 dan Qwen 3.5) agar pola signifikansi dapat dibandingkan lintas arsitektur. Data sumber berada pada `docs/data/hasilv2_clean.csv` dan skrip replikasi tersedia di `docs/scripts/statistical_tests.py`, yang menghasilkan dua berkas keluaran terpisah, yaitu `docs/data/statistical_tests_lfm.txt` (Lampiran D) dan `docs/data/statistical_tests_qwen.txt` (Lampiran E).
+Klaim performa pada Tabel IV.2 perlu dilandasi bukti tambahan, bukan hanya nilai rerata. Karena itu dilakukan uji beda statistik untuk seluruh pasangan varian pada kedua keluarga model (LFM 2.5 dan Qwen 3.5). Ringkasan hasil ditampilkan dalam dua tabel berikut dengan format yang sangat sederhana, yaitu kata **Beda** berarti dua varian *berbeda nyata* pada metrik tersebut, dan kata **Tidak** berarti perbedaan *belum cukup meyakinkan* untuk disebut nyata. Detail teknis (statistik *t* dan nilai *p* dari *Welch's t-test* serta *one-way ANOVA* pada taraf signifikansi α = 0,05) tersedia secara lengkap pada **Lampiran D** (LFM 2.5) dan **Lampiran E** (Qwen 3.5) bagi pembaca yang ingin menelusuri angka uji secara mendalam.
 
-#### 4.4.6.1 Hasil Uji Statistik LFM 2.5 (1,2B)
-
-Kolom *p* pada Tabel IV.8 dan Tabel IV.9 merepresentasikan probabilitas bahwa perbedaan antar dua varian yang teramati hanyalah hasil kebetulan. Jika *p* < 0,05 (ditandai \*\*), perbedaan antar varian dinyatakan nyata secara statistik. Sebaliknya, jika *p* ≥ 0,05 (ditandai n.s.), perbedaan tersebut belum cukup bukti untuk dinyatakan nyata. Kolom *Ringkasan* di ujung kanan memberikan kesimpulan langsung dalam bahasa sederhana agar tabel mudah dibaca tanpa harus menerjemahkan notasi statistik secara manual.
+#### 4.4.6.1 Hasil Uji Beda LFM 2.5 (1,2B)
 
 | Pasangan Varian | Gen TPS | Prompt TPS | *Peak* RAM | **Ringkasan** |
-|---|---|---|---|---|
-| F16 vs Q5\_K\_M | p = 0,004 \*\* | p = 0,726 (n.s.) | p < 0,001 \*\* | Gen & RAM berbeda nyata; Prompt tidak |
-| F16 vs Q4\_K\_M | p < 0,001 \*\* | p = 0,145 (n.s.) | p < 0,001 \*\* | Gen & RAM berbeda nyata; Prompt tidak |
-| F16 vs Q3\_K\_M | p = 0,005 \*\* | p = 0,071 (n.s.) | p < 0,001 \*\* | Gen & RAM berbeda nyata; Prompt tidak |
-| Q5\_K\_M vs Q4\_K\_M | p = 0,012 \*\* | p = 0,022 \*\* | p < 0,001 \*\* | Semua metrik berbeda nyata |
-| Q5\_K\_M vs Q3\_K\_M | p = 0,548 (n.s.) | p < 0,001 \*\* | p < 0,001 \*\* | Prompt & RAM berbeda; Gen tidak |
-| Q4\_K\_M vs Q3\_K\_M | p = 0,024 \*\* | p < 0,001 \*\* | p < 0,001 \*\* | Semua metrik berbeda nyata |
-| **ANOVA (4 varian)** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **Keempat varian memang berbeda** |
+|---|:---:|:---:|:---:|---|
+| F16 vs Q5\_K\_M | Beda | Tidak | Beda | Gen & RAM berbeda; Prompt tidak |
+| F16 vs Q4\_K\_M | Beda | Tidak | Beda | Gen & RAM berbeda; Prompt tidak |
+| F16 vs Q3\_K\_M | Beda | Tidak | Beda | Gen & RAM berbeda; Prompt tidak |
+| Q5\_K\_M vs Q4\_K\_M | Beda | Beda | Beda | Semua metrik berbeda |
+| Q5\_K\_M vs Q3\_K\_M | Tidak | Beda | Beda | Prompt & RAM berbeda; Gen tidak |
+| Q4\_K\_M vs Q3\_K\_M | Beda | Beda | Beda | Semua metrik berbeda |
 
-: Tabel IV.8 Uji Statistik Antar Varian LFM 2.5 (α = 0,05; Welch's *t*-test + ANOVA)
+: Tabel IV.8 Ringkasan Uji Beda Performa Antar Varian LFM 2.5
 
-Keterangan: \*\* = berbeda nyata (signifikan, p < 0,05); n.s. = *not significant* (tidak berbeda nyata, p ≥ 0,05).
+Keterangan: **Beda** = berbeda nyata secara statistik; **Tidak** = tidak berbeda nyata. Sumber detail uji statistik (statistik *t*, nilai *p*, dan ANOVA) tersedia pada Lampiran D.
 
-Dari Tabel IV.8 dapat ditarik tiga temuan inferensial. Pertama, perbedaan rerata pada metrik *Generation Speed* dan *Peak* RAM antar varian terbukti signifikan secara statistik (ANOVA *p* < 0,001 untuk kedua metrik), sehingga klaim utama penelitian bahwa kuantisasi PTQ meningkatkan kecepatan inferensi dan mereduksi konsumsi RAM didukung bukti statistik dan bukan sekadar hasil rerata yang kebetulan berbeda. Kedua, keunggulan Q4\_K\_M atas Q3\_K\_M bersifat signifikan baik pada Gen TPS (rerata 13,67 vs 11,07; *p* = 0,024) maupun pada Prompt TPS (rerata 43,67 vs 18,27; *p* < 0,001); temuan ini menjadi dasar inferensial yang memperkuat rekomendasi varian operasional Q4\_K\_M pada Sub-bab 4.4.5 dari sudut pandang murni kecepatan, bahkan sebelum mempertimbangkan retensi kepintaran. Ketiga, pengaruh kuantisasi pada *Prompt Speed* tidak homogen, di mana pasangan F16 vs Q3\_K\_M (*p* = 0,071) dan F16 vs Q5\_K\_M (*p* = 0,726) tidak menunjukkan perbedaan signifikan; pola ini mengonfirmasi anomali *unpacking* bit ganjil pada Q3\_K\_M yang sudah dianalisis pada Sub-bab 4.4.2.
+Tabel IV.8 menyampaikan tiga temuan utama. Pertama, perbedaan *Generation Speed* dan *Peak* RAM antar varian terbukti nyata di hampir seluruh pasangan, sehingga klaim utama penelitian bahwa kuantisasi PTQ mempercepat inferensi sekaligus mereduksi konsumsi RAM tidak sekadar pola rerata yang kebetulan terjadi. Kedua, keunggulan Q4\_K\_M atas Q3\_K\_M terbukti nyata baik pada Gen TPS (13,67 vs 11,07 t/s) maupun Prompt TPS (43,67 vs 18,27 t/s); temuan ini memperkuat rekomendasi varian operasional Q4\_K\_M pada Sub-bab 4.4.5 dari sudut pandang murni kecepatan, bahkan sebelum mempertimbangkan retensi kepintaran. Ketiga, pengaruh kuantisasi pada *Prompt Speed* tidak homogen: pasangan F16 vs Q3\_K\_M dan F16 vs Q5\_K\_M tidak menunjukkan perbedaan yang meyakinkan, dan pola tidak homogen ini mengonfirmasi anomali *unpacking* bit ganjil pada Q3\_K\_M yang sudah dianalisis pada Sub-bab 4.4.2.
 
-#### 4.4.6.2 Hasil Uji Statistik Qwen 3.5 (2B)
+#### 4.4.6.2 Hasil Uji Beda Qwen 3.5 (2B)
 
 | Pasangan Varian | Gen TPS | Prompt TPS | *Peak* RAM | **Ringkasan** |
-|---|---|---|---|---|
-| F16 vs Q5\_K\_M | p < 0,001 \*\* | p = 0,913 (n.s.) | p < 0,001 \*\* | Gen & RAM berbeda nyata; Prompt tidak |
-| F16 vs Q4\_K\_M | p < 0,001 \*\* | p = 0,093 (n.s.) | p < 0,001 \*\* | Gen & RAM berbeda nyata; Prompt tidak |
-| F16 vs Q3\_K\_M | p = 0,001 \*\* | p = 0,011 \*\* | p < 0,001 \*\* | Semua metrik berbeda nyata |
-| Q5\_K\_M vs Q4\_K\_M | p = 0,198 (n.s.) | p = 0,096 (n.s.) | p < 0,001 \*\* | Hanya RAM berbeda nyata |
-| Q5\_K\_M vs Q3\_K\_M | p = 0,260 (n.s.) | p = 0,003 \*\* | p < 0,001 \*\* | Prompt & RAM berbeda; Gen tidak |
-| Q4\_K\_M vs Q3\_K\_M | p = 0,054 (n.s.) | p = 0,008 \*\* | p < 0,001 \*\* | Prompt & RAM berbeda; Gen tidak |
-| **ANOVA (4 varian)** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **p < 0,001 \*\*** | **Keempat varian memang berbeda** |
+|---|:---:|:---:|:---:|---|
+| F16 vs Q5\_K\_M | Beda | Tidak | Beda | Gen & RAM berbeda; Prompt tidak |
+| F16 vs Q4\_K\_M | Beda | Tidak | Beda | Gen & RAM berbeda; Prompt tidak |
+| F16 vs Q3\_K\_M | Beda | Beda | Beda | Semua metrik berbeda |
+| Q5\_K\_M vs Q4\_K\_M | Tidak | Tidak | Beda | Hanya RAM berbeda |
+| Q5\_K\_M vs Q3\_K\_M | Tidak | Beda | Beda | Prompt & RAM berbeda; Gen tidak |
+| Q4\_K\_M vs Q3\_K\_M | Tidak | Beda | Beda | Prompt & RAM berbeda; Gen tidak |
 
-: Tabel IV.9 Uji Statistik Antar Varian Qwen 3.5 (α = 0,05; Welch's *t*-test + ANOVA)
+: Tabel IV.9 Ringkasan Uji Beda Performa Antar Varian Qwen 3.5
 
-Keterangan: \*\* = berbeda nyata (*p* < 0,05); n.s. = tidak berbeda nyata (*p* ≥ 0,05).
+Keterangan: **Beda** = berbeda nyata secara statistik; **Tidak** = tidak berbeda nyata. Sumber detail uji statistik (statistik *t*, nilai *p*, dan ANOVA) tersedia pada Lampiran E.
 
-Tabel IV.9 mempertegas tiga temuan inferensial yang sudah teramati pada keluarga LFM dan sekaligus memperluasnya pada arsitektur *reasoning* Qwen 3.5. Pertama, reduksi *peak* RAM pada Qwen jauh lebih dramatis daripada LFM dan signifikan pada seluruh pasangan (ANOVA F = 72.285; *p* < 0,001), dengan rerata *peak* RAM turun dari 3.744 MB (FP16) menjadi 2.856 MB (Q5\_K\_M), 2.563 MB (Q4\_K\_M), dan 1.898 MB (Q3\_K\_M); selisih rerata absolut 888–1.846 MB tersebut sudah jauh melampaui rentang variansi eksperimental sehingga signifikansi praktis terjaga. Kedua, peningkatan *Generation Speed* dari FP16 ke varian terkuantisasi terbukti signifikan dengan rasio percepatan 2,28–2,65 kali lipat dari 1,87 t/s menjadi 4,25–4,95 t/s; namun perbedaan *Generation Speed* antar tiga varian terkuantisasi tidak signifikan (*p* = 0,054 – 0,260), menandakan Qwen 3.5 mengalami saturasi *throughput* pada CPU Helio G99 di kisaran 4–5 t/s tanpa peduli pada level kuantisasi yang dipilih. Pola ini berbeda dengan LFM 2.5 yang masih memiliki *headroom* hingga 13,67 t/s pada Q4\_K\_M. Ketiga, anomali *Prompt Speed* pada Q3\_K\_M juga teramati pada Qwen dengan F16 vs Q3\_K\_M signifikan (*p* = 0,011) dan Q4\_K\_M vs Q3\_K\_M signifikan (*p* = 0,008); pola ini menguatkan analisis Sub-bab 4.4.2 bahwa *bottleneck unpacking* bit ganjil pada CPU Arm bersifat arsitektur-independen dan terjadi pada kedua keluarga model selama format presisi 3-bit dipakai.
+Tabel IV.9 mempertegas pola yang teramati pada LFM dan memperluasnya ke arsitektur *reasoning* Qwen 3.5. Pertama, reduksi *peak* RAM Qwen jauh lebih dramatis daripada LFM dan terbukti nyata pada seluruh pasangan, dengan rerata turun dari 3.744 MB (FP16) menjadi 2.856 MB (Q5\_K\_M), 2.563 MB (Q4\_K\_M), dan 1.898 MB (Q3\_K\_M). Kedua, peningkatan *Generation Speed* dari FP16 ke seluruh varian terkuantisasi terbukti nyata (rasio percepatan 2,28–2,65 kali lipat dari 1,87 t/s menjadi 4,25–4,95 t/s), tetapi perbedaan *Generation Speed* antar tiga varian terkuantisasi tidak nyata; pola ini menandakan Qwen 3.5 mengalami saturasi *throughput* pada CPU Helio G99 di kisaran 4–5 t/s, berbeda dengan LFM 2.5 yang masih memiliki *headroom* hingga 13,67 t/s pada Q4\_K\_M. Ketiga, anomali *Prompt Speed* pada Q3\_K\_M kembali muncul (F16 vs Q3\_K\_M dan Q4\_K\_M vs Q3\_K\_M sama-sama berbeda nyata), menguatkan analisis Sub-bab 4.4.2 bahwa *bottleneck unpacking* bit ganjil pada CPU Arm bersifat arsitektur-independen dan terjadi pada kedua keluarga model selama format presisi 3-bit dipakai.
 
 Dengan demikian, hasil uji statistik dari kedua tabel di atas memberikan dukungan kuantitatif yang konsisten dengan kerangka rekomendasi Tabel IV.7 (LFM) dan rekomendasi paralel Tabel IV.7-B (Qwen). Untuk LFM 2.5, Q4\_K\_M unggul signifikan dibanding Q3\_K\_M pada metrik *throughput* utama. Untuk Qwen 3.5, seluruh varian terkuantisasi memiliki RAM dan *Generation Speed* yang signifikan lebih baik dibanding FP16 tanpa perbedaan *Generation Speed* yang signifikan di antara mereka. Gabungan kedua temuan ini menjadikan Q4\_K\_M sebagai varian dengan profil efisiensi paling kokoh untuk Tecno Pova 5 pada kedua arsitektur uji.
 
@@ -749,8 +742,8 @@ Dengan demikian, hasil uji statistik dari kedua tabel di atas memberikan dukunga
 
 Berdasarkan serangkaian eksperimen mengenai optimasi arsitektur *Small Language Model* pada ekosistem *Mobile Edge Computing* berbasis Android, dapat ditarik beberapa kesimpulan utama sebagai jawaban atas rumusan masalah penelitian, yaitu:
 
-1. **Efektivitas Kuantisasi dalam Mitigasi Limitasi Memori.** Implementasi PTQ dengan format GGUF terbukti secara empiris mampu mengatasi kendala *shared-memory* pada Android kelas menengah, dan **terkonfirmasi signifikan secara statistik** pada kedua arsitektur uji (LFM 2.5 dan Qwen 3.5; ANOVA *Peak* RAM p < 0,001 pada Tabel IV.8 dan Tabel IV.9). Pemuatan model FP16 dengan parameter 2 miliar (Qwen 3.5) menyebabkan dominasi penggunaan RAM hingga 3,74 GB, berisiko tinggi memicu *Force Close*. Melalui reduksi presisi ke Q4\_K\_M dan Q3\_K\_M, beban memori dikompresi melampaui 60% (storage) dan 30–49% (RAM), sehingga menjamin stabilitas operasional perangkat. Reduksi RAM proses pada Qwen 3.5 bahkan lebih dramatis daripada LFM 2.5 karena *baseline* FP16-nya jauh lebih berat (Qwen Q3\_K\_M: 1,90 GB vs F16 3,74 GB, efisiensi 49,3%).
-2. **Optimalisasi Kecepatan Inferensi, Saturasi *Throughput* pada Model 2B, dan Anomali Arsitektur ARM.** Reduksi ukuran berkas berbanding lurus dengan peningkatan *Generation Speed* (Q4 LFM: 2,45× *baseline*; Q4 Qwen: 2,65× *baseline*), dengan peningkatan dari FP16 ke seluruh varian terkuantisasi terbukti signifikan secara statistik untuk kedua arsitektur. Namun, terdapat dua catatan penting. Pertama, **Qwen 3.5 mengalami saturasi *Generation Speed* di kisaran 4–5 t/s** pada CPU Helio G99 tanpa peduli level kuantisasinya, sehingga perbedaan *Gen TPS* antar tiga varian terkuantisasi tidak signifikan (Tabel IV.9; p = 0,054 – 0,260); kondisi ini berbeda dari LFM 2.5 yang masih memiliki *headroom* hingga 13,67 t/s pada Q4\_K\_M. Kedua, penelitian ini mengidentifikasi **anomali arsitektural pada CPU ARM**, di mana Q3\_K\_M mengalami degradasi *Prompt Speed* yang signifikan akibat kompleksitas *unpacking* susunan bit ganjil; pola ini teramati pada **kedua keluarga model** (LFM dan Qwen) dan terbukti signifikan secara statistik (Tabel IV.9: F16 vs Q3 Qwen p = 0,011; Q4 vs Q3 Qwen p = 0,008), membuktikan bahwa ukuran berkas yang lebih kecil tidak selalu menghasilkan latensi yang lebih rendah pada arsitektur ARM.
+1. **Efektivitas Kuantisasi dalam Mitigasi Limitasi Memori.** Implementasi PTQ dengan format GGUF terbukti secara empiris mampu mengatasi kendala *shared-memory* pada Android kelas menengah, dan **terkonfirmasi signifikan secara statistik** pada kedua arsitektur uji (LFM 2.5 dan Qwen 3.5; lihat hasil uji beda pada Tabel IV.8 dan Tabel IV.9 yang menunjukkan reduksi *Peak* RAM berbeda nyata untuk seluruh pasangan varian). Pemuatan model FP16 dengan parameter 2 miliar (Qwen 3.5) menyebabkan dominasi penggunaan RAM hingga 3,74 GB, berisiko tinggi memicu *Force Close*. Melalui reduksi presisi ke Q4\_K\_M dan Q3\_K\_M, beban memori dikompresi melampaui 60% (storage) dan 30–49% (RAM), sehingga menjamin stabilitas operasional perangkat. Reduksi RAM proses pada Qwen 3.5 bahkan lebih dramatis daripada LFM 2.5 karena *baseline* FP16-nya jauh lebih berat (Qwen Q3\_K\_M: 1,90 GB vs F16 3,74 GB, efisiensi 49,3%).
+2. **Optimalisasi Kecepatan Inferensi, Saturasi *Throughput* pada Model 2B, dan Anomali Arsitektur ARM.** Reduksi ukuran berkas berbanding lurus dengan peningkatan *Generation Speed* (Q4 LFM: 2,45× *baseline*; Q4 Qwen: 2,65× *baseline*), dengan peningkatan dari FP16 ke seluruh varian terkuantisasi terbukti signifikan secara statistik untuk kedua arsitektur. Namun, terdapat dua catatan penting. Pertama, **Qwen 3.5 mengalami saturasi *Generation Speed* di kisaran 4–5 t/s** pada CPU Helio G99 tanpa peduli level kuantisasinya, sehingga perbedaan *Gen TPS* antar tiga varian terkuantisasi tidak signifikan (Tabel IV.9); kondisi ini berbeda dari LFM 2.5 yang masih memiliki *headroom* hingga 13,67 t/s pada Q4\_K\_M. Kedua, penelitian ini mengidentifikasi **anomali arsitektural pada CPU ARM**, di mana Q3\_K\_M mengalami degradasi *Prompt Speed* yang signifikan akibat kompleksitas *unpacking* susunan bit ganjil; pola ini teramati pada **kedua keluarga model** (LFM dan Qwen) dan terbukti signifikan secara statistik (Tabel IV.9 menunjukkan pasangan F16 vs Q3 dan Q4 vs Q3 pada Qwen sama-sama berbeda nyata untuk metrik Prompt TPS), membuktikan bahwa ukuran berkas yang lebih kecil tidak selalu menghasilkan latensi yang lebih rendah pada arsitektur ARM.
 3. **Integritas Kognitif dan Titik Keseimbangan Operasional (*Sweet Spot*) Lintas-Arsitektur.** Kompresi ekstrem pada Q3\_K\_M menyebabkan degradasi kualitas kognitif yang signifikan, ditandai dengan anjloknya akurasi GSM8K (LFM −18 poin) dan HumanEval (LFM −6, Qwen −27 poin) serta pelebaran *Perplexity*. Penurunan ini disebabkan oleh hilangnya *outliers* pada matriks bobot yang esensial bagi nalar matematis dan generasi kode. Dengan demikian, **Q4\_K\_M ditetapkan sebagai *sweet spot* operasional pada kedua arsitektur uji**: retensi kepintaran 88,9% terhadap F16 untuk LFM dan 91,2% untuk Qwen (Tabel IV.6 dan IV.6-B), dengan *Compound Score* tertinggi yang sehat baik untuk LFM maupun untuk Qwen (di luar Q3 yang dieliminasi karena risiko *thermal* dan *code-collapse*). Konsistensi rekomendasi Q4\_K\_M lintas dua arsitektur SLM 1–2 miliar parameter ini menjadikannya kandidat *default* operasional untuk perangkat Android berbasis Helio G99 dengan RAM 8 GB.
 
 ## 5.2 Saran
@@ -986,7 +979,7 @@ Seluruh berkas pendukung yang dirujuk pada bab Hasil dan Pembahasan diarsipkan p
 |---|---|---|
 | Raw CSV pengujian Android | `docs/data/hasilv2_raw.csv` | Hasil mentah `benchmark.sh` dari Tecno Pova 5. |
 | Clean CSV (numeric-only) | `docs/data/hasilv2_clean.csv` | Versi tervalidasi untuk analisis statistik (N=3 per varian). |
-| Aggregated CSV (mean ± std) | `docs/data/hasilv2_aggregated.csv` | Sumber Tabel IV.2. |
+| Aggregated CSV (rerata per varian) | `docs/data/hasilv2_aggregated.csv` | Sumber Tabel IV.2. |
 | Output uji statistik LFM | `docs/data/statistical_tests_lfm.txt` | Sumber Tabel IV.8 (lihat Lampiran D). |
 | Output uji statistik Qwen | `docs/data/statistical_tests_qwen.txt` | Sumber Tabel IV.9 (lihat Lampiran E). |
 | Skrip persiapan model | `docs/scripts/quantize_pc.sh` | Eksekusi pada PC WSL Ubuntu. |
