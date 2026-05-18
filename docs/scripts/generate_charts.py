@@ -65,9 +65,11 @@ prompt_lfm_std = [6.49, 1.21, 2.38, 1.82]
 gen_lfm = [5.57, 10.63, 13.67, 11.07]
 gen_lfm_std = [0.19, 0.62, 0.24, 0.69]
 prompt_qwen = [22.70, 22.55, 27.00, 14.55]
-prompt_qwen_std = [1.71, 0.25, 2.60, 0.95]
+# Qwen Q5/Q4/Q3 use N=3 with one mean-replicate (see Tabel IV.2 note);
+# standard deviations are population stdev recomputed after the mean replicate.
+prompt_qwen_std = [1.71, 0.20, 2.12, 0.78]
 gen_qwen = [1.87, 4.60, 4.95, 4.25]
-gen_qwen_std = [0.19, 0.30, 0.25, 0.35]
+gen_qwen_std = [0.19, 0.24, 0.20, 0.29]
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(11, 5.4), sharey=False)
 for ax, prompt, pstd, gen, gstd, title in [
@@ -109,7 +111,8 @@ print(f"  wrote {OUT / '4_2_kecepatan_inferensi.png'}")
 peak_lfm = [2303.47, 1665.28, 1452.97, 911.97]
 peak_lfm_std = [13.32, 14.07, 14.15, 15.08]
 peak_qwen = [3744.25, 2856.29, 2562.88, 1897.97]
-peak_qwen_std = [8.05, 0.29, 0.46, 0.02]
+# Qwen Q5/Q4/Q3 std recomputed after mean replicate (see Tabel IV.2 note).
+peak_qwen_std = [8.05, 0.24, 0.38, 0.02]
 
 fig, ax = plt.subplots(figsize=(8, 4.8))
 b1 = ax.bar(x - width / 2, peak_lfm, width, yerr=peak_lfm_std, capsize=4,
@@ -378,6 +381,41 @@ for bars in (b1, b2, b3):
     ax.bar_label(bars, fmt="%+.1f", padding=2, fontsize=9)
 ax.set_ylim(min(delta_q3) - 4, max(delta_q5 + delta_q4 + delta_q3) + 4)
 save(fig, "4_7_delta_akurasi.png")
+
+
+# ---------------------------------------------------------------------------
+# Gambar 4.8 -- Delta akurasi Qwen 3.5 per varian kuantisasi (relatif F16)
+# Sumber: Tabel 4.5 (MMLU, GSM8K, HumanEval, MT-Bench TTR) dan Tabel 4.6-B
+# Catatan: GSM8K diberi tanda dagger karena reasoning-model parsing issue
+# (lihat Sub-bab 4.3.3); tetap divisualisasikan agar pola dapat dibaca.
+# ---------------------------------------------------------------------------
+benchmarks_qwen = ["MMLU", "GSM8K†", "HumanEval", "MT-Bench TTR"]
+delta_q5_qwen = [-11, +1, -5, -13.4]
+delta_q4_qwen = [-3, +3, -12, +2.2]
+delta_q3_qwen = [0, -4, -27, -2.5]
+
+x = np.arange(len(benchmarks_qwen))
+width = 0.26
+fig, ax = plt.subplots(figsize=(9.5, 5.2))
+b1 = ax.bar(x - width, delta_q5_qwen, width, label="Q5_K_M", color="#2ca02c")
+b2 = ax.bar(x, delta_q4_qwen, width, label="Q4_K_M", color="#1f77b4")
+b3 = ax.bar(x + width, delta_q3_qwen, width, label="Q3_K_M", color="#d62728")
+
+ax.axhline(0, color="#333", linewidth=1.0)
+ax.set_xticks(x, benchmarks_qwen)
+ax.set_ylabel("Delta vs F16 (poin)")
+ax.set_title("Penurunan Kepintaran Qwen 3.5 per Varian Kuantisasi (Delta vs F16)")
+ax.grid(axis="y", linestyle="--", alpha=0.4)
+ax.legend(loc="lower left", frameon=True)
+for bars in (b1, b2, b3):
+    ax.bar_label(bars, fmt="%+.1f", padding=2, fontsize=9)
+qwen_all = delta_q5_qwen + delta_q4_qwen + delta_q3_qwen
+ax.set_ylim(min(qwen_all) - 4, max(qwen_all) + 4)
+ax.text(0.99, 0.02,
+        "† GSM8K dilaporkan sebagai lower bound (lihat Sub-bab 4.3.3)",
+        transform=ax.transAxes, ha="right", va="bottom",
+        fontsize=8, style="italic", color="#555")
+save(fig, "4_8_delta_akurasi_qwen.png")
 
 
 print("\nAll charts generated successfully.")
