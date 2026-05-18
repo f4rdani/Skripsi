@@ -480,7 +480,7 @@ Pengujian performa komputasi dilakukan secara *batch* langsung pada perangkat *t
 
 : Tabel IV.2 Performa Inferensi (Total Waktu, *Prompt Speed*, *Generation Speed*, *Peak* RAM proses, dan CPU *Peak*), rerata ± simpangan baku
 
-*Catatan: kolom CPU *Peak* (%) mencerminkan beban gabungan terhadap 6 *thread* yang dialokasikan (skala maksimal teoretis 600%, menggunakan metrik `%CPU` dari `ps`).*
+**Catatan:** kolom **N** menunjukkan jumlah pengulangan pengujian (replikasi) untuk setiap varian; tiga kali untuk seluruh varian LFM 2.5 dan varian Qwen 3.5 F16, sementara tiga varian Qwen 3.5 terkuantisasi (Q5\_K\_M, Q4\_K\_M, Q3\_K\_M) dibatasi dua kali akibat keterbatasan termal perangkat (*thermal throttling* pada pengujian beruntun). Nilai rerata ± simpangan baku pada tiap sel dihitung dari N pengulangan tersebut. Kolom CPU *Peak* (%) mencerminkan beban gabungan terhadap 6 *thread* yang dialokasikan (skala maksimal teoretis 600%, menggunakan metrik `%CPU` dari `ps`).
 
 ![Gambar IV.2 Konsumsi *Peak* RAM proses per varian kuantisasi pada Helio G99 (RAM 8 GB). *Error bar* menunjukkan ± satu simpangan baku. Sumber: olahan penulis.](gambar/4_3_konsumsi_ram.png){width=92%}
 
